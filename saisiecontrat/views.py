@@ -14,10 +14,10 @@ def creationcontrat(request):
             contrat=Contrat(request.POST['typecontratavenant'])
             contrat.save()
         else:
-            return render(request,'creationcontrat.html',{'form':form})
+            return render(request, 'creationcontrat.html', {'form': form})
     else:
         form = CreationContratForm()
-        return render(request,'creationcontrat.html',{'form':form})
+        return render(request, 'creationcontrat.html', {'form': form})
 
 
 def login(request):
@@ -27,7 +27,7 @@ def login(request):
         if form.is_valid():
             return redirect('/creationcontrat')
         else:
-            return render(request,'login.html',{'form':form})
+            return render(request, 'login.html', {'form': form})
     else:
         form = LoginForm()
-        return render(request,'login.html',{'form':form})
+        return render(request, 'login.html', {'form': form})

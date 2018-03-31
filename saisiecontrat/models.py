@@ -68,9 +68,9 @@ class Alternant(models.Model):
     nom=models.CharField(max_length=70)
     prenom=models.CharField(max_length=35)
     sexe=models.CharField(max_length=1)
-    datenaissance=models.DateField()
-    numerodepartementnaissance=models.CharField(max_length=3)
-    communeNaissance=models.CharField(max_length=60,blank=True)
+    date_naissance=models.DateField()
+    numero_departement_naissance=models.CharField(max_length=3)
+    commune_naissance=models.CharField(max_length=60,blank=True)
     adresse1=models.CharField(max_length=100)
     adresse2=models.CharField(max_length=100, blank=True)
     codepostal=models.CharField(max_length=5)
@@ -165,7 +165,7 @@ class Personnel(models.Model):
     datemaj=models.DateTimeField()
 
     def __str__(self):
-        return self.nom + " " + self.prenom
+        return "%s %s" % (self.nom, self.prenom)
 
 class CFA(models.Model):
     numeroUAI=models.CharField(max_length=8,primary_key=True)

@@ -22,8 +22,13 @@ class LoginForm(forms.Form):
     return cleaned_data
 
 class CreationContratForm(forms.Form):
-  typecontratavenant = forms.ChoiceField(label='Type de contrat/avenant :',widget=forms.select(),required=True)
-  modecontractuel = forms.ChoiceField(label='Mode contractuel :',widget=forms.select(),required=True)
+
+  typecontratavenant = forms.ChoiceField(label='Type de contrat/avenant :',
+                                         widget=forms.Select(choices=Contrat.TYPECONTRATAVENANT),
+                                         required=True)
+  modecontractuel = forms.ChoiceField(label='Mode contractuel :',
+                                      widget=forms.Select(choices=Contrat.MODECONTRACTUEL),
+                                      required=True)
 
   def clean(self):
     cleaned_data = super(CreationContratForm, self).clean()
