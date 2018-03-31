@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Inscription apprentissage – {% block title %}Bienvenue{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css" />
+  </head>
+  <body id="{% block bodyId %}genericPage{% endblock %}">
+    <header>
+    {% block headerContent %}{% endblock %}
+    </header>
+    <section id="content">
+    {% block content %}{% endblock %}
+    </section>
+    <section id="footer">
+    {% block footercontent %}{% endblock %}
+    </section>
+    <section id="menu">
+    {% block menucontent %}{% endblock %}
+    </section>
+    <section id="leftside">
+    {% block leftsidecontent %}{% endblock %}
+    </section>
+    <section id="rightside">
+    {% block rightsidecontent %}{% endblock %}
+    </section>
+  </body>
+</html>
