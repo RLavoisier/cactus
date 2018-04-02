@@ -72,6 +72,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'cactus.wsgi.application'
 
+AUTH_USER_MODEL = 'saisiecontrat.User'
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
