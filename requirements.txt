@@ -1,3 +1,6 @@
 Django==2.0.3
 mysqlclient==1.3.12
 pytz==2018.3
+django-bootstrap3==9.1.0
+bcrypt==3.1.4
+django[argon2]
