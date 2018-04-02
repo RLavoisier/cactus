@@ -1,30 +1,8 @@
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth import get_user_model
 from django.db import models
 
-from saisiecontrat.model_managers import CactusUserManager
 
-
-class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True, null=True)
-    is_active = models.BooleanField(
-        default=True,
-        help_text=
-            'Designates whether this user should be treated as active. '
-            'Unselect this instead of deleting accounts.'
-        ,
-    )
-    USERNAME_FIELD = 'email'
-    objects = CactusUserManager()
-
-    def __str__(self):
-        return self.email
-
-    def get_full_name(self):
-        return self.email
-
-    def get_short_name(self):
-        return self.email
+User = get_user_model()
 
 class Alternant(models.Model):
 

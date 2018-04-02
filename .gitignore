@@ -101,3 +101,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+.idea/
+db.sqlite3
+saisiecontrat/migrations/0001_initial.py
+saisiecontrat/migrations/0002_remove_user_is_staff.py

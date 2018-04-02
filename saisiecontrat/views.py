@@ -19,15 +19,3 @@ def creationcontrat(request):
         form = CreationContratForm()
         return render(request,'creationcontrat.html',{'form':form})
 
-
-def login(request):
-
-    if len(request.POST) > 0:
-        form=LoginForm(request.POST)
-        if form.is_valid():
-            return redirect('/creationcontrat')
-        else:
-            return render(request,'login.html',{'form':form})
-    else:
-        form = LoginForm()
-        return render(request,'login.html',{'form':form})

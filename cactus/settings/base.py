@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'comptes',
     'saisiecontrat',
 ]
 
@@ -72,7 +73,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'cactus.wsgi.application'
 
-AUTH_USER_MODEL = 'saisiecontrat.User'
+AUTH_USER_MODEL = 'comptes.User'
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
