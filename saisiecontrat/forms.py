@@ -6,7 +6,7 @@ from saisiecontrat.models import Contrat
 
 class LoginForm(forms.Form):
   email = forms.EmailField(label='Courriel :')
-  password = forms.CharField(label='Mot de passe :', widget = forms.PasswordInput)
+  password = forms.CharField(label='Mot de passe :', widget=forms.PasswordInput)
 
   def clean(self):
     cleaned_data = super(LoginForm, self).clean()
@@ -15,7 +15,7 @@ class LoginForm(forms.Form):
 
     # Vérifie que les deux champs sont valides
     if email and password:
-        result = User.objects.filter(email=email,password=password)
+        result = User.objects.filter(email=email, password=password)
         if len(result) != 0:
             raise forms.ValidationError("Courriel inexistant ou mot de passe erroné.")
 
@@ -23,17 +23,17 @@ class LoginForm(forms.Form):
 
 class CreationContratForm(forms.Form):
 
-  typecontratavenant = forms.ChoiceField(label='Type de contrat/avenant :',
-                                         widget=forms.Select(choices=Contrat.TYPECONTRATAVENANT),
+  type_contrat_avenant = forms.ChoiceField(label='Type de contrat/avenant :',
+                                         widget=forms.Select(choices=Contrat.TYPE_CONTRAT_AVENANT),
                                          required=True)
-  modecontractuel = forms.ChoiceField(label='Mode contractuel :',
-                                      widget=forms.Select(choices=Contrat.MODECONTRACTUEL),
+  mode_contractuel = forms.ChoiceField(label='Mode contractuel :',
+                                      widget=forms.Select(choices=Contrat.MODE_CONTRACTUEL),
                                       required=True)
 
   def clean(self):
     cleaned_data = super(CreationContratForm, self).clean()
-    typecontratavenant = cleaned_data.get("typecontratavenant")
-    modecontractuel = cleaned_data.get("modecontractuel")
+    type_contrat_avenant = cleaned_data.get("type_contrat_avenant")
+    mode_contractuel = cleaned_data.get("mode_contractuel")
 
     # Vérifie que les deux champs sont valides
     if not (typecontratavenant and modecontractuel):

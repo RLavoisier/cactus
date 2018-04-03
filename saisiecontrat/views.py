@@ -11,7 +11,7 @@ def creationcontrat(request):
 
         form=CreationContratForm(request.POST)
         if form.is_valid():
-            contrat=Contrat(request.POST['typecontratavenant'])
+            contrat=Contrat(request.POST['type_contrat_avenant'])
             contrat.save()
         else:
             return render(request, 'creationcontrat.html', {'form': form})
