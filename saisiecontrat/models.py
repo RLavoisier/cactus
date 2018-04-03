@@ -258,7 +258,7 @@ class Entreprise(models.Model):
     date_maj_contacts = models.DateTimeField(blank=True)
 
     def __str__(self):
-        return self.raisonsociale
+        return self.raison_sociale
 
 
 class Personnel(models.Model):
@@ -346,7 +346,7 @@ class Formation(models.Model):
 
 
     def __str__(self):
-        return self.intitule
+        return self.intitule_formation
 
 
 class Contrat(models.Model):

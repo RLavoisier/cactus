@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from saisiecontrat.views import login,creationcontrat
+from saisiecontrat.views import login, creationcontrat, create_entreprise
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/',login),
     path('creationcontrat/',creationcontrat),
+    path('creationentreprise/', create_entreprise, name="creationentreprise"),
 ]

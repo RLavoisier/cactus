@@ -1,0 +1,10 @@
+<form action="{% url 'creationentreprise' %}" method="post">
+  {% csrf_token %}
+  {% if error %}
+  <p class="error">{{ error }}</p>
+  {% endif %}
+  {{ form.as_p }}
+  <p>
+    <input type="submit" value="Créer" />
+  </p>
+</form>

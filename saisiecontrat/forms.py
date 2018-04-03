@@ -2,7 +2,8 @@
 
 from django import forms
 from django.contrib.auth.models import User
-from saisiecontrat.models import Contrat
+from saisiecontrat.models import Contrat, Entreprise
+
 
 class LoginForm(forms.Form):
   email = forms.EmailField(label='Courriel :')
@@ -36,7 +37,34 @@ class CreationContratForm(forms.Form):
     mode_contractuel = cleaned_data.get("mode_contractuel")
 
     # Vérifie que les deux champs sont valides
-    if not (typecontratavenant and modecontractuel):
+    if not (type_contrat_avenant and mode_contractuel):
         raise forms.ValidationError("Vous devez renseigner ces données pour créer le contrat")
 
     return cleaned_data
+
+
+class CreationEntrepriseForm(forms.ModelForm):
+
+    class Meta:
+        """
+        Cette classe est propre au form de type "Model Form"
+        On y paramètre toutes les information du modèle lié ainsi que la définition des champs
+        """
+        model = Entreprise
+        fields = ("__all__")
+
+        # Si vous souhaitez éditez les widgets des champs (si ceux par défaut ne vous conviennent pas
+        widgets = {
+            "numero_SIRET": forms.TextInput()
+        }
+
+    # Vous pouvez définir une methode clean_*nom de votre champ* qui servira a valider ce dernier
+    def clean_numero_SIRET(self):
+        siret = self.cleaned_data["numero_SIRET"]
+
+        # Code de validation du numéro de SIRET
+        # Ecrire la logique puis renvoyer la valeur si elle est juste, sinon erreur de validation
+        if True:
+            return siret
+        else:
+            raise forms.ValidationError("Le numéro de siret n'est pas au bon format")
