@@ -342,6 +342,7 @@ class Formation(models.Model):
     nombre_annees = models.PositiveSmallIntegerField()
     annee_remuneration_annee_diplome = models.PositiveSmallIntegerField()
     inspection_pedagogique_competente = models.PositiveSmallIntegerField()
+    clef_formation = models.CharField(max_length=10)
 
 
     def __str__(self):
