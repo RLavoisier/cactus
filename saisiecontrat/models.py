@@ -1,8 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+import datetime
 
 class Alternant(models.Model):
+
+
+    SEXE = (
+        ('M','M'),
+        ('F','F'),
+    )
 
     NATIONALITE = (
         (1, "Française"),
@@ -66,136 +72,136 @@ class Alternant(models.Model):
     )
 
     DEPARTEMENT_NAISSANCE = (
-        ("01", "Ain"),
-        ("02", "Aisne"),
-        ("03", "Allier"),
-        ("04", "Alpes-de-Haute-Provence"),
-        ("05", "Hautes-Alpes"),
-        ("06", "Alpes-Maritimes"),
-        ("07", "Ardèche"),
-        ("08", "Ardennes"),
-        ("09", "Ariège"),
-        ("10", "Aube"),
-        ("11", "Aude"),
-        ("12", "Aveyron"),
-        ("13", "Bouches-du-Rhône"),
-        ("14", "Calvados"),
-        ("15", "Cantal"),
-        ("16", "Charente"),
-        ("17", "Charente-Maritime"),
-        ("18", "Cher"),
-        ("19", "Corrèze"),
-        ("2A", "Corse-du-Sud"),
-        ("2B", "Haute-Corse"),
-        ("21", "Côte-d'Or"),
-        ("22", "Côtes-d'Armor"),
-        ("23", "Creuse"),
-        ("24", "Dordogne"),
-        ("25", "Doubs"),
-        ("26", "Drôme"),
-        ("27", "Eure"),
-        ("28", "Eure-et-Loir"),
-        ("29", "Finistère"),
-        ("30", "Gard"),
-        ("31", "Haute-Garonne"),
-        ("32", "Gers"),
-        ("33", "Gironde"),
-        ("34", "Hérault"),
-        ("35", "Ille-et-Vilaine"),
-        ("36", "Indre"),
-        ("37", "Indre-et-Loire"),
-        ("38", "Isère"),
-        ("39", "Jura"),
-        ("40", "Landes"),
-        ("41", "Loir-et-Cher"),
-        ("42", "Loire"),
-        ("43", "Haute-Loire"),
-        ("44", "Loire-Atlantique"),
-        ("45", "Loiret"),
-        ("46", "Lot"),
-        ("47", "Lot-et-Garonne"),
-        ("48", "Lozère"),
-        ("49", "Maine-et-Loire"),
-        ("50", "Manche"),
-        ("51", "Marne"),
-        ("52", "Haute-Marne"),
-        ("53", "Mayenne"),
-        ("54", "Meurthe-et-Moselle"),
-        ("55", "Meuse"),
-        ("56", "Morbihan"),
-        ("57", "Moselle"),
-        ("58", "Nièvre"),
-        ("59", "Nord"),
-        ("60", "Oise"),
-        ("61", "Orne"),
-        ("62", "Pas-de-Calais"),
-        ("63", "Puy-de-Dôme"),
-        ("64", "Pyrénées-Atlantiques"),
-        ("65", "Hautes-Pyrénées"),
-        ("66", "Pyrénées-Orientales"),
-        ("67", "Bas-Rhin"),
-        ("68", "Haut-Rhin"),
-        ("69", "Rhône"),
-        ("70", "Haute-Saône"),
-        ("71", "Saône-et-Loire"),
-        ("72", "Sarthe"),
-        ("73", "Savoie"),
-        ("74", "Haute-Savoie"),
-        ("75", "Paris"),
-        ("76", "Seine-Maritime"),
-        ("77", "Seine-et-Marne"),
-        ("78", "Yvelines"),
-        ("79", "Deux-Sèvres"),
-        ("80", "Somme"),
-        ("81", "Tarn"),
-        ("82", "Tarn-et-Garonne"),
-        ("83", "Var"),
-        ("84", "Vaucluse"),
-        ("85", "Vendée"),
-        ("86", "Vienne"),
-        ("87", "Haute-Vienne"),
-        ("88", "Vosges"),
-        ("89", "Yonne"),
-        ("90", "Territoire de Belfort"),
-        ("91", "Essonne"),
-        ("92", "Hauts-de-Seine"),
-        ("93", "Seine-Saint-Denis"),
-        ("94", "Val-de-Marne"),
-        ("95", "Val-d'Oise"),
-        ("971", "Guadeloupe"),
-        ("972", "Martinique"),
-        ("973", "Guyane"),
-        ("974", "La Réunion"),
-        ("976", "Mayotte"),
-        ("099", "Personnes nées l’étranger"),
+        ("01", "01 Ain"),
+        ("02", "02 Aisne"),
+        ("03", "03 Allier"),
+        ("04", "04 Alpes-de-Haute-Provence"),
+        ("05", "05 Hautes-Alpes"),
+        ("06", "06 Alpes-Maritimes"),
+        ("07", "07 Ardèche"),
+        ("08", "08 Ardennes"),
+        ("09", "09 Ariège"),
+        ("10", "10 Aube"),
+        ("11", "11 Aude"),
+        ("12", "12 Aveyron"),
+        ("13", "13 Bouches-du-Rhône"),
+        ("14", "14 Calvados"),
+        ("15", "15 Cantal"),
+        ("16", "16 Charente"),
+        ("17", "17 Charente-Maritime"),
+        ("18", "18 Cher"),
+        ("19", "19 Corrèze"),
+        ("2A", "2A Corse-du-Sud"),
+        ("2B", "2B Haute-Corse"),
+        ("21", "21 Côte-d'Or"),
+        ("22", "22 Côtes-d'Armor"),
+        ("23", "23 Creuse"),
+        ("24", "24 Dordogne"),
+        ("25", "25 Doubs"),
+        ("26", "26 Drôme"),
+        ("27", "27 Eure"),
+        ("28", "28 Eure-et-Loir"),
+        ("29", "29 Finistère"),
+        ("30", "30 Gard"),
+        ("31", "31 Haute-Garonne"),
+        ("32", "32 Gers"),
+        ("33", "33 Gironde"),
+        ("34", "34 Hérault"),
+        ("35", "35 Ille-et-Vilaine"),
+        ("36", "36 Indre"),
+        ("37", "37 Indre-et-Loire"),
+        ("38", "38 Isère"),
+        ("39", "39 Jura"),
+        ("40", "40 Landes"),
+        ("41", "41 Loir-et-Cher"),
+        ("42", "42 Loire"),
+        ("43", "43 Haute-Loire"),
+        ("44", "44 Loire-Atlantique"),
+        ("45", "45 Loiret"),
+        ("46", "46 Lot"),
+        ("47", "47 Lot-et-Garonne"),
+        ("48", "48 Lozère"),
+        ("49", "49 Maine-et-Loire"),
+        ("50", "50 Manche"),
+        ("51", "51 Marne"),
+        ("52", "52 Haute-Marne"),
+        ("53", "53 Mayenne"),
+        ("54", "54 Meurthe-et-Moselle"),
+        ("55", "55 Meuse"),
+        ("56", "56 Morbihan"),
+        ("57", "57 Moselle"),
+        ("58", "58 Nièvre"),
+        ("59", "59 Nord"),
+        ("60", "60 Oise"),
+        ("61", "61 Orne"),
+        ("62", "62 Pas-de-Calais"),
+        ("63", "63 Puy-de-Dôme"),
+        ("64", "64 Pyrénées-Atlantiques"),
+        ("65", "65 Hautes-Pyrénées"),
+        ("66", "66 Pyrénées-Orientales"),
+        ("67", "67 Bas-Rhin"),
+        ("68", "68 Haut-Rhin"),
+        ("69", "69 Rhône"),
+        ("70", "70 Haute-Saône"),
+        ("71", "71 Saône-et-Loire"),
+        ("72", "72 Sarthe"),
+        ("73", "73 Savoie"),
+        ("74", "74 Haute-Savoie"),
+        ("75", "75 Paris"),
+        ("76", "76 Seine-Maritime"),
+        ("77", "77 Seine-et-Marne"),
+        ("78", "78 Yvelines"),
+        ("79", "79 Deux-Sèvres"),
+        ("80", "80 Somme"),
+        ("81", "81 Tarn"),
+        ("82", "82 Tarn-et-Garonne"),
+        ("83", "83 Var"),
+        ("84", "84 Vaucluse"),
+        ("85", "85 Vendée"),
+        ("86", "86 Vienne"),
+        ("87", "87 Haute-Vienne"),
+        ("88", "88 Vosges"),
+        ("89", "89 Yonne"),
+        ("90", "90 Territoire de Belfort"),
+        ("91", "91 Essonne"),
+        ("92", "92 Hauts-de-Seine"),
+        ("93", "93 Seine-Saint-Denis"),
+        ("94", "94 Val-de-Marne"),
+        ("95", "95 Val-d'Oise"),
+        ("971", "971 Guadeloupe"),
+        ("972", "972 Martinique"),
+        ("973", "973 Guyane"),
+        ("974", "974 La Réunion"),
+        ("976", "976 Mayotte"),
+        ("099", "099 Né(e) l’étranger"),
     )
 
     user = models.OneToOneField(User,on_delete=models.CASCADE, primary_key=True)
     nom = models.CharField(max_length=70)
-    prenom = models.CharField(max_length=35)
-    sexe = models.CharField(max_length=1)
-    date_naissance = models.DateField()
-    numero_departement_naissance = models.CharField(max_length=3)
-    commune_naissance = models.CharField(max_length=60, blank=True)
-    adresse_1 = models.CharField(max_length=100)
-    adresse_2 = models.CharField(max_length=100, blank=True)
-    code_postal = models.CharField(max_length=5)
+    prenom = models.CharField(verbose_name="Prénom", max_length=35)
+    sexe = models.CharField(max_length=1, choices=SEXE, default='M')
+    date_naissance = models.DateField(verbose_name="Date de naissance")
+    numero_departement_naissance = models.CharField(verbose_name="Département de naissance", max_length=3, choices=DEPARTEMENT_NAISSANCE, help_text="Sélectionnez votre département de naissance ou '099 Né(e) à l'étranger'")
+    commune_naissance = models.CharField(verbose_name="Commune de naissance", max_length=60, blank=True)
+    adresse_1 = models.CharField(verbose_name="Adresse", max_length=100)
+    adresse_2 = models.CharField(verbose_name="Complément d'adresse", max_length=100, blank=True)
+    code_postal = models.CharField(verbose_name="Code postal", max_length=5)
     ville = models.CharField(max_length=60)
-    telephone = models.CharField(max_length=15)
-    handicape = models.BooleanField(default=False)
+    telephone = models.CharField(verbose_name="Téléphone", max_length=15)
+    handicape = models.BooleanField(verbose_name="Travailleur handicapé", default=False)
     courriel = models.CharField(max_length=40, blank=True)
-    nationalite = models.PositiveSmallIntegerField(choices=NATIONALITE)
-    regime_social = models.PositiveSmallIntegerField(choices=REGIME_SOCIAL)
-    situation_avant_contrat = models.PositiveSmallIntegerField(choices=SITUATION_AVANT_CONTRAT)
-    dernier_diplome_prepare = models.PositiveSmallIntegerField(choices=DIPLOME)
-    derniere_annee_suivie = models.PositiveSmallIntegerField(choices=DERNIERE_ANNEE_SUIVIE)
-    intitule_dernier_diplome_prepare = models.CharField(max_length=100)
-    diplome_le_plus_eleve = models.PositiveSmallIntegerField(choices=DIPLOME)
-    nom_representant = models.CharField(max_length=70, blank=True)
-    prenom_representant = models.CharField(max_length=35, blank=True)
-    adresse_1_representant = models.CharField(max_length=100, blank=True)
-    adresse_2_representant = models.CharField(max_length=100, blank=True)
-    code_postal_representant = models.CharField(max_length=5, blank=True)
+    nationalite = models.PositiveSmallIntegerField(verbose_name="Nationalité", choices=NATIONALITE, default=1)
+    regime_social = models.PositiveSmallIntegerField(verbose_name="Régime social", choices=REGIME_SOCIAL)
+    situation_avant_contrat = models.PositiveSmallIntegerField(verbose_name="Situation avant contrat", choices=SITUATION_AVANT_CONTRAT)
+    dernier_diplome_prepare = models.PositiveSmallIntegerField(verbose_name="Dernier diplôme ou titre préparé", choices=DIPLOME, help_text="Choisissez le dernier diplôme ou titre que vous avez préparé même si le cursus n'a pas été achevé.")
+    derniere_annee_suivie = models.PositiveSmallIntegerField(verbose_name="Dernière année suivie", choices=DERNIERE_ANNEE_SUIVIE)
+    intitule_dernier_diplome_prepare = models.CharField(verbose_name="Intitulé du dernier diplôme obtenu", max_length=100, help_text="Saisissez le libellé précis du dernier diplôme préparé.")
+    diplome_le_plus_eleve = models.PositiveSmallIntegerField(verbose_name="Diplôme le plus élevé obtenu", choices=DIPLOME)
+    nom_representant = models.CharField(verbose_name="Nom", max_length=70, blank=True)
+    prenom_representant = models.CharField(verbose_name="Prénom", max_length=35, blank=True)
+    adresse_1_representant = models.CharField(verbose_name="Adresse", max_length=100, blank=True)
+    adresse_2_representant = models.CharField(verbose_name="Complément d'adresse", max_length=100, blank=True)
+    code_postal_representant = models.CharField(verbose_name="Code postal", max_length=5, blank=True)
     ville_representant = models.CharField(max_length=60, blank=True)
     date_maj = models.DateTimeField()
 
@@ -244,9 +250,9 @@ class Entreprise(models.Model):
     code_postal = models.CharField(max_length=5)
     ville = models.CharField(max_length=70)
     type_employeur = models.PositiveSmallIntegerField(choices=TYPE_EMPLOYEUR)
-    secteur_employeur = models.PositiveSmallIntegerField(choices=SECTEUR_EMPLOYEUR)
-    employeur_specifique = models.PositiveSmallIntegerField(choices=EMPLOYEUR_SPECIFIQUE)
-    codeAPE = models.CharField(max_length=5)
+    secteur_employeur = models.PositiveSmallIntegerField(choices=SECTEUR_EMPLOYEUR, default=1)
+    employeur_specifique = models.PositiveSmallIntegerField(choices=EMPLOYEUR_SPECIFIQUE, default=0)
+    code_APE = models.CharField(max_length=5)
     effectif_entreprise = models.PositiveSmallIntegerField()
     telephone = models.CharField(max_length=15)
     telecopie = models.CharField(max_length=15, blank=True)
@@ -254,8 +260,8 @@ class Entreprise(models.Model):
     code_convention_collective = models.CharField(max_length=4, blank=True)
     libelle_convention_collective = models.CharField(max_length=200, blank=True)
     adhesion_regime_assurance_chomage = models.BooleanField(default=False, blank=True)
-    date_maj = models.DateTimeField(blank=True)
-    date_maj_contacts = models.DateTimeField(blank=True)
+    date_maj = models.DateTimeField(default=datetime.datetime.now())
+    date_maj_contacts = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
         return self.raison_sociale
@@ -268,15 +274,20 @@ class Personnel(models.Model):
         (2, "Monsieur"),
     )
 
+    ROLE = (
+        (1, "Dirigeant"),
+        (2, "Maître d'apprentissage")
+    )
+
     id = models.AutoField(primary_key=True)
     entreprise = models.ForeignKey(Entreprise,on_delete=models.CASCADE)
-    role = models.CharField(max_length=25)
-    civilite = models.CharField(max_length=12)
+    role = models.CharField(max_length=25, choices=ROLE)
+    civilite = models.CharField(max_length=12,choices=CIVILITE)
     nom = models.CharField(max_length=70)
     prenom = models.CharField(max_length=35)
     courriel = models.CharField(max_length=40, blank=True)
     date_naissance = models.DateField()
-    date_maj = models.DateTimeField()
+    date_maj = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
         return "%s %s" % (self.nom, self.prenom)
@@ -320,30 +331,27 @@ class Formation(models.Model):
         (60,"Aucun diplôme ni titre professionnel"),
     )
 
-
-    code_formation = models.AutoField(primary_key=True)
-    cfa = models.ForeignKey(CFA,on_delete=models.CASCADE)
+    code_formation = models.AutoField(max_length=13, primary_key=True)
+    cfa = models.ForeignKey(CFA, on_delete=models.CASCADE)
     intitule_formation = models.CharField(max_length=150)
     ville = models.CharField(max_length=35)
     specialite = models.CharField(max_length=50)
     diplome = models.PositiveSmallIntegerField(choices=DIPLOME)
     intitule_diplome = models.CharField(max_length=100)
     numero_UAI = models.CharField(max_length=8)
-    an_1_du = models.DateField(blank=True)
-    an_1_au = models.DateField(blank=True)
-    heures_an_1 = models.PositiveSmallIntegerField()
-    an_2_du = models.DateField(blank=True)
-    an_2_au = models.DateField(blank=True)
-    heures_an_2 = models.PositiveSmallIntegerField(blank=True)
-    an_3_du = models.DateField(blank=True)
-    an_3_au = models.DateField(blank=True)
-    heures_an_3 = models.PositiveSmallIntegerField(blank=True)
+    an_1_du = models.DateField(blank=True, null=True)
+    an_1_au = models.DateField(blank=True, null=True)
+    heures_an_1 = models.PositiveSmallIntegerField(blank=True, null=True)
+    an_2_du = models.DateField(blank=True, null=True)
+    an_2_au = models.DateField(blank=True, null=True)
+    heures_an_2 = models.PositiveSmallIntegerField(blank=True, null=True)
+    an_3_du = models.DateField(blank=True, null=True)
+    an_3_au = models.DateField(blank=True, null=True)
+    heures_an_3 = models.PositiveSmallIntegerField(blank=True, null=True)
     niveau = models.PositiveSmallIntegerField()
     nombre_annees = models.PositiveSmallIntegerField()
     annee_remuneration_annee_diplome = models.PositiveSmallIntegerField()
     inspection_pedagogique_competente = models.PositiveSmallIntegerField()
-    clef_formation = models.CharField(max_length=10)
-
 
     def __str__(self):
         return self.intitule_formation
@@ -394,65 +402,66 @@ class Contrat(models.Model):
     formation = models.ForeignKey(Formation, on_delete=models.CASCADE, blank=True)
     mission = models.TextField(blank=True)
     type_contrat_avenant = models.PositiveSmallIntegerField(choices=TYPE_CONTRAT_AVENANT)
-    date_inscription = models.DateField(blank=True)
-    type_derogation = models.PositiveSmallIntegerField(choices=TYPE_DEROGATION, blank=True)
+    date_inscription = models.DateField(blank=True, null=True)
+    type_derogation = models.PositiveSmallIntegerField(verbose_name="Type de dérogation", choices=TYPE_DEROGATION, blank=True, null=True)
     numero_contrat_anterieur = models.CharField(max_length=20, blank=True)
-    date_embauche = models.DateField(blank=True)
-    date_debut_contrat = models.DateField(blank=True)
-    date_effet_avenant = models.DateField(blank=True)
-    date_fin_contrat = models.DateField(blank=True)
-    duree_hebdomadaire_travail = models.DurationField(blank=True)
+    date_embauche = models.DateField(blank=True, null=True)
+    date_debut_contrat = models.DateField(blank=True, null=True)
+    date_effet_avenant = models.DateField(blank=True, null=True)
+    date_fin_contrat = models.DateField(blank=True, null=True)
+    duree_hebdomadaire_travail = models.DurationField(blank=True, null=True)
     risques_particuliers = models.BooleanField(default=False)
-    numero_annee_debut_contrat = models.PositiveSmallIntegerField(blank=True)
-    salaire_minimum_conventionnel = models.FloatField(blank=True)
-    salaire_brut_mensuel = models.FloatField(blank=True)
-    caisse_retraite_complementaire = models.CharField(max_length=35, blank=True)
-    nourriture = models.FloatField(blank=True)
-    logement = models.FloatField(blank=True)
-    prime_panier = models.FloatField(blank=True)
-    fait_a = models.CharField(max_length=60, blank=True)
-    fait_le = models.DateField(blank=True)
-    attestation_pieces = models.BooleanField(default=False)
-    attestation_maitre_apprentissage = models.BooleanField(default=False)
-    an_1_per_1_du = models.DateField(blank=True)
-    an_1_per_1_au = models.DateField(blank=True)
-    an_1_per_1_taux = models.FloatField(blank=True)
-    an_1_per_1_base = models.CharField(max_length=4, choices=BASE, blank=True)
-    an_1_per_2_du = models.DateField(blank=True)
-    an_1_per_2_au = models.DateField(blank=True)
-    an_1_per_2_taux = models.FloatField(blank=True)
-    an_1_per_2_base = models.CharField(max_length=4, choices=BASE, blank=True)
-    an_2_per_1_du = models.DateField(blank=True)
-    an_2_per_1_au = models.DateField(blank=True)
-    an_2_per_1_taux = models.FloatField(blank=True)
-    an_2_per_1_base = models.CharField(max_length=4, choices=BASE, blank=True)
-    an_2_per_2_du = models.DateField(blank=True)
-    an_2_per_2_au = models.DateField(blank=True, default=None)
-    an_2_per_2_taux = models.FloatField(blank=True)
-    an_2_per_2_base = models.CharField(max_length=4, choices=BASE, blank=True)
-    an_3_per_1_du = models.DateField(blank=True)
-    an_3_per_1_au = models.DateField(blank=True)
-    an_3_per_1_taux = models.FloatField(blank=True)
-    an_3_per_1_base = models.CharField(max_length=4, choices=BASE, blank=True)
-    an_3_per_2_du = models.DateField(blank=True)
-    an_3_per_2_au = models.DateField(blank=True)
-    an_3_per_2_taux = models.FloatField(blank=True)
-    an_3_per_2_base = models.CharField(max_length=4, choices=BASE, blank=True)
-    an_4_per_1_du = models.DateField(blank=True)
-    an_4_per_1_au = models.DateField(blank=True)
-    an_4_per_1_taux = models.FloatField(blank=True)
-    an_4_per_1_base = models.CharField(max_length=4, choices=BASE, blank=True)
-    an_4_per_2_du = models.DateField(blank=True)
-    an_4_per_2_au = models.DateField(blank=True)
-    an_4_per_2_taux = models.FloatField(blank=True)
-    an_4_per_2_base = models.CharField(max_length=4, choices=BASE, blank=True)
-    date_maj = models.DateTimeField(blank=True)
-    date_maj_mission = models.DateTimeField(blank=True)
-    date_saisie_complete = models.DateTimeField(blank=True)
-    date_generation_CERFA = models.DateTimeField(blank=True)
-    date_exportation_CFA = models.DateTimeField(blank=True)
+    numero_annee_debut_contrat = models.PositiveSmallIntegerField(blank=True, null=True)
+    salaire_minimum_conventionnel = models.FloatField(blank=True, null=True)
+    salaire_brut_mensuel = models.FloatField(blank=True, null=True)
+    caisse_retraite_complementaire = models.CharField(max_length=35, blank=True, null=True)
+    nourriture = models.FloatField(blank=True, null=True)
+    logement = models.FloatField(blank=True, null=True)
+    prime_panier = models.FloatField(blank=True, null=True)
+    fait_a = models.CharField(max_length=60, blank=True, null=True)
+    fait_le = models.DateField(blank=True, null=True)
+    attestation_pieces = models.BooleanField(default=True)
+    attestation_maitre_apprentissage = models.BooleanField(default=True)
+    an_1_per_1_du = models.DateField(blank=True, null=True)
+    an_1_per_1_au = models.DateField(blank=True, null=True)
+    an_1_per_1_taux = models.FloatField(blank=True, null=True)
+    an_1_per_1_base = models.CharField(max_length=4, choices=BASE, blank=True, null=True)
+    an_1_per_2_du = models.DateField(blank=True, null=True)
+    an_1_per_2_au = models.DateField(blank=True, null=True)
+    an_1_per_2_taux = models.FloatField(blank=True, null=True)
+    an_1_per_2_base = models.CharField(max_length=4, choices=BASE, blank=True, null=True)
+    an_2_per_1_du = models.DateField(blank=True, null=True)
+    an_2_per_1_au = models.DateField(blank=True, null=True)
+    an_2_per_1_taux = models.FloatField(blank=True, null=True)
+    an_2_per_1_base = models.CharField(max_length=4, choices=BASE, blank=True, null=True)
+    an_2_per_2_du = models.DateField(blank=True, null=True)
+    an_2_per_2_au = models.DateField(blank=True, null=True)
+    an_2_per_2_taux = models.FloatField(blank=True, null=True)
+    an_2_per_2_base = models.CharField(max_length=4, choices=BASE, blank=True, null=True)
+    an_3_per_1_du = models.DateField(blank=True, null=True)
+    an_3_per_1_au = models.DateField(blank=True, null=True)
+    an_3_per_1_taux = models.FloatField(blank=True, null=True)
+    an_3_per_1_base = models.CharField(max_length=4, choices=BASE, blank=True, null=True)
+    an_3_per_2_du = models.DateField(blank=True, null=True)
+    an_3_per_2_au = models.DateField(blank=True, null=True)
+    an_3_per_2_taux = models.FloatField(blank=True, null=True)
+    an_3_per_2_base = models.CharField(max_length=4, choices=BASE, blank=True, null=True)
+    an_4_per_1_du = models.DateField(blank=True, null=True)
+    an_4_per_1_au = models.DateField(blank=True, null=True)
+    an_4_per_1_taux = models.FloatField(blank=True, null=True)
+    an_4_per_1_base = models.CharField(max_length=4, choices=BASE, blank=True, null=True)
+    an_4_per_2_du = models.DateField(blank=True, null=True)
+    an_4_per_2_au = models.DateField(blank=True, null=True)
+    an_4_per_2_taux = models.FloatField(blank=True, null=True)
+    an_4_per_2_base = models.CharField(max_length=4, choices=BASE, blank=True, null=True)
+    date_maj = models.DateTimeField(default=datetime.datetime.now())
+    date_maj_mission = models.DateTimeField(blank=True, null=True)
+    date_saisie_complete = models.DateTimeField(blank=True, null=True)
+    date_generation_CERFA = models.DateTimeField(blank=True, null=True)
+    date_exportation_CFA = models.DateTimeField(blank=True, null=True)
     cursus_abrege = models.BooleanField(default=False)
-    nombre_annees = models.PositiveSmallIntegerField()
+    nombre_annees = models.PositiveSmallIntegerField(blank=True, null=True)
+    contrat_courant = models.BooleanField(default=True)
 
     def __str__(self):
         return self.id
@@ -478,8 +487,25 @@ class Minima (models.Model):
         return self.annee
 
 
-class Parametres (models.Model):
+class Parametre (models.Model):
     majoration_taux_public = models.FloatField()
 
     def __str__(self):
-        return "Paramètres"
+        return "Paramètre"
+
+
+class Commune (models.Model):
+    code_INSEE = models.CharField(max_length=5)
+    code_postal = models.CharField(max_length=5)
+    libelle = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.libelle
+
+
+class NAF (models.Model):
+    code = models.CharField(max_length=5)
+    libelle = models.CharField(max_length=150)
+
+    def __str__(self):
+        return self.code
