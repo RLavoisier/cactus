@@ -7,7 +7,14 @@
 {% block content %}
 <h2>Accueil</h2>
 <p>Bienvenue {{ user.email }}</p>
-<a href="{% url "comptes:logout" %}">Se déconnecter</a>
+<a href="{% url 'comptes:logout' %}">Se déconnecter</a>
+
+{% if alternant.nom %}
+Bonjour {{ alternant.nom }} {{ alternant.prenom }}
+{% else %}
+<a href="{% url 'creationalternant' %}">Remplissez vos données alternant</a>
+{% endif %}
+
 {% endblock %}
 
 {% block menucontent %}

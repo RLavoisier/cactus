@@ -72,7 +72,10 @@ def create_alternant(request):
             # Ici, on sauvegarde le formulaire, ce qui nous renvoie automatiauement
             # un nouvel objet entreprise
 
-            alternant = form.save()
+            # commit = false n'enregistre pas en base
+            alternant = form.save(commit=False)
+            alternant.user = request.user
+            alternant.save()
 
             #alternant.secteur_employeur = int(form.data.get("type_employeur")[1])
             #alternant.save()

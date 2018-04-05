@@ -20,7 +20,7 @@ class CactusUserCreationForm(UserCreationForm):
         label="Code formation",
         widget=forms.TextInput,
         strip=False,
-        help_text="Entrez le code fournis par votre responsable de formation."
+        help_text="Entrez le code fourni par votre responsable de formation."
     )
 
     class Meta:

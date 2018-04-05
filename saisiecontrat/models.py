@@ -181,7 +181,7 @@ class Alternant(models.Model):
         ("099", "099 Né(e) l’étranger"),
     )
 
-    user = models.OneToOneField(User,on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(User,on_delete=models.CASCADE, primary_key=True, related_name="alternant")
     nom = models.CharField(max_length=70)
     prenom = models.CharField(verbose_name="Prénom", max_length=35)
     sexe = models.CharField(max_length=1, choices=SEXE, default='M')
@@ -208,10 +208,14 @@ class Alternant(models.Model):
     adresse_2_representant = models.CharField(verbose_name="Complément d'adresse", max_length=100, blank=True)
     code_postal_representant = models.CharField(verbose_name="Code postal", max_length=5, blank=True)
     ville_representant = models.CharField(max_length=60, blank=True)
-    date_maj = models.DateTimeField()
+    date_maj = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
         return self.nom + " " + self.prenom
+
+    def get_active_contrat(self):
+        # récupération du contrat courant
+        pass
 
 
 class Entreprise(models.Model):
@@ -286,7 +290,7 @@ class Personnel(models.Model):
 
     id = models.AutoField(primary_key=True)
     entreprise = models.ForeignKey(Entreprise,on_delete=models.CASCADE)
-    role = models.CharField(max_length=25, choices=ROLE)
+    role = models.PositiveSmallIntegerField(choices=ROLE)
     civilite = models.CharField(max_length=12,choices=CIVILITE)
     nom = models.CharField(max_length=70)
     prenom = models.CharField(max_length=35)

@@ -2,7 +2,7 @@
 
 from django import forms
 from django.contrib.auth.models import User
-from saisiecontrat.models import Contrat, Entreprise, NAF, Alternant
+from saisiecontrat.models import Contrat, Entreprise, NAF, Alternant, Personnel
 
 
 class LoginForm(forms.Form):
@@ -52,6 +52,10 @@ class CreationContratForm(forms.Form):
 
 class CreationEntrepriseForm(forms.ModelForm):
 
+    civilite = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE))
+    nom = forms.CharField(max_length=40)
+    prenom = forms.CharField(max_length=40)
+
     class Meta:
         """
         Cette classe est propre au form de type "Model Form"
@@ -68,8 +72,9 @@ class CreationEntrepriseForm(forms.ModelForm):
 
         }
 
-    # Vous pouvez définir une methode clean_*nom de votre champ* qui servira a valider ce dernier
 
+
+    # Vous pouvez définir une methode clean_*nom de votre champ* qui servira a valider ce dernier
     def clean_numero_SIRET(self):
 
         siret = self.cleaned_data["numero_SIRET"]
@@ -118,7 +123,7 @@ class CreationAlternantForm(forms.ModelForm):
         model = Alternant
         fields = ("__all__")
 
-        exclude = ["date_maj"]
+        exclude = ["date_maj", "user"]
 
         # Si vous souhaitez éditez les widgets des champs (si ceux par défaut ne vous conviennent pas
         widgets = {
