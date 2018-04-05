@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+<form action="{% url 'comptes:login' %}" method="POST">
+    {{ form.as_p }}
+    {% csrf_token %}
+    <input type="submit" value="Envoyer">
+</form>
+
+
+</body>
+</html>

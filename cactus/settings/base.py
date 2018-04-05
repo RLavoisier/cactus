@@ -75,6 +75,10 @@ WSGI_APPLICATION = 'cactus.wsgi.application'
 
 AUTH_USER_MODEL = 'comptes.User'
 
+LOGIN_URL = "comptes:signup_or_login"
+LOGOUT_REDIRECT_URL = LOGIN_URL
+LOGIN_REDIRECT_URL = "accueil"
+
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
