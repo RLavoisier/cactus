@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'comptes',
     'saisiecontrat',
 ]
 
@@ -72,6 +73,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'cactus.wsgi.application'
 
+AUTH_USER_MODEL = 'comptes.User'
+
+LOGIN_URL = "comptes:signup_or_login"
+LOGOUT_REDIRECT_URL = LOGIN_URL
+LOGIN_REDIRECT_URL = "accueil"
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
@@ -128,3 +134,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
+# Importing local infos
+try:
+    from .local import *
+except ImportError:
+    print("No local settings found")

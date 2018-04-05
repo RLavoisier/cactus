@@ -16,13 +16,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from saisiecontrat.views import login, creationcontrat, create_entreprise, create_alternant, inform_contrat, inform_mission
+from django.urls import path, include
+
+from cactus.views import accueil
+from saisiecontrat.views import creationcontrat, create_entreprise
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/',login),
-    path('creationcontrat/',creationcontrat),
+    path('', accueil, name="accueil"),
+    path('creationcontrat/',creationcontrat, name="creationcontrat"),
     path('creationentreprise/', create_entreprise, name="creationentreprise"),
     path('creationalternant/', create_alternant, name="creationalternant"),
     path('informationcontrat/', inform_contrat, name="informationcontrat"),
     path('informationmission/', inform_mission, name="informationmission"),
+    path('comptes/', include("comptes.urls"))
 ]

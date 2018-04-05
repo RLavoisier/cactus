@@ -1,6 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import User
 import datetime
+
+
+User = get_user_model()
+
 
 class Alternant(models.Model):
 
@@ -352,6 +357,8 @@ class Formation(models.Model):
     nombre_annees = models.PositiveSmallIntegerField()
     annee_remuneration_annee_diplome = models.PositiveSmallIntegerField()
     inspection_pedagogique_competente = models.PositiveSmallIntegerField()
+    clef_formation = models.CharField(max_length=10)
+
 
     def __str__(self):
         return self.intitule_formation

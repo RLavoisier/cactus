@@ -3,6 +3,7 @@
 from django.shortcuts import render,redirect
 from datetime import datetime
 from saisiecontrat.forms import LoginForm, CreationContratForm, CreationEntrepriseForm, CreationAlternantForm, InformationContratForm, InformationMissionForm
+from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm
 from saisiecontrat.models import Contrat
 
 def creationcontrat(request):
@@ -23,19 +24,6 @@ def creationcontrat(request):
     else:
         form = CreationContratForm()
         return render(request, 'creationcontrat.html', {'form': form})
-
-
-def login(request):
-
-    if len(request.POST) > 0:
-        form=LoginForm(request.POST)
-        if form.is_valid():
-            return redirect('/creationcontrat')
-        else:
-            return render(request, 'login.html', {'form': form})
-    else:
-        form = LoginForm()
-        return render(request, 'login.html', {'form': form})
 
 def create_entreprise(request):
 
