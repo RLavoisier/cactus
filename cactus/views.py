@@ -12,7 +12,7 @@ def accueil(request):
         return redirect("comptes:signup")
     else:
         try:
-            alternant = Alternant(user=request.user)
+            alternant = Alternant.objects.get(user=request.user)
         except ObjectDoesNotExist:
             alternant = None
 

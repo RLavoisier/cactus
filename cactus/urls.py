@@ -22,6 +22,7 @@ from cactus.views import accueil
 from saisiecontrat.views import creationcontrat, create_entreprise
 
 urlpatterns = [
+    path('comptes/', include("comptes.urls"), name="comptes"),
     path('admin/', admin.site.urls),
     path('', accueil, name="accueil"),
     path('creationcontrat/',creationcontrat, name="creationcontrat"),
@@ -29,5 +30,4 @@ urlpatterns = [
     path('creationalternant/', create_alternant, name="creationalternant"),
     path('informationcontrat/', inform_contrat, name="informationcontrat"),
     path('informationmission/', inform_mission, name="informationmission"),
-    path('comptes/', include("comptes.urls"))
 ]
