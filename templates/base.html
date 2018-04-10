@@ -11,31 +11,36 @@
     <header>
     {% block headerContent %}{% endblock %}
     </header>
+
     <section id="content">
       <div class="container">
         <ul class="nav nav-tabs">
-        <li class="nav-item">
-          <a class="nav-link active" href="#">Active</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#">Disabled</a>
-        </li>
-      </ul>
-    {% block content %}{% endblock %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'accueil' %}">Accueil</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'creationalternant' %}">Vous</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'creationentreprise' %}">Votre employeur</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Votre formation</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'informationcontrat' %}">Votre contrat</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'informationcontrat' %}">Votre mission</a>
+          </li>
+        </ul>
+        {% block content %}
+        {% endblock %}
       </div>
     </section>
-    <section id="footer">
-    {% block footercontent %}{% endblock %}
-    </section>
-    <section id="menu">
-    {% block menucontent %}{% endblock %}
-    </section>
+
+    <a href="{% url 'comptes:logout' %}">Se déconnecter</a>
+
     <section id="leftside">
     {% block leftsidecontent %}{% endblock %}
     </section>

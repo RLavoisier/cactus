@@ -181,41 +181,42 @@ class Alternant(models.Model):
         ("099", "099 Né(e) l’étranger"),
     )
 
+    # Le related name permet de renvoyer l'alternant depuis le user avec la syntaxe user.alternant
     user = models.OneToOneField(User,on_delete=models.CASCADE, primary_key=True, related_name="alternant")
-    nom = models.CharField(max_length=70)
-    prenom = models.CharField(verbose_name="Prénom", max_length=35)
+    nom = models.CharField(max_length=70, blank=True, null=True)
+    prenom = models.CharField(verbose_name="Prénom", max_length=35, blank=True, null=True)
     sexe = models.CharField(max_length=1, choices=SEXE, default='M')
-    date_naissance = models.DateField(verbose_name="Date de naissance")
-    numero_departement_naissance = models.CharField(verbose_name="Département de naissance", max_length=3, choices=DEPARTEMENT_NAISSANCE, help_text="Sélectionnez votre département de naissance ou '099 Né(e) à l'étranger'")
-    commune_naissance = models.CharField(verbose_name="Commune de naissance", max_length=60, blank=True)
-    adresse_1 = models.CharField(verbose_name="Adresse", max_length=100)
-    adresse_2 = models.CharField(verbose_name="Complément d'adresse", max_length=100, blank=True)
-    code_postal = models.CharField(verbose_name="Code postal", max_length=5)
-    ville = models.CharField(max_length=60)
-    telephone = models.CharField(verbose_name="Téléphone", max_length=15)
+    date_naissance = models.DateField(verbose_name="Date de naissance", blank=True, null=True)
+    numero_departement_naissance = models.CharField(verbose_name="Département de naissance", max_length=3, choices=DEPARTEMENT_NAISSANCE, help_text="Sélectionnez votre département de naissance ou '099 Né(e) à l'étranger'", blank=True, null=True)
+    commune_naissance = models.CharField(verbose_name="Commune de naissance", max_length=60, blank=True, null=True)
+    adresse_1 = models.CharField(verbose_name="Adresse", max_length=100, blank=True, null=True)
+    adresse_2 = models.CharField(verbose_name="Complément d'adresse", max_length=100, blank=True, null=True)
+    code_postal = models.CharField(verbose_name="Code postal", max_length=5, blank=True, null=True)
+    ville = models.CharField(max_length=60, blank=True, null=True)
+    telephone = models.CharField(verbose_name="Téléphone", max_length=15, blank=True, null=True)
     handicape = models.BooleanField(verbose_name="Travailleur handicapé", default=False)
-    courriel = models.CharField(max_length=40, blank=True)
-    nationalite = models.PositiveSmallIntegerField(verbose_name="Nationalité", choices=NATIONALITE, default=1)
-    regime_social = models.PositiveSmallIntegerField(verbose_name="Régime social", choices=REGIME_SOCIAL)
-    situation_avant_contrat = models.PositiveSmallIntegerField(verbose_name="Situation avant contrat", choices=SITUATION_AVANT_CONTRAT)
-    dernier_diplome_prepare = models.PositiveSmallIntegerField(verbose_name="Dernier diplôme ou titre préparé", choices=DIPLOME, help_text="Choisissez le dernier diplôme ou titre que vous avez préparé même si le cursus n'a pas été achevé.")
-    derniere_annee_suivie = models.PositiveSmallIntegerField(verbose_name="Dernière année suivie", choices=DERNIERE_ANNEE_SUIVIE)
-    intitule_dernier_diplome_prepare = models.CharField(verbose_name="Intitulé du dernier diplôme obtenu", max_length=100, help_text="Saisissez le libellé précis du dernier diplôme préparé.")
-    diplome_le_plus_eleve = models.PositiveSmallIntegerField(verbose_name="Diplôme le plus élevé obtenu", choices=DIPLOME)
-    nom_representant = models.CharField(verbose_name="Nom", max_length=70, blank=True)
-    prenom_representant = models.CharField(verbose_name="Prénom", max_length=35, blank=True)
-    adresse_1_representant = models.CharField(verbose_name="Adresse", max_length=100, blank=True)
-    adresse_2_representant = models.CharField(verbose_name="Complément d'adresse", max_length=100, blank=True)
-    code_postal_representant = models.CharField(verbose_name="Code postal", max_length=5, blank=True)
-    ville_representant = models.CharField(max_length=60, blank=True)
+    courriel = models.CharField(max_length=40, blank=True, null=True)
+    nationalite = models.PositiveSmallIntegerField(verbose_name="Nationalité", choices=NATIONALITE, default=1, blank=True, null=True)
+    regime_social = models.PositiveSmallIntegerField(verbose_name="Régime social", choices=REGIME_SOCIAL, blank=True, null=True)
+    situation_avant_contrat = models.PositiveSmallIntegerField(verbose_name="Situation avant contrat", choices=SITUATION_AVANT_CONTRAT, blank=True, null=True)
+    dernier_diplome_prepare = models.PositiveSmallIntegerField(verbose_name="Dernier diplôme ou titre préparé", choices=DIPLOME,
+                                                               help_text="Choisissez le dernier diplôme ou titre que vous avez préparé même si le cursus n'a pas été achevé.",
+                                                               blank=True, null=True)
+    derniere_annee_suivie = models.PositiveSmallIntegerField(verbose_name="Dernière année suivie", choices=DERNIERE_ANNEE_SUIVIE, blank=True, null=True)
+    intitule_dernier_diplome_prepare = models.CharField(verbose_name="Intitulé du dernier diplôme obtenu", max_length=100,
+                                                        help_text="Saisissez le libellé précis du dernier diplôme préparé.",
+                                                        blank = True, null = True)
+    diplome_le_plus_eleve = models.PositiveSmallIntegerField(verbose_name="Diplôme le plus élevé obtenu", choices=DIPLOME, blank=True, null=True)
+    nom_representant = models.CharField(verbose_name="Nom", max_length=70, blank=True, null=True)
+    prenom_representant = models.CharField(verbose_name="Prénom", max_length=35, blank=True, null=True)
+    adresse_1_representant = models.CharField(verbose_name="Adresse", max_length=100, blank=True, null=True)
+    adresse_2_representant = models.CharField(verbose_name="Complément d'adresse", max_length=100, blank=True, null=True)
+    code_postal_representant = models.CharField(verbose_name="Code postal", max_length=5, blank=True, null=True)
+    ville_representant = models.CharField(max_length=60, blank=True, null=True)
     date_maj = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
-        return self.nom + " " + self.prenom
-
-    def get_active_contrat(self):
-        # récupération du contrat courant
-        pass
+        return "%s %s" % (self.nom, self.prenom)
 
 
 class Entreprise(models.Model):
@@ -252,28 +253,28 @@ class Entreprise(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    raison_sociale = models.CharField(max_length=70)
-    numero_SIRET = models.CharField(max_length=14)
-    adresse_1 = models.CharField(max_length=100)
-    adresse_2 = models.CharField(max_length=100, blank=True)
-    code_postal = models.CharField(max_length=5)
-    ville = models.CharField(max_length=70)
-    type_employeur = models.PositiveSmallIntegerField(choices=TYPE_EMPLOYEUR)
+    raison_sociale = models.CharField(max_length=70, blank=True, null=True)
+    numero_SIRET = models.CharField(max_length=14, blank=True, null=True)
+    adresse_1 = models.CharField(max_length=100, blank=True, null=True)
+    adresse_2 = models.CharField(max_length=100, blank=True, null=True)
+    code_postal = models.CharField(max_length=5, blank=True, null=True)
+    ville = models.CharField(max_length=70, blank=True, null=True)
+    type_employeur = models.PositiveSmallIntegerField(choices=TYPE_EMPLOYEUR, blank=True, null=True)
     secteur_employeur = models.PositiveSmallIntegerField(choices=SECTEUR_EMPLOYEUR, default=1)
     employeur_specifique = models.PositiveSmallIntegerField(choices=EMPLOYEUR_SPECIFIQUE, default=0)
-    code_APE = models.CharField(max_length=5)
-    effectif_entreprise = models.PositiveSmallIntegerField()
-    telephone = models.CharField(max_length=15)
-    telecopie = models.CharField(max_length=15, blank=True)
-    courriel = models.CharField(max_length=40)
-    code_convention_collective = models.CharField(max_length=4, blank=True)
-    libelle_convention_collective = models.CharField(max_length=200, blank=True)
-    adhesion_regime_assurance_chomage = models.BooleanField(default=False, blank=True)
+    code_APE = models.CharField(max_length=5, blank=True, null=True)
+    effectif_entreprise = models.PositiveSmallIntegerField(blank=True, null=True)
+    telephone = models.CharField(max_length=15, blank=True, null=True)
+    telecopie = models.CharField(max_length=15, blank=True, null=True)
+    courriel = models.CharField(max_length=40, blank=True, null=True)
+    code_convention_collective = models.CharField(max_length=4, blank=True, null=True, help_text="Saisissez le code de la convention collective (4 chiffres). Si la convention collective n'est pas encore entrée en vigueur saisissez 9998. S'il n'y a aucune convention collective, saisissez 9999.")
+    libelle_convention_collective = models.CharField(max_length=200, blank=True, null=True, help_text="Cette donnée est obligatoire. Si le code de convention existe, elle sera renseignée automatiquement.")
+    adhesion_regime_assurance_chomage = models.BooleanField(default=False, help_text="Cochez cette case si l'employeur appartient au secteur public et si l'apprenti adhère au régime spécifique d'assurance chômage.")
     date_maj = models.DateTimeField(default=datetime.datetime.now())
     date_maj_contacts = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
-        return self.raison_sociale
+        return "%s" % (self.raison_sociale)
 
 
 class Personnel(models.Model):
@@ -342,12 +343,12 @@ class Formation(models.Model):
 
     code_formation = models.AutoField(max_length=13, primary_key=True)
     cfa = models.ForeignKey(CFA, on_delete=models.CASCADE)
-    intitule_formation = models.CharField(max_length=150)
-    ville = models.CharField(max_length=35)
-    specialite = models.CharField(max_length=50)
-    diplome = models.PositiveSmallIntegerField(choices=DIPLOME)
-    intitule_diplome = models.CharField(max_length=100)
-    numero_UAI = models.CharField(max_length=8)
+    intitule_formation = models.CharField(max_length=150,blank=True, null=True)
+    ville = models.CharField(max_length=35,blank=True, null=True)
+    specialite = models.CharField(max_length=50,blank=True, null=True)
+    diplome = models.PositiveSmallIntegerField(choices=DIPLOME, blank=True, null=True)
+    intitule_diplome = models.CharField(max_length=100,blank=True, null=True)
+    numero_UAI = models.CharField(max_length=8,blank=True, null=True)
     an_1_du = models.DateField(blank=True, null=True)
     an_1_au = models.DateField(blank=True, null=True)
     heures_an_1 = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -357,12 +358,10 @@ class Formation(models.Model):
     an_3_du = models.DateField(blank=True, null=True)
     an_3_au = models.DateField(blank=True, null=True)
     heures_an_3 = models.PositiveSmallIntegerField(blank=True, null=True)
-    niveau = models.PositiveSmallIntegerField()
-    nombre_annees = models.PositiveSmallIntegerField()
-    annee_remuneration_annee_diplome = models.PositiveSmallIntegerField()
-    inspection_pedagogique_competente = models.PositiveSmallIntegerField()
-    clef_formation = models.CharField(max_length=10)
-
+    niveau = models.PositiveSmallIntegerField(blank=True, null=True)
+    nombre_annees = models.PositiveSmallIntegerField(blank=True, null=True)
+    annee_remuneration_annee_diplome = models.PositiveSmallIntegerField(blank=True, null=True)
+    inspection_pedagogique_competente = models.PositiveSmallIntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.intitule_formation
@@ -387,7 +386,7 @@ class Contrat(models.Model):
         (33,"Prolongation du contrat suite à un échec à l’examen de l’apprenti"),
         (34,"Prolongation du contrat suite à la reconnaissance de l’apprenti comme travailleur handicapé"),
         (35,"Modification du diplôme préparé par l’apprenti"),
-        (36,"Autres changements : changement de maître d’apprentissage, de durée de travail hebdomadaire, etc ..."),
+        (36, "Autres changements : changement de maître d’apprentissage, de durée de travail hebdomadaire, etc ..."),
     )
 
     TYPE_DEROGATION = (
@@ -407,15 +406,15 @@ class Contrat(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
+    alternant = models.ForeignKey(Alternant, on_delete=models.CASCADE, blank=True, null=True)
     mode_contractuel = models.PositiveSmallIntegerField(choices=MODE_CONTRACTUEL)
-    alternant = models.ForeignKey(Alternant, on_delete=models.CASCADE, blank=True)
-    entreprise = models.ForeignKey(Entreprise, on_delete=models.CASCADE, blank=True)
-    formation = models.ForeignKey(Formation, on_delete=models.CASCADE, blank=True)
-    mission = models.TextField(blank=True)
-    type_contrat_avenant = models.PositiveSmallIntegerField(choices=TYPE_CONTRAT_AVENANT)
+    entreprise = models.ForeignKey(Entreprise, on_delete=models.CASCADE, blank=True, null=True)
+    formation = models.ForeignKey(Formation, on_delete=models.CASCADE, blank=True, null=True)
+    mission = models.TextField(blank=True, null=True)
+    type_contrat_avenant = models.PositiveSmallIntegerField(choices=TYPE_CONTRAT_AVENANT, blank=True, null=True)
     date_inscription = models.DateField(blank=True, null=True)
     type_derogation = models.PositiveSmallIntegerField(verbose_name="Type de dérogation", choices=TYPE_DEROGATION, blank=True, null=True)
-    numero_contrat_anterieur = models.CharField(max_length=20, blank=True)
+    numero_contrat_anterieur = models.CharField(max_length=8, blank=True, null=True)
     date_embauche = models.DateField(blank=True, null=True)
     date_debut_contrat = models.DateField(blank=True, null=True)
     date_effet_avenant = models.DateField(blank=True, null=True)
@@ -475,7 +474,7 @@ class Contrat(models.Model):
     contrat_courant = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.id
+        return "Contrat %i" % self.id
 
 
 class SMIC (models.Model):
@@ -485,7 +484,7 @@ class SMIC (models.Model):
     montant = models.FloatField()
 
     def __str__(self):
-        return self.id
+        return "SMIC %i" % self.id
 
 
 class Minima (models.Model):
@@ -520,3 +519,12 @@ class NAF (models.Model):
 
     def __str__(self):
         return self.code
+
+
+class ConventionCollective(models.Model):
+    code = models.CharField(max_length=4)
+    libelle = models.CharField(max_length=300)
+
+    def __str__(self):
+        return "%s" % (self.code)
+

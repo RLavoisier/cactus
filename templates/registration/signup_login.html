@@ -5,34 +5,20 @@
 {% block bodyId %}loginPage{% endblock %}
 
 {% block content %}
-<h2>S'enregistrer</h2>
+<h3>Vous avez un compte. Identifiez-vous.</h3>
+<form action="{% url 'comptes:login' %}" method="POST">
+    {{ form.as_p }}
+    {% csrf_token %}
+    <p><a href="{% url 'comptes:password_reset' %}">Mot de passe oublié</a></p>
+    <input type="submit" value="Envoyer">
+</form>
+
+<h3>Vous n'avez pas encore de compte</h3>
+<p>Pour votre inscription, utilisez une adresse mail que vous pensez conserver. N'utilisez pas d'adresse fournie par un lycée ou votre organisme de formation actuel.</p>
 <form action="{% url 'comptes:signup' %}" method="POST">
     {{ signup_form.as_p }}
     {% csrf_token %}
     <input type="submit" value="Envoyer">
 </form>
 
-<h2>S'authentifier</h2>
-<form action="{% url 'comptes:login' %}" method="POST">
-    {{ login_form.as_p }}
-    {% csrf_token %}
-    <p><a href="{% url 'comptes:password_reset' %}">Mot de passe oublié</a></p>
-    <input type="submit" value="Envoyer">
-</form>
-{% endblock %}
-
-{% block menucontent %}
-  menu
-{% endblock %}
-
-{% block leftsidecontent %}
-  gauche
-{% endblock %}
-
-{% block rightsidecontent %}
-  droite
-{% endblock %}
-
-{% block footercontent %}
-  pied
 {% endblock %}

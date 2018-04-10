@@ -7,7 +7,6 @@ body {
 }
 
 header {
-  position: absolute;
   left: 0;
   top: 0;
   height: 120px;
@@ -17,18 +16,9 @@ header {
   border-bottom: 1px solid #133783;
 }
 
-body#loginPage section#menu {
-  position: absolute;
-  top: 120px;
-  left:10%;
-  width: 70%;
-  height:50px;
-  border-bottom: 1px solid #133783;
-}
-
 body#loginPage section#content {
   position: absolute;
-  top: 180px;
+  top: 120px;
   bottom:50px;
   left: 10%;
   width: 70%;

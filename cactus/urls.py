@@ -24,6 +24,7 @@ from saisiecontrat.views import creationcontrat, create_entreprise
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', accueil, name="accueil"),
+    path('accueil/', accueil, name="accueil"),
     path('creationcontrat/',creationcontrat, name="creationcontrat"),
     path('creationentreprise/', create_entreprise, name="creationentreprise"),
     path('creationalternant/', create_alternant, name="creationalternant"),

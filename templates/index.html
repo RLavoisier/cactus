@@ -9,7 +9,7 @@
 <p>Bienvenue {{ user.email }}</p>
 <a href="{% url 'comptes:logout' %}">Se déconnecter</a>
 
-{% if alternant.nom %}
+{% if not alternant %}
 Bonjour {{ alternant.nom }} {{ alternant.prenom }}
 {% else %}
 <a href="{% url 'creationalternant' %}">Remplissez vos données alternant</a>
@@ -17,18 +17,3 @@ Bonjour {{ alternant.nom }} {{ alternant.prenom }}
 
 {% endblock %}
 
-{% block menucontent %}
-  menu
-{% endblock %}
-
-{% block leftsidecontent %}
-  gauche
-{% endblock %}
-
-{% block rightsidecontent %}
-  droite
-{% endblock %}
-
-{% block footercontent %}
-  pied
-{% endblock %}

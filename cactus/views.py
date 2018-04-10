@@ -9,16 +9,6 @@ def accueil(request):
     # logout(request)
     # On vérifie que l'utilisateur est loggé
     if not request.user.is_authenticated:
-        return redirect("comptes:signup")
+        return redirect("comptes:signup_or_login")
     else:
-        try:
-            alternant = Alternant(user=request.user)
-        except ObjectDoesNotExist:
-            alternant = None
-
-        context = {
-            "user": request.user,
-            "alternant": alternant
-        }
-    # on retourne la page d'accueil
-    return render(request, "index.html", context)
+        return redirect("creationcontrat")

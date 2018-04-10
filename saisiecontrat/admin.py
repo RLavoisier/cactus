@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Alternant, Entreprise, Personnel, CFA, Formation, Contrat, SMIC, Minima, Parametre, Commune, NAF
+from .models import Alternant, Entreprise, Personnel, CFA, Formation, Contrat, SMIC, Minima, Parametre, Commune, NAF, \
+    ConventionCollective
 
 # Register your models here.
 
@@ -14,3 +15,4 @@ admin.site.register(Minima)
 admin.site.register(Parametre)
 admin.site.register(Commune)
 admin.site.register(NAF)
+admin.site.register(ConventionCollective)
