@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from saisiecontrat.views import creationcontrat, create_entreprise, create_alternant, inform_contrat, inform_mission
+from saisiecontrat.views import creationcontrat, create_entreprise, create_alternant, inform_contrat, inform_mission, \
+    liste_formation
 from django.urls import path, include
 
 from cactus.views import accueil
@@ -31,4 +32,5 @@ urlpatterns = [
     path('creationalternant/', create_alternant, name="creationalternant"),
     path('informationcontrat/', inform_contrat, name="informationcontrat"),
     path('informationmission/', inform_mission, name="informationmission"),
+    path('liste_formation/', liste_formation.as_view(), name="liste_formation"),
 ]

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block bodyId %}loginPage{% endblock %}
+
+{% block content %}
+    {% if formations %}
+        <div class="card">
+          <div class="card-header">
+            Recherche
+          </div>
+          <div class="card-body">
+              <form action="." method="GET">
+                  <label for="specialite">Specialité :</label>
+                  <select name="specialite">
+                      {% for specialite in specialites %}
+                          <option {% if request.GET.specialite == specialite %} selected="selected"{% endif %} value="{{ specialite }}">{{ specialite|default:"Sans specialite" }}</option>
+                      {% endfor %}
+                  </select>
+                  <input type="submit" value="rechercher" />
+              </form>
+          </div>
+        </div>
+        {% regroup formations by specialite as formation_list %}
+        {% for frm in formation_list %}
+            <h2>{{ frm.grouper|default:"Sans specialite" }}</h2>
+            <div id="accordion">
+            {% for formation in frm.list %}
+            <div class="card">
+            <div class="card-header" id="heading{{ formation.code_formation }}">
+              <h5 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse{{ formation.code_formation }}" aria-expanded="true" aria-controls="collapse{{ formation.code_formation }}">
+                  {{ formation.code_formation }} - {{ formation.intitule_formation }}
+                </button>
+              </h5>
+            </div>
+
+            <div id="collapse{{ formation.code_formation }}" class="collapse" aria-labelledby="heading{{ formation.code_formation }}" data-parent="#accordion">
+              <div class="card-body">
+                <p>Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute,
+                    non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
+                    Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et.
+                    Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+                    Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table,
+                    raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</p>
+                  <p><a class="btn btn-primary" role="button" href="#">Selectionner</a></p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+        {% endfor %}
+        </div>
+    {% else %}
+        <h2>Aucune formation à afficher</h2>
+    {% endif %}
+{% endblock %}
+
+{% block menucontent %}
+  menu
+{% endblock %}
+
+{% block leftsidecontent %}
+  gauche
+{% endblock %}

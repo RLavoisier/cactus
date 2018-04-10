@@ -2,8 +2,11 @@
 
 from django.shortcuts import render, redirect
 from datetime import datetime
+
+from django.views.generic import ListView
+
 from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm, CreationAlternantForm, InformationContratForm, InformationMissionForm
-from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel
+from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel, Formation
 from django.core.exceptions import ObjectDoesNotExist
 
 def creationcontrat(request):
@@ -253,3 +256,26 @@ def inform_mission(request):
         form = InformationMissionForm()
         return render(request, "mission_form.html", {"form": form})
 
+
+class liste_formation(ListView):
+    queryset = Formation.objects.order_by("specialite")
+    template_name = "formations_list.html"
+    context_object_name = "formations"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=None, **kwargs)
+        specialites = Formation.objects.order_by("specialite").values_list("specialite", flat=True).distinct()
+        context["specialites"] = ["Toutes"] + list(specialites)
+        context["request"] = self.request
+
+        return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        specialite_filter = self.request.GET.get("specialite")
+
+        if specialite_filter and specialite_filter != "Toutes":
+            queryset = queryset.filter(specialite=self.request.GET.get("specialite"))
+
+        return queryset
