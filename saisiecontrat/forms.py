@@ -239,6 +239,160 @@ class CreationAlternantForm(forms.ModelForm):
 
         }
 
+    def clean_nom(self):
+
+        nom = self.cleaned_data["nom"]
+
+        if nom is None:
+            raise forms.ValidationError("Le nom doit être renseigné.")
+        else:
+            return nom
+
+    def clean_prenom(self):
+
+        prenom = self.cleaned_data["prenom"]
+
+        if prenom is None:
+            raise forms.ValidationError("Le prénom doit être renseigné.")
+        else:
+            return prenom
+
+    def clean_date_naissance(self):
+
+        date_naissance = self.cleaned_data["date_naissance"]
+
+        if date_naissance is None:
+            raise forms.ValidationError("Le date de naissance doit être renseignée.")
+        else:
+            return date_naissance
+
+    def clean_numero_departement_naissance(self):
+
+        numero_departement_naissance = self.cleaned_data["numero_departement_naissance"]
+
+        if numero_departement_naissance is None:
+            raise forms.ValidationError("Le numéro_de département de naissance doit être renseigné.")
+        else:
+            return numero_departement_naissance
+
+    def clean_courriel(self):
+
+        courriel = self.cleaned_data["courriel"]
+
+        if courriel is None:
+            raise forms.ValidationError("Le courriel doit être renseigné.")
+        else:
+            return courriel
+
+    def clean_courriel(self):
+
+        courriel = self.cleaned_data["courriel"]
+
+        if courriel is None:
+            raise forms.ValidationError("Le courriel doit être renseigné.")
+        else:
+            return courriel
+
+    def clean_courriel(self):
+
+        courriel = self.cleaned_data["courriel"]
+
+        if courriel is None:
+            raise forms.ValidationError("Le courriel doit être renseigné.")
+        else:
+            return courriel
+
+    def clean_courriel(self):
+
+        courriel = self.cleaned_data["courriel"]
+
+        if courriel is None:
+            raise forms.ValidationError("Le courriel doit être renseigné.")
+        else:
+            return courriel
+
+    def clean_courriel(self):
+
+        courriel = self.cleaned_data["courriel"]
+
+        if courriel is None:
+            raise forms.ValidationError("Le courriel doit être renseigné.")
+        else:
+            return courriel
+
+    def clean_courriel(self):
+
+        courriel = self.cleaned_data["courriel"]
+
+        if courriel is None:
+            raise forms.ValidationError("Le courriel doit être renseigné.")
+        else:
+            return courriel
+
+    def clean_courriel(self):
+
+        courriel = self.cleaned_data["courriel"]
+
+        if courriel is None:
+            raise forms.ValidationError("Le courriel doit être renseigné.")
+        else:
+            return courriel
+
+    def clean_courriel(self):
+
+        courriel = self.cleaned_data["courriel"]
+
+        if courriel is None:
+            raise forms.ValidationError("Le courriel doit être renseigné.")
+        else:
+            return courriel
+
+    def clean_courriel(self):
+
+        courriel = self.cleaned_data["courriel"]
+
+        if courriel is None:
+            raise forms.ValidationError("Le courriel doit être renseigné.")
+        else:
+            return courriel
+
+    def clean_courriel(self):
+
+        courriel = self.cleaned_data["courriel"]
+
+        if courriel is None:
+            raise forms.ValidationError("Le courriel doit être renseigné.")
+        else:
+            return courriel
+
+    def clean_courriel(self):
+
+        courriel = self.cleaned_data["courriel"]
+
+        if courriel is None:
+            raise forms.ValidationError("Le courriel doit être renseigné.")
+        else:
+            return courriel
+
+    def clean_courriel(self):
+
+        courriel = self.cleaned_data["courriel"]
+
+        if courriel is None:
+            raise forms.ValidationError("Le courriel doit être renseigné.")
+        else:
+            return courriel
+
+    def clean_courriel(self):
+
+        courriel = self.cleaned_data["courriel"]
+
+        if courriel is None:
+            raise forms.ValidationError("Le courriel doit être renseigné.")
+        else:
+            return courriel
+
+
 class InformationContratForm(forms.ModelForm):
 
     class Meta:

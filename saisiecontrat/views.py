@@ -63,7 +63,8 @@ def creationcontrat(request):
 
 def create_entreprise(request):
 
-    if request.method == "POST":
+    if len(request.POST) > 0:
+
         # On créé le formulaire en lui passant le contenu du post
         # Comme c'est un formulaire modèle, cela prépare également un objet de base de donnée
         form = CreationEntrepriseForm(request.POST)
@@ -163,7 +164,6 @@ def create_alternant(request):
             alternant.ville = request.POST['ville']
             alternant.telephone = request.POST['telephone']
             #alternant.handicape = request.POST['handicape']
-            #alternant.courriel = request.POST['courriel']
             alternant.nationalite = request.POST['nationalite']
             alternant.regime_social = request.POST['regime_social']
             alternant.situation_avant_contrat = request.POST['situation_avant_contrat']
@@ -204,14 +204,13 @@ def create_alternant(request):
 
 def inform_contrat(request):
 
-    if request.method == "POST":
-        # On créé le formulaire en lui passant le contenu du post
-        # Comme c'est un formulaire modèle, cela prépare également un objet de base de donnée
+    if len(request.POST) > 0:
+
         form = InformationContratForm(request.POST)
 
         if form.is_valid():
 
-            # Ici, on sauvegarde le formulaire, ce qui nous renvoie automatiauement
+            # Ici, on sauvegarde le formulaire, ce qui nous renvoie automatiquement
             # un nouvel objet contrat
 
             contrat = form.save()
@@ -221,6 +220,7 @@ def inform_contrat(request):
         else:
             return render(request, "contrat_form.html", {"form": form})
     else:
+
         # Il faut que la date de naissance de l'alternant soit renseignée avant l'appel à ce formulaire
 
         form = InformationContratForm()
