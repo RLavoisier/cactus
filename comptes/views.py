@@ -2,6 +2,7 @@ from django.contrib.auth import login, authenticate
 
 # Create your views here.
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import TemplateView
@@ -12,7 +13,9 @@ from saisiecontrat.models import Alternant
 
 
 class UserSignupView(CreateView):
-
+    """
+    Vue servant à l'enregistrement d'un utilisateur
+    """
     template_name = "registration/signup.html"
     form_class = CactusUserCreationForm
     success_url = reverse_lazy("creationcontrat")
@@ -41,11 +44,9 @@ class UserSignupView(CreateView):
 
 
 class UserSignupOrLoginView(TemplateView):
-
     template_name = "registration/signup_login.html"
 
     def get_context_data(self, **kwargs):
-
         context = super().get_context_data(**kwargs)
 
         context["signup_form"] = CactusUserCreationForm()

@@ -10,9 +10,9 @@
 <a href="{% url 'comptes:logout' %}">Se déconnecter</a>
 
 {% if not alternant %}
-Bonjour {{ alternant.nom }} {{ alternant.prenom }}
-{% else %}
 <a href="{% url 'creationalternant' %}">Remplissez vos données alternant</a>
+{% else %}
+Bonjour {{ alternant.nom }} {{ alternant.prenom }}
 {% endif %}
 
 {% endblock %}
