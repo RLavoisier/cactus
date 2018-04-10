@@ -357,10 +357,10 @@ class Formation(models.Model):
     an_3_du = models.DateField(blank=True, null=True)
     an_3_au = models.DateField(blank=True, null=True)
     heures_an_3 = models.PositiveSmallIntegerField(blank=True, null=True)
-    niveau = models.PositiveSmallIntegerField()
-    nombre_annees = models.PositiveSmallIntegerField()
-    annee_remuneration_annee_diplome = models.PositiveSmallIntegerField()
-    inspection_pedagogique_competente = models.PositiveSmallIntegerField()
+    niveau = models.PositiveSmallIntegerField(blank=True, null=True)
+    nombre_annees = models.PositiveSmallIntegerField(blank=True, null=True)
+    annee_remuneration_annee_diplome = models.PositiveSmallIntegerField(blank=True, null=True)
+    inspection_pedagogique_competente = models.PositiveSmallIntegerField(blank=True, null=True)
     clef_formation = models.CharField(max_length=10)
 
 
