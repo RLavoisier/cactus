@@ -3,7 +3,8 @@
 from django.shortcuts import render, redirect
 from datetime import datetime
 
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
+from django.views.generic.edit import FormMixin
 
 from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm, CreationAlternantForm, InformationContratForm, InformationMissionForm
 from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel, Formation
@@ -25,7 +26,7 @@ def creationcontrat(request):
             except ObjectDoesNotExist:
                 contrat = None
 
-            # Si aucun contrat n'existe on cré un nouveau contrat
+            # Si aucun contrat n'existe on crée un nouveau contrat
 
             if contrat is not None:
 
@@ -60,7 +61,7 @@ def creationcontrat(request):
                 "numero_contrat_anterieur": contrat.numero_contrat_anterieur,
             })
         else:
-            form = CreationContratForm(instance=contrat)
+            form = CreationContratForm()
 
         return render(request, 'creationcontrat.html', {'form': form})
 
@@ -260,9 +261,11 @@ def inform_mission(request):
 class liste_formation(ListView):
     queryset = Formation.objects.order_by("specialite")
     template_name = "formations_list.html"
+    # variable contenant les objets pour les passer au template
     context_object_name = "formations"
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        # super fait référence à la classe mère ListView
         context = super().get_context_data(object_list=None, **kwargs)
         specialites = Formation.objects.order_by("specialite").values_list("specialite", flat=True).distinct()
         context["specialites"] = ["Toutes"] + list(specialites)
@@ -276,6 +279,41 @@ class liste_formation(ListView):
         specialite_filter = self.request.GET.get("specialite")
 
         if specialite_filter and specialite_filter != "Toutes":
-            queryset = queryset.filter(specialite=self.request.GET.get("specialite"))
+            queryset = queryset.filter(specialite=specialite_filter)
 
         return queryset
+
+
+class detail_formation(DetailView):
+    model = Formation
+    template_name = ("detail_formation.html")
+    context_object_name = "formation"
+
+    def get_object(self, queryset=None):
+        alternant = self.request.user.alternant
+        # self.contrat permet de récupérer le contrat ailleurs dans la class
+        self.contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        formation = self.contrat.formation
+
+        # la fonction du return est d'envoyer les infos à la page
+        return formation
+
+    # On redéfinit la fonction get de la classe DetailView
+    def get(self, request, *args, **kwargs):
+        # get_object redéfini au-dessus pour ramener une formation précise
+        self.object = self.get_object()
+
+        # l'objet de la redéfinition est de reouter en cas de non définition de la formationsur le contrat
+        if not self.object:
+            return redirect("liste_formation")
+        # pas besoin de else: le return return sort de la fonction
+        context = self.get_context_data(object=self.object)
+        context["nombre_annees"] = self.contrat.nombre_annees
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        nombre_annee = self.request.POST.get("nombre_annees")
+        #changer contrat
+
+        return redirect("detail_formation")
+

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block bodyId %}loginPage{% endblock %}
+
+{% block content %}
+    <h1>{{ formation.intitule_formation }}</h1>
+    <p>{{ formation.code_formation }}</p>
+
+    <form action="." method="POST">
+        <input type="text" name="nombre_annees" value="{{ nombre_annees }}">
+        <input type="submit" value="Valider" />
+    </form>
+
+{% endblock %}
+
+{% block menucontent %}
+  menu
+{% endblock %}
+
+{% block leftsidecontent %}
+  gauche
+{% endblock %}

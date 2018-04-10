@@ -2,6 +2,8 @@
 
 from django import forms
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+
 from saisiecontrat.models import Contrat, Entreprise, NAF, Alternant, Personnel, ConventionCollective
 
 
@@ -180,7 +182,7 @@ class CreationEntrepriseForm(forms.ModelForm):
 
     def clean_code_convention_collective(self):
 
-        code_convention_collective = self.cleaned_data["code_convention_collective"]
+        code_convention_collective = self.cleaned_data.get("code_convention_collective")
 
         if code_convention_collective is None:
             raise forms.ValidationError("Le code de la convention collective doit être renseigné.")
@@ -189,16 +191,16 @@ class CreationEntrepriseForm(forms.ModelForm):
 
     def clean_libelle_convention_collective(self):
 
-        libelle_convention_collective = self.cleaned_data["libelle_convention_collective"]
-        code_convention_collective = self.cleaned_data["code_convention_collective"]
+        libelle_convention_collective = self.cleaned_data.get("libelle_convention_collective")
+        code_convention_collective = self.cleaned_data.get("code_convention_collective")
 
         if not code_convention_collective is None:
             try:
-                conventioncollective = ConventionCollective.objects.get(code=request.POST.get("code_convention_collective"))
+                conventioncollective = ConventionCollective.objects.get(code=self.cleaned_data.get("code_convention_collective"))
             except ObjectDoesNotExist:
                 conventioncollective = None
 
-            if conventioncollective is None:
+            if conventioncollective is None and libelle_convention_collective is None:
                 raise forms.ValidationError("La convention collective %s est inconnue, veuillez renseigner le libellé." % (code_convention_collective))
             else:
                 return libelle_convention_collective

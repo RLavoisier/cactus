@@ -362,7 +362,6 @@ class Formation(models.Model):
     nombre_annees = models.PositiveSmallIntegerField(blank=True, null=True)
     annee_remuneration_annee_diplome = models.PositiveSmallIntegerField(blank=True, null=True)
     inspection_pedagogique_competente = models.PositiveSmallIntegerField(blank=True, null=True)
-    clef_formation = models.CharField(max_length=10)
 
 
     def __str__(self):
@@ -471,7 +470,6 @@ class Contrat(models.Model):
     date_saisie_complete = models.DateTimeField(blank=True, null=True)
     date_generation_CERFA = models.DateTimeField(blank=True, null=True)
     date_exportation_CFA = models.DateTimeField(blank=True, null=True)
-    cursus_abrege = models.BooleanField(default=False)
     nombre_annees = models.PositiveSmallIntegerField(blank=True, null=True)
     contrat_courant = models.BooleanField(default=True)
 

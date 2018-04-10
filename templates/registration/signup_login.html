@@ -7,7 +7,7 @@
 {% block content %}
 <h3>Vous avez un compte. Identifiez-vous.</h3>
 <form action="{% url 'comptes:login' %}" method="POST">
-    {{ form.as_p }}
+    {{ login_form.as_p }}
     {% csrf_token %}
     <p><a href="{% url 'comptes:password_reset' %}">Mot de passe oublié</a></p>
     <input type="submit" value="Envoyer">
