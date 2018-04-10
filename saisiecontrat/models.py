@@ -362,6 +362,8 @@ class Formation(models.Model):
     nombre_annees = models.PositiveSmallIntegerField(blank=True, null=True)
     annee_remuneration_annee_diplome = models.PositiveSmallIntegerField(blank=True, null=True)
     inspection_pedagogique_competente = models.PositiveSmallIntegerField(blank=True, null=True)
+    clef_formation = models.CharField(max_length=10)
+
 
     def __str__(self):
         return self.intitule_formation
