@@ -14,6 +14,8 @@ header {
   background: #ffffff url('../img/logo.png') no-repeat 25px 10px;
   background-size: 30%;
   border-bottom: 1px solid #133783;
+  text-align:right;
+  text-align:bottom;
 }
 
 body#loginPage section#content {

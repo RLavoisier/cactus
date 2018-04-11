@@ -15,6 +15,7 @@ class CreationContratForm(forms.Form):
     mode_contractuel = forms.IntegerField(label='Mode contractuel :',
                                       widget=forms.Select(choices=Contrat.MODE_CONTRACTUEL),
                                       )
+    date_effet_avenant = forms.DateField(required=False)
     numero_contrat_anterieur = forms.CharField(required=False)
 
 
@@ -33,15 +34,19 @@ class CreationContratForm(forms.Form):
             if len(numero_contrat_anterieur) == 0 and type_contrat_avenant in (21,31,32,33,34,35,36):
                 raise forms.ValidationError("Le numéro de contrat antérieur doit être renseigné pour les avenants et les renouvellements de contrat chez le même employeur.")
 
-
         return cleaned_data
 
 
 class CreationEntrepriseForm(forms.ModelForm):
 
-    civilite_dirigeant = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE))
-    nom_dirigeant = forms.CharField(max_length=40)
-    prenom_dirigeant = forms.CharField(max_length=40)
+    civilite_ma_1 = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE))
+    nom_ma_1 = forms.CharField(max_length=40)
+    prenom_ma_1 = forms.CharField(max_length=40)
+    date_naissance_ma_1 = forms.DateField()
+    civilite_ma_2 = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE))
+    nom_ma_2= forms.CharField(max_length=40, required=False)
+    prenom_ma_2 = forms.CharField(max_length=40, required=False)
+    date_naissance_ma_2 = forms.DateField(required=False)
 
     class Meta:
         """
@@ -205,23 +210,32 @@ class CreationEntrepriseForm(forms.ModelForm):
             else:
                 return libelle_convention_collective
 
-    def clean_nom_dirigeant(self):
+    def clean_nom_ma_1(self):
 
-        nom_dirigeant = self.cleaned_data["nom_dirigeant"]
+        nom_ma_1 = self.cleaned_data["nom_ma_1"]
 
-        if nom_dirigeant is None:
-            raise forms.ValidationError("Le nom du (de la) dirigeant(e) doit être renseigné.")
+        if nom_ma_1 is None:
+            raise forms.ValidationError("Le nom du maître d'apprentissage doit être renseigné.")
         else:
-            return nom_dirigeant
+            return nom_ma_1
 
-    def clean_prenom_dirigeant(self):
+    def clean_prenom_ma_1(self):
 
-        prenom_dirigeant = self.cleaned_data["prenom_dirigeant"]
+        prenom_ma_1 = self.cleaned_data["prenom_ma_1"]
 
-        if prenom_dirigeant is None:
-            raise forms.ValidationError("Le prénom du (de la) dirigeant(e) doit être renseigné.")
+        if prenom_ma_1 is None:
+            raise forms.ValidationError("Le prénom du maître d'apprentissage doit être renseigné.")
         else:
-            return prenom_dirigeant
+            return prenom_ma_1
+
+    def clean_date_naissance_ma_1(self):
+
+        date_naissance_ma_1 = self.cleaned_data["date_naissance_ma_1"]
+
+        if date_naissance_ma_1 is None:
+            raise forms.ValidationError("La date de naissance du maître d'apprentissage doit être renseigné.")
+        else:
+            return date_naissance_ma_1
 
 
 class CreationAlternantForm(forms.ModelForm):
@@ -243,7 +257,7 @@ class CreationAlternantForm(forms.ModelForm):
 
     def clean_nom(self):
 
-        nom = self.cleaned_data["nom"]
+        nom = self.cleaned_data.get("nom")
 
         if nom is None:
             raise forms.ValidationError("Le nom doit être renseigné.")
@@ -252,7 +266,7 @@ class CreationAlternantForm(forms.ModelForm):
 
     def clean_prenom(self):
 
-        prenom = self.cleaned_data["prenom"]
+        prenom = self.cleaned_data.get("prenom")
 
         if prenom is None:
             raise forms.ValidationError("Le prénom doit être renseigné.")
@@ -261,7 +275,7 @@ class CreationAlternantForm(forms.ModelForm):
 
     def clean_date_naissance(self):
 
-        date_naissance = self.cleaned_data["date_naissance"]
+        date_naissance = self.cleaned_data.get("date_naissance")
 
         if date_naissance is None:
             raise forms.ValidationError("Le date de naissance doit être renseignée.")
@@ -270,130 +284,111 @@ class CreationAlternantForm(forms.ModelForm):
 
     def clean_numero_departement_naissance(self):
 
-        numero_departement_naissance = self.cleaned_data["numero_departement_naissance"]
+        numero_departement_naissance = self.cleaned_data.get("numero_departement_naissance")
 
         if numero_departement_naissance is None:
             raise forms.ValidationError("Le numéro_de département de naissance doit être renseigné.")
         else:
             return numero_departement_naissance
 
-    def clean_courriel(self):
+    def clean_commune_naissance(self):
 
-        courriel = self.cleaned_data["courriel"]
+        commune_naissance = self.cleaned_data.get("commune_naissance")
 
-        if courriel is None:
-            raise forms.ValidationError("Le courriel doit être renseigné.")
+        if commune_naissance is None:
+            raise forms.ValidationError("La commune de naissance doit être renseignée.")
         else:
-            return courriel
+            return commune_naissance
 
-    def clean_courriel(self):
+    def clean_adresse_1(self):
 
-        courriel = self.cleaned_data["courriel"]
+        adresse_1 = self.cleaned_data.get("adresse_1")
 
-        if courriel is None:
-            raise forms.ValidationError("Le courriel doit être renseigné.")
+        if adresse_1 is None:
+            raise forms.ValidationError("L'adresse doit être renseignée.")
         else:
-            return courriel
+            return adresse_1
 
-    def clean_courriel(self):
+    def clean_code_postal(self):
 
-        courriel = self.cleaned_data["courriel"]
+        code_postal = self.cleaned_data.get("code_postal")
 
-        if courriel is None:
-            raise forms.ValidationError("Le courriel doit être renseigné.")
+        if code_postal is None:
+            raise forms.ValidationError("Le code postal doit être renseigné.")
         else:
-            return courriel
+            return code_postal
 
-    def clean_courriel(self):
+    def clean_ville(self):
 
-        courriel = self.cleaned_data["courriel"]
+        ville = self.cleaned_data.get("ville")
 
-        if courriel is None:
-            raise forms.ValidationError("Le courriel doit être renseigné.")
+        if ville is None:
+            raise forms.ValidationError("La ville doit être renseignée.")
         else:
-            return courriel
+            return ville
 
-    def clean_courriel(self):
+    def clean_telephone(self):
 
-        courriel = self.cleaned_data["courriel"]
+        telephone = self.cleaned_data.get("telephone")
 
-        if courriel is None:
-            raise forms.ValidationError("Le courriel doit être renseigné.")
+        if telephone is None:
+            raise forms.ValidationError("Le téléphone doit être renseigné.")
         else:
-            return courriel
+            return telephone
 
-    def clean_courriel(self):
+    def clean_nationalite(self):
 
-        courriel = self.cleaned_data["courriel"]
+        nationalite = self.cleaned_data.get("nationalite")
 
-        if courriel is None:
-            raise forms.ValidationError("Le courriel doit être renseigné.")
+        if nationalite is None:
+            raise forms.ValidationError("La nationalité doit être renseignée.")
         else:
-            return courriel
+            return nationalite
 
-    def clean_courriel(self):
+    def clean_regime_social(self):
 
-        courriel = self.cleaned_data["courriel"]
+        regime_social = self.cleaned_data.get("regime_social")
 
-        if courriel is None:
-            raise forms.ValidationError("Le courriel doit être renseigné.")
+        if regime_social is None:
+            raise forms.ValidationError("Le régime social doit être renseigné.")
         else:
-            return courriel
+            return regime_social
 
-    def clean_courriel(self):
+    def clean_situation_avant_contrat(self):
 
-        courriel = self.cleaned_data["courriel"]
+        situation_avant_contrat = self.cleaned_data.get("situation_avant_contrat")
 
-        if courriel is None:
-            raise forms.ValidationError("Le courriel doit être renseigné.")
+        if situation_avant_contrat is None:
+            raise forms.ValidationError("La situation avant contrat doit être renseignée.")
         else:
-            return courriel
+            return situation_avant_contrat
 
-    def clean_courriel(self):
+    def clean_dernier_diplome_prepare(self):
 
-        courriel = self.cleaned_data["courriel"]
+        dernier_diplome_prepare = self.cleaned_data.get("dernier_diplome_prepare")
 
-        if courriel is None:
-            raise forms.ValidationError("Le courriel doit être renseigné.")
+        if dernier_diplome_prepare is None:
+            raise forms.ValidationError("Le dernier diplôme préparé doit être renseigné.")
         else:
-            return courriel
+            return dernier_diplome_prepare
 
-    def clean_courriel(self):
+    def clean_derniere_annee_suivie(self):
 
-        courriel = self.cleaned_data["courriel"]
+        derniere_annee_suivie = self.cleaned_data.get("derniere_annee_suivie")
 
-        if courriel is None:
-            raise forms.ValidationError("Le courriel doit être renseigné.")
+        if derniere_annee_suivie is None:
+            raise forms.ValidationError("La dernière année suivie pour le dernier diplôme préparé doit être renseignée.")
         else:
-            return courriel
+            return derniere_annee_suivie
 
-    def clean_courriel(self):
+    def clean_intitule_dernier_diplome_prepare(self):
 
-        courriel = self.cleaned_data["courriel"]
+        intitule_dernier_diplome_prepare = self.cleaned_data.get("intitule_dernier_diplome_prepare")
 
-        if courriel is None:
-            raise forms.ValidationError("Le courriel doit être renseigné.")
+        if intitule_dernier_diplome_prepare is None:
+            raise forms.ValidationError("L'intitulé précis du dernier diplôme préparé être renseignée.")
         else:
-            return courriel
-
-    def clean_courriel(self):
-
-        courriel = self.cleaned_data["courriel"]
-
-        if courriel is None:
-            raise forms.ValidationError("Le courriel doit être renseigné.")
-        else:
-            return courriel
-
-    def clean_courriel(self):
-
-        courriel = self.cleaned_data["courriel"]
-
-        if courriel is None:
-            raise forms.ValidationError("Le courriel doit être renseigné.")
-        else:
-            return courriel
-
+            return intitule_dernier_diplome_prepare
 
 class InformationContratForm(forms.ModelForm):
 
@@ -407,13 +402,61 @@ class InformationContratForm(forms.ModelForm):
 
         exclude = ["date_maj", "type_contrat_avenant", "mode_contractuel", "numero_contrat_anterieur", "alternant",
                    "formation", "entreprise", "mission", "date_inscription", "contrat_courant", "date_maj_mission",
-                   "date_maj", "date_generation_CERFA", "date_exportation_CFA","date_saisie_complete"]
+                   "date_maj", "date_generation_CERFA", "date_exportation_CFA","date_saisie_complete","nombre_années",
+                   "attestation_pieces", "attestation_maitre_apprentissage"]
 
         # Si vous souhaitez, éditez les widgets des champs (si ceux par défaut ne vous conviennent pas
         widgets = {
 
         }
 
+    def clean_date_embauche(self):
+
+        date_embauche = self.cleaned_data.get("date_embauche")
+
+        if date_embauche is None:
+            raise forms.ValidationError("La date d'embauche doit être renseignée.")
+        else:
+            return date_embauche
+
+    def clean_date_debut_contrat(self):
+
+        date_debut_contrat = self.cleaned_data.get("date_debut_contrat")
+
+        if date_debut_contrat is None:
+            raise forms.ValidationError("La date de début de contrat doit être renseignée.")
+        else:
+            return date_debut_contrat
+
+    def clean_date_effet_avenant(self):
+
+        date_effet_avenant = self.cleaned_data.get("date_effet_avenant")
+        alternant = Alternant(user=self.request.user)
+        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+
+        if contrat.type_contrat_avenant in (31, 32, 33,34,35,36):
+            if date_effet_avenant is None:
+                raise forms.ValidationError("La date d'effet de l'avenant doit être renseignée.")
+            else:
+                return date_effet_avenant
+
+    def clean_date_fin_contrat(self):
+
+        date_fin_contrat = self.cleaned_data.get("date_fin_contrat")
+
+        if date_fin_contrat is None:
+            raise forms.ValidationError("La date de fin de contrat doit être renseignée.")
+        else:
+            return date_fin_contrat
+
+    def clean_duree_hebdomadaire_travail(self):
+
+        duree_hebdomadaire_travail = self.cleaned_data.get("duree_hebdomadaire_travail")
+
+        if duree_hebdomadaire_travail is None:
+            raise forms.ValidationError("La durée hebdomadaire du travail doit être renseignée.")
+        else:
+            return duree_hebdomadaire_travail
 
 
 class InformationMissionForm(forms.ModelForm):
@@ -428,5 +471,10 @@ class InformationMissionForm(forms.ModelForm):
 
     def clean_mission(self):
 
-       raise forms.ValidationError("Mission erronée.")
+        mission = self.cleaned_data.get("mission")
+
+        if mission is None:
+            raise forms.ValidationError("Vous devez saisir une mission.")
+        else:
+            return mission
 

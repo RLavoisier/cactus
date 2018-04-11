@@ -205,7 +205,7 @@ class Alternant(models.Model):
     derniere_annee_suivie = models.PositiveSmallIntegerField(verbose_name="Dernière année suivie", choices=DERNIERE_ANNEE_SUIVIE, blank=True, null=True)
     intitule_dernier_diplome_prepare = models.CharField(verbose_name="Intitulé du dernier diplôme obtenu", max_length=100,
                                                         help_text="Saisissez le libellé précis du dernier diplôme préparé.",
-                                                        blank = True, null = True)
+                                                        blank=True, null=True)
     diplome_le_plus_eleve = models.PositiveSmallIntegerField(verbose_name="Diplôme le plus élevé obtenu", choices=DIPLOME, blank=True, null=True)
     nom_representant = models.CharField(verbose_name="Nom", max_length=70, blank=True, null=True)
     prenom_representant = models.CharField(verbose_name="Prénom", max_length=35, blank=True, null=True)
@@ -286,17 +286,18 @@ class Personnel(models.Model):
 
     ROLE = (
         (1, "Dirigeant"),
-        (2, "Maître d'apprentissage")
+        (2, "Maître d'apprentissage 1"),
+        (3, "Maître d'apprentissage 2"),
     )
 
     id = models.AutoField(primary_key=True)
-    entreprise = models.ForeignKey(Entreprise,on_delete=models.CASCADE)
+    entreprise = models.ForeignKey(Entreprise, on_delete=models.CASCADE)
     role = models.PositiveSmallIntegerField(choices=ROLE)
     civilite = models.CharField(max_length=12,choices=CIVILITE)
     nom = models.CharField(max_length=70)
     prenom = models.CharField(max_length=35)
-    courriel = models.CharField(max_length=40, blank=True)
-    date_naissance = models.DateField()
+    courriel = models.CharField(max_length=40, blank=True, null=True)
+    date_naissance = models.DateField(blank=True, null=True)
     date_maj = models.DateTimeField(default=datetime.datetime.now())
 
     def __str__(self):
@@ -422,7 +423,6 @@ class Contrat(models.Model):
     date_fin_contrat = models.DateField(blank=True, null=True)
     duree_hebdomadaire_travail = models.DurationField(blank=True, null=True)
     risques_particuliers = models.BooleanField(default=False)
-    numero_annee_debut_contrat = models.PositiveSmallIntegerField(blank=True, null=True)
     salaire_minimum_conventionnel = models.FloatField(blank=True, null=True)
     salaire_brut_mensuel = models.FloatField(blank=True, null=True)
     caisse_retraite_complementaire = models.CharField(max_length=35, blank=True, null=True)
@@ -494,7 +494,7 @@ class Minima (models.Model):
     taux_minimum = models.FloatField()
 
     def __str__(self):
-        return self.annee
+        return "Année %i de %i à %i" % (self.annee, self.age_de, self.age_a)
 
 
 class Parametre (models.Model):

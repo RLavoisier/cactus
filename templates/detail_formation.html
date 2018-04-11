@@ -7,9 +7,50 @@
 {% block content %}
     <h1>{{ formation.intitule_formation }}</h1>
     <p>{{ formation.code_formation }}</p>
+    <p>{{ formation.nom_cfa }}</p>
+    <p>{{ formation.numeroUAI }}</p>
+    <p>{{ formation.adresse_1 }}</p>
+    <p>{{ formation.adresse_2 }}</p>
+    <p>{{ formation.code_postal }}</p>
+    <p>{{ formation.intitule_formation }}</p>
+    <p>{{ formation.diplome }}</p>
+    <p>{{ formation.intitule_diplome }}</p>
+    <p>{{ formation.numero_UAI }}</p>
+
+    {% if formation.heures_an_1 != None %}
+        <p>{{ formation.an_1_du }}</p>
+        <p>{{ formation.an_1_au }}</p>
+        <p>{{ formation.heures_an_1 }}</p>
+    {% endif %}
+
+    {% if formation.an_2_du != None %}
+        <p>{{ formation.an_2_du }}</p>
+        <p>{{ formation.an_2_au }}</p>
+        <p>{{ formation.heures_an_2 }}</p>
+    {% endif %}
+
+    {% if formation.an_3_du != None %}
+        <p>{{ formation.an_3_du }}</p>
+        <p>{{ formation.an_3_au }}</p>
+        <p>{{ formation.heures_an_3 }}</p>
+    {% endif %}
+
+    <p>{{ formation.inspection_pedagogique_competente }}</p>
+    <p>{{ formation.nombre_annees }}</p>
 
     <form action="." method="POST">
-        <input type="text" name="nombre_annees" value="{{ nombre_annees }}">
+        {% csrf_token %}
+        Durée effective de la formation. Si vous suivez un cursus abgrégé, sélectionnez dans la liste ci-contre le nombre d'années de formation réellement effectué.
+        <input list="listeannée" name="nombre_annees">
+        <datalist id="listeannée">
+            {% if 1 < formation.nombre_annees %}
+                <option value=1>
+            {% endif %}
+            {% if 2 < formation.nombre_annees %}
+                <option value=2>
+            {% endif %}
+        </datalist>
+
         <input type="submit" value="Valider" />
     </form>
 

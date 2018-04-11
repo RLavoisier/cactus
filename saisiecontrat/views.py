@@ -4,7 +4,6 @@ from django.shortcuts import render, redirect
 from datetime import datetime
 
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import FormMixin
 
 from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm, CreationAlternantForm, InformationContratForm, InformationMissionForm
 from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel, Formation
@@ -28,7 +27,7 @@ def creationcontrat(request):
 
             # Si aucun contrat n'existe on crée un nouveau contrat
 
-            if contrat is not None:
+            if contrat is None:
 
                 contrat=Contrat(alternant=request.user.alternant,
                                 type_contrat_avenant=request.POST['type_contrat_avenant'],
@@ -39,11 +38,12 @@ def creationcontrat(request):
 
             else:
                 nouveaucontrat=contrat
+                nouveaucontrat.id=None
+                nouveaucontrat.save()
                 contrat.contrat_courant = False
                 contrat.save()
-                nouveaucontrat.save()
 
-            return render(request, 'creationcontrat.html', {'form': form})
+            return redirect("creationalternant")
         else:
             return render(request, 'creationcontrat.html', {'form': form})
     else:
@@ -96,38 +96,58 @@ def create_entreprise(request):
             entreprise.telecopie = request.POST.get("telecopie")
             entreprise.courriel = request.POST.get("courriel")
             entreprise.code_convention_collective = request.POST.get("code_convention_collective")
-            entreprise.adhesion_regime_assurance_chomage = request.POST.get("adhesion_regime_assurance_chomage")
-
+            entreprise.adhesion_regime_assurance_chomage = request.POST.get("adhesion_regime_assurance_chomage", False)
             entreprise.secteur_employeur = int(request.POST.get("type_employeur")[1])
 
-            if not request.POST.get("code_convention_collective") is None:
+            if len(entreprise.code_convention_collective) > 0:
                 try:
                     conventioncollective = ConventionCollective.objects.get(code=entreprise.code_convention_collective)
                 except ObjectDoesNotExist:
                     conventioncollective = None
 
                 if not conventioncollective is None:
-                    entreprise.libelle_convention_collective = ConventionCollective.libelle
+                    entreprise.libelle_convention_collective = conventioncollective.libelle
 
             entreprise.save()
 
             try:
-                personnel = Personnel.objects.get(id=entreprise.id, role=1)
+                personnel = Personnel.objects.get(id=entreprise.id, role=2)
             except ObjectDoesNotExist:
                 personnel = None
 
             if personnel is None:
                 personnel = Personnel(entreprise=entreprise,
-                                      civilite_dirigeant=request.POST.get("civilite_dirigeant"),
-                                      nom_dirigeant = request.POST.get("nom_dirigeant"),
-                                      prenom_dirigeant = request.POST.get("prenom_dirigeant"),
-                                      role=1)
+                                      civilite=request.POST.get("civilite_ma_2"),
+                                      nom=request.POST.get("nom_ma_2"),
+                                      prenom=request.POST.get("prenom_ma_2"),
+                                      role=2)
                 personnel.save()
             else:
-                personnel.civilite_dirigeant = request.POST.get("civilite_dirigeant")
-                personnel.nom_dirigeant = request.POST.get("nom_dirigeant")
-                personnel.prenom_dirigeant = request.POST.get("prenom_dirigeant")
+                personnel.civilite = request.POST.get("civilite_ma_2")
+                personnel.nom = request.POST.get("nom_ma_2")
+                personnel.prenom = request.POST.get("prenom_ma_2")
+                personnel.role = 2
                 personnel.save()
+
+            if request.POST.get("nom_ma_2") is None:
+                try:
+                    personnel = Personnel.objects.get(id=entreprise.id, role=3)
+                except ObjectDoesNotExist:
+                    personnel = None
+
+                if personnel is None:
+                    personnel = Personnel(entreprise=entreprise,
+                                          civilite=request.POST.get("civilite_ma_2"),
+                                          nom=request.POST.get("nom_ma_2"),
+                                          prenom=request.POST.get("prenom_ma_2"),
+                                          role=2)
+                    personnel.save()
+                else:
+                    personnel.civilite = request.POST.get("civilite_ma_2")
+                    personnel.nom = request.POST.get("nom_ma_2")
+                    personnel.prenom = request.POST.get("prenom_ma_2")
+                    personnel.role = 3
+                    personnel.save()
 
             return render(request, "entreprise_form.html", {"form": form})
         else:
@@ -144,13 +164,25 @@ def create_entreprise(request):
         else:
             entreprise = contrat.entreprise
 
+        try:
+            personnel = Personnel.objects.get(id=entreprise.id, role=2)
+        except ObjectDoesNotExist:
+            personnel = None
+
         form = CreationEntrepriseForm(instance=entreprise)
+
+        if personnel is not None:
+            form.civilite_ma_1 = personnel.civilite
+            form.nom_ma_1 = personnel.nom
+            form.prenom_ma_1 = personnel.prenom
+
+
         return render(request, "entreprise_form.html", {"form": form})
 
 def create_alternant(request):
 
 
-    if request.method == "POST":
+    if len(request.POST) > 0:
         # On créé le formulaire en lui passant le contenu du post
         # Comme c'est un formulaire modèle, cela prépare également un objet de base de donnée
         form = CreationAlternantForm(request.POST)
@@ -158,29 +190,29 @@ def create_alternant(request):
         if form.is_valid():
 
             alternant = Alternant(user=request.user)
-            alternant.nom = request.POST['nom']
-            alternant.prenom = request.POST['prenom']
-            alternant.date_naissance = request.POST['date_naissance']
-            alternant.numero_departement_naissance = request.POST['numero_departement_naissance']
-            alternant.adresse_1 = request.POST['adresse_1']
-            alternant.adresse_2 = request.POST['adresse_2']
-            alternant.code_postal = request.POST['code_postal']
-            alternant.ville = request.POST['ville']
-            alternant.telephone = request.POST['telephone']
-            #alternant.handicape = request.POST['handicape']
-            alternant.nationalite = request.POST['nationalite']
-            alternant.regime_social = request.POST['regime_social']
-            alternant.situation_avant_contrat = request.POST['situation_avant_contrat']
-            alternant.dernier_diplome_prepare = request.POST['dernier_diplome_prepare']
-            alternant.derniere_annee_suivie = request.POST['derniere_annee_suivie']
-            alternant.intitule_dernier_diplome_prepare = request.POST['intitule_dernier_diplome_prepare']
-            alternant.diplome_le_plus_eleve = request.POST['diplome_le_plus_eleve']
-            alternant.nom_representant = request.POST['nom_representant']
-            alternant.prenom_representant = request.POST['prenom_representant']
-            alternant.adresse_1_representant = request.POST['adresse_1_representant']
-            alternant.adresse_2_representant = request.POST['adresse_2_representant']
-            alternant.code_postal_representant = request.POST['code_postal_representant']
-            alternant.ville_representant = request.POST['ville_representant']
+            alternant.nom = request.POST.get("nom")
+            alternant.prenom = request.POST.get("prenom")
+            alternant.date_naissance = request.POST.get("date_naissance")
+            alternant.numero_departement_naissance = request.POST.get("numero_departement_naissance")
+            alternant.adresse_1 = request.POST.get("adresse_1")
+            alternant.adresse_2 = request.POST.get("adresse_2")
+            alternant.code_postal = request.POST.get("code_postal")
+            alternant.ville = request.POST.get("ville")
+            alternant.telephone = request.POST.get("telephone")
+            #alternant.handicape = request.POST.get("handicape")
+            alternant.nationalite = request.POST.get("nationalite")
+            alternant.regime_social = request.POST.get("regime_social")
+            alternant.situation_avant_contrat = request.POST.get("situation_avant_contrat")
+            alternant.dernier_diplome_prepare = request.POST.get("dernier_diplome_prepare")
+            alternant.derniere_annee_suivie = request.POST.get("derniere_annee_suivie")
+            alternant.intitule_dernier_diplome_prepare = request.POST.get("intitule_dernier_diplome_prepare")
+            alternant.diplome_le_plus_eleve = request.POST.get("diplome_le_plus_eleve")
+            alternant.nom_representant = request.POST.get("nom_representant")
+            alternant.prenom_representant = request.POST.get("prenom_representant")
+            alternant.adresse_1_representant = request.POST.get("adresse_1_representant")
+            alternant.adresse_2_representant = request.POST.get("adresse_2_representant")
+            alternant.code_postal_representant = request.POST.get("code_postal_representant")
+            alternant.ville_representant = request.POST.get("ville_representant")
             alternant.date_maj = datetime.now()
             alternant.save()
 
@@ -199,6 +231,7 @@ def create_alternant(request):
             #    contrat.save()
 
             #return redirect("creationalternant")
+
             return render(request, "alternant_form.html", {"form": form})
         else:
             return render(request, "alternant_form.html", {"form": form})
@@ -214,10 +247,24 @@ def inform_contrat(request):
 
         if form.is_valid():
 
-            # Ici, on sauvegarde le formulaire, ce qui nous renvoie automatiquement
-            # un nouvel objet contrat
+            alternant = request.user.alternant
+            contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+            formation =  Formation.objects.get(formation=contrat.formation)
+            if contrat.nombre_année is None:
+                nombre_années = formation.nombre_annees
+            else:
+                nombre_années = contrat.nombre_annees
 
-            contrat = form.save()
+            annee_debut = formation.annee_remuneration_annee_diplome + 1 - nombre_années
+
+            i = annee_debut
+
+            while i <= formation.annee_remuneration_annee_diplome:
+
+                pass
+
+
+
 
 
             return render(request, "contrat_form.html", {"form": form})
@@ -231,9 +278,24 @@ def inform_contrat(request):
 
         return render(request, "contrat_form.html", {"form": form})
 
+
+def date_anniversaire(date_naissance, date_reference):
+    return datetime(date_reference.year, date_naissance.month, date_naissance.day)
+
+
+def age(date_naissance, date_reference):
+    date_anniversaire = date_anniversaire(date_naissance, date_reference)
+    annees=date_anniversaire.year-date_naissance.year
+    if date_reference<date_anniversaire:
+        annees-=1
+    return annees
+
+
+
 def inform_mission(request):
 
-    if request.method == "POST":
+    if len(request.POST) > 0:
+
         # On créé le formulaire en lui passant le contenu du post
         # Comme c'est un formulaire modèle, cela prépare également un objet de base de donnée
 
@@ -243,17 +305,19 @@ def inform_mission(request):
 
             if form.is_valid():
 
-                # Ici, on sauvegarde le formulaire, ce qui nous renvoie automatiauement
-                # un nouvel objet entreprise
-
-                contrat = form.save()
-
+                alternant = Alternant(user=request.user)
+                contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+                contrat.mission = request.POST.get("mission")
+                contrat.date_maj_mission=datetime.now()
+                contrat.date_maj=datetime.now()
+                contrat.save()
 
                 return render(request, "mission_form.html", {"form": form})
             else:
                 return render(request, "mission_form.html", {"form": form})
+        else:
+            return render(request, "mission_form.html", {"form": form})
     else:
-
         form = InformationMissionForm()
         return render(request, "mission_form.html", {"form": form})
 
@@ -283,7 +347,6 @@ class liste_formation(ListView):
 
         return queryset
 
-
 class detail_formation(DetailView):
     model = Formation
     template_name = ("detail_formation.html")
@@ -294,6 +357,7 @@ class detail_formation(DetailView):
         # self.contrat permet de récupérer le contrat ailleurs dans la class
         self.contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
         formation = self.contrat.formation
+        self.cfa = formation.cfa
 
         # la fonction du return est d'envoyer les infos à la page
         return formation
@@ -303,17 +367,27 @@ class detail_formation(DetailView):
         # get_object redéfini au-dessus pour ramener une formation précise
         self.object = self.get_object()
 
-        # l'objet de la redéfinition est de reouter en cas de non définition de la formationsur le contrat
+        # l'objet de la redéfinition de la fonction get est de rerouter vers la page de choix dans le cas où aucune formation n'est associée au contrat
         if not self.object:
             return redirect("liste_formation")
         # pas besoin de else: le return return sort de la fonction
         context = self.get_context_data(object=self.object)
         context["nombre_annees"] = self.contrat.nombre_annees
+        context["nom_cfa"] = self.cfa.nom
+        context["numeroUAI"] = self.cfa.numeroUAI
+        context["adresse_1"] = self.cfa.adresse_1
+        context["adresse_2"] = self.cfa.adresse_2
+        context["code_postal"] = self.cfa.code_postal
+        context["ville"] = self.cfa.ville
+
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         nombre_annee = self.request.POST.get("nombre_annees")
-        #changer contrat
+        alternant = Alternant(user=request.user)
+        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        contrat.nombre_annees = request.POST.get("nombre_années")
+        contrat.save()
 
         return redirect("detail_formation")
 

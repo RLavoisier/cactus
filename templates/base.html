@@ -5,9 +5,11 @@
     <title>Inscription apprentissage – {% block title %}Bienvenue{% endblock %}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/static/css/style.css" />
+
   </head>
   <body id="{% block bodyId %}genericPage{% endblock %}">
     <header>
+      <a href="{% url 'comptes:logout' %}">Se déconnecter</a>
     {% block headerContent %}{% endblock %}
     </header>
 
@@ -24,21 +26,19 @@
             <a class="nav-link" href="{% url 'creationentreprise' %}">Votre employeur</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Votre formation</a>
+            <a class="nav-link" href="{% url 'detail_formation' %}">Votre formation</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'informationcontrat' %}">Votre contrat</a>
+            <a class="nav-link" href="{% url 'informationcontrat' %}">Les données de votre contrat</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'informationcontrat' %}">Votre mission</a>
+            <a class="nav-link" href="{% url 'informationmission' %}">Votre mission</a>
           </li>
         </ul>
         {% block content %}
         {% endblock %}
       </div>
     </section>
-
-    <a href="{% url 'comptes:logout' %}">Se déconnecter</a>
 
     <section id="leftside">
     {% block leftsidecontent %}{% endblock %}
