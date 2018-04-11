@@ -9,6 +9,7 @@
     <p>{{ formation.code_formation }}</p>
 
     <form action="." method="POST">
+        {% csrf_token %}
         <input type="text" name="nombre_annees" value="{{ nombre_annees }}">
         <input type="submit" value="Valider" />
     </form>
