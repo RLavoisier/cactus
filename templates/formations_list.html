@@ -5,60 +5,61 @@
 {% block bodyId %}loginPage{% endblock %}
 
 {% block content %}
-    {% if formations %}
+
         <div class="card">
           <div class="card-header">
             Recherche
           </div>
           <div class="card-body">
-              <form action="." method="GET">
+              <form action="." method="GET" class="form">
                   <label for="specialite">Specialité :</label>
-                  <select name="specialite">
+                  <select class="form-control form-control-sm" name="specialite">
                       {% for specialite in specialites %}
                           <option {% if request.GET.specialite == specialite %} selected="selected"{% endif %} value="{{ specialite }}">{{ specialite|default:"Sans specialite" }}</option>
                       {% endfor %}
                   </select>
-                  <input type="submit" value="rechercher" />
+                  <label for="ville">Ville :</label>
+                    <select class="form-control form-control-sm" name="ville">
+                      {% for ville in villes %}
+                          <option {% if request.GET.ville == ville %} selected="selected"{% endif %} value="{{ ville }}">{{ ville|title }}</option>
+                      {% endfor %}
+                  </select>
+                    <label for="nombre_annees">Nombre d'années :</label>
+                    <select class="form-control form-control-sm" name="nombre_annees">
+                      {% for nb in nombre_annees %}
+                          <option {% if request.GET.nombre_annees == nb|stringformat:"d" %} selected="selected"{% endif %} value="{{ nb }}">{{ nb }}</option>
+                      {% endfor %}
+                  </select>
+                  <button type="submit" class="btn btn-primary">Rechercher</button>
               </form>
           </div>
         </div>
-        {% regroup formations by specialite as formation_list %}
-        {% for frm in formation_list %}
-            <h2>{{ frm.grouper|default:"Sans specialite" }}</h2>
-            <div id="accordion">
-            {% for formation in frm.list %}
-            <div class="card">
-            <div class="card-header" id="heading{{ formation.code_formation }}">
-              <h5 class="mb-0">
-                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse{{ formation.code_formation }}" aria-expanded="true" aria-controls="collapse{{ formation.code_formation }}">
-                  {{ formation.code_formation }} - {{ formation.intitule_formation }}
-                </button>
-              </h5>
-            </div>
-
-            <div id="collapse{{ formation.code_formation }}" class="collapse" aria-labelledby="heading{{ formation.code_formation }}" data-parent="#accordion">
-              <div class="card-body">
-                <p>Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute,
-                    non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod.
-                    Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et.
-                    Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
-                    Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table,
-                    raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</p>
-                  <p><a class="btn btn-primary" role="button" href="#">Selectionner</a></p>
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-        {% endfor %}
-        </div>
+    {% if formations %}
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Code formation</th>
+              <th scope="col">Intitulé formation</th>
+              <th scope="col">Durée</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for formation in formations %}
+                <tr>
+                    <th scope="row">{{ formation.code_formation }}</th>
+                    <td>{{ formation.intitule_formation }}</td>
+                    <td>{{ formation.nombre_annees }} ans</td>
+                    <td><a href="{% url "appliquer_formation" pk=formation.pk %}">Sélectionner</a></td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
     {% else %}
         <h2>Aucune formation à afficher</h2>
     {% endif %}
 {% endblock %}
 
-{% block menucontent %}
-  menu
-{% endblock %}
 
 {% block leftsidecontent %}
   gauche

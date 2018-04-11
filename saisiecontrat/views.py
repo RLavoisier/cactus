@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-
+from django.db.models import Min, Max
 from django.shortcuts import render, redirect
 from datetime import datetime
 
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView
 
 from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm, CreationAlternantForm, InformationContratForm, InformationMissionForm
@@ -323,7 +324,7 @@ def inform_mission(request):
 
 
 class liste_formation(ListView):
-    queryset = Formation.objects.order_by("specialite")
+    queryset = Formation.objects.order_by("code_formation")
     template_name = "formations_list.html"
     # variable contenant les objets pour les passer au template
     context_object_name = "formations"
@@ -332,7 +333,14 @@ class liste_formation(ListView):
         # super fait référence à la classe mère ListView
         context = super().get_context_data(object_list=None, **kwargs)
         specialites = Formation.objects.order_by("specialite").values_list("specialite", flat=True).distinct()
+        villes = Formation.objects.order_by("ville").values_list("ville", flat=True).distinct()
+        min_max_annees = Formation.objects.all().aggregate(Min("nombre_annees"), Max("nombre_annees"))
+        nombre_annees = [i for i in
+                         range(min_max_annees.get("nombre_annees__min"), min_max_annees.get("nombre_annees__max") + 1)]
+
         context["specialites"] = ["Toutes"] + list(specialites)
+        context["villes"] = ["Toutes"] + list(villes)
+        context["nombre_annees"] = ["Toutes"] + nombre_annees
         context["request"] = self.request
 
         return context
@@ -340,10 +348,16 @@ class liste_formation(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        specialite_filter = self.request.GET.get("specialite")
+        # Application des différents filtres
+        filters = {
+            "specialite": self.request.GET.get("specialite"),
+            "ville": self.request.GET.get("ville"),
+            "nombre_annees": self.request.GET.get("nombre_annees"),
+        }
 
-        if specialite_filter and specialite_filter != "Toutes":
-            queryset = queryset.filter(specialite=specialite_filter)
+        for attr, filter in filters.items():
+            if filter and filter != "Toutes":
+                queryset = queryset.filter(**{attr: filter})
 
         return queryset
 
@@ -388,6 +402,21 @@ class detail_formation(DetailView):
         contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
         contrat.nombre_annees = request.POST.get("nombre_années")
         contrat.save()
+
+        return redirect("detail_formation")
+
+class appliquer_formation(DetailView):
+    model = Formation
+
+    def get(self, request, *args, **kwargs):
+        # Cette vue ne sert qu'a enregistrer la formation sélectionnée dans le contrat actuel
+        self.object = self.get_object()
+
+        contrat = self.request.user.alternant.get_contrat_courant()
+
+        if contrat:
+            contrat.formation = self.object
+            contrat.save()
 
         return redirect("detail_formation")
 

@@ -215,6 +215,15 @@ class Alternant(models.Model):
     ville_representant = models.CharField(max_length=60, blank=True, null=True)
     date_maj = models.DateTimeField(default=datetime.datetime.now())
 
+    def get_contrat_courant(self):
+        """
+        Cette méthode retourne le contrats courant de l'alternant
+        """
+        if self.contrats.filter(contrat_courant=True).exists():
+            return self.contrats.filter(contrat_courant=True)[0]
+        else:
+            return None
+
     def __str__(self):
         return "%s %s" % (self.nom, self.prenom)
 
@@ -408,7 +417,7 @@ class Contrat(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    alternant = models.ForeignKey(Alternant, on_delete=models.CASCADE, blank=True, null=True)
+    alternant = models.ForeignKey(Alternant, on_delete=models.CASCADE, blank=True, null=True, related_name="contrats")
     mode_contractuel = models.PositiveSmallIntegerField(choices=MODE_CONTRACTUEL)
     entreprise = models.ForeignKey(Entreprise, on_delete=models.CASCADE, blank=True, null=True)
     formation = models.ForeignKey(Formation, on_delete=models.CASCADE, blank=True, null=True)

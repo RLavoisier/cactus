@@ -40,17 +40,7 @@
 
     <form action="." method="POST">
         {% csrf_token %}
-        Durée effective de la formation. Si vous suivez un cursus abgrégé, sélectionnez dans la liste ci-contre le nombre d'années de formation réellement effectué.
-        <input list="listeannée" name="nombre_annees">
-        <datalist id="listeannée">
-            {% if 1 < formation.nombre_annees %}
-                <option value=1>
-            {% endif %}
-            {% if 2 < formation.nombre_annees %}
-                <option value=2>
-            {% endif %}
-        </datalist>
-
+        <input type="text" name="nombre_annees" value="{{ nombre_annees }}">
         <input type="submit" value="Valider" />
     </form>
 

@@ -48,10 +48,7 @@ body#loginPage section#rightside {
 
 
 form label {
-  display: block;
-  width: 150px;
-  float: left;
-  text-align: right;
+  margin: 10px 0px;
   padding: 4px 10px 0 0;
 }
 
@@ -61,8 +58,8 @@ form input[type="email"], form input[type="text"], form input[type="password"]{
   padding: 2px;
 }
 
-form input[type="submit"] {
-  margin: 0 20px 0 160px;
+form input[type="submit"], button {
+  margin: 20px 20px 0 0px;
   border-style: solid;
   border-width: 1px;
   border-color: #d9dfea #0e1f5b #0e1f5b #d9dfea;
