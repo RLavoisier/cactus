@@ -64,16 +64,16 @@ class Alternant(models.Model):
     )
 
     DERNIERE_ANNEE_SUIVIE = (
-        (1, "l’apprenti a suivi la dernière année du cycle de formation et a obtenu le diplôme ou titre"),
-        (11, "l’apprenti a suivi la 1ère année du cycle et l’a validée (examens réussis mais année non diplômante)"),
-        (12, "l’apprenti a suivi la 1ère année du cycle mais ne l’a pas validée (échec aux examens, interruption ou abandon de formation)"),
-        (21, "l’apprenti a suivi la 2è année du cycle et l’a validée (examens réussis mais année non diplômante)"),
-        (22, "l’apprenti a suivi la 2è année du cycle mais ne l’a pas validée (échec aux examens, interruption ou abandon de formation)"),
-        (31, "l’apprenti a suivi la 3è année du cycle et l’a validée (examens réussis mais année non diplômante, cycle adapté)"),
-        (32, "l’apprenti a suivi la 3è année du cycle mais ne l’a pas validée (échec aux examens, interruption ou abandon de formation)"),
-        (40, "l’apprenti a achevé le 1er cycle de l’enseignement secondaire (collège)"),
-        (41, "l’apprenti a interrompu ses études en classe de 3è"),
-        (42, "l’apprenti a interrompu ses études en classe de 4è"),
+        (1, "l’apprenti(e) a suivi la dernière année du cycle de formation et a obtenu le diplôme ou titre"),
+        (11, "l’apprenti(e) a suivi la 1ère année du cycle et l’a validée (examens réussis mais année non diplômante)"),
+        (12, "l’apprenti(e) a suivi la 1ère année du cycle mais ne l’a pas validée (échec aux examens, interruption ou abandon de formation)"),
+        (21, "l’apprenti(e) a suivi la 2è année du cycle et l’a validée (examens réussis mais année non diplômante)"),
+        (22, "l’apprenti(e) a suivi la 2è année du cycle mais ne l’a pas validée (échec aux examens, interruption ou abandon de formation)"),
+        (31, "l’apprenti(e) a suivi la 3è année du cycle et l’a validée (examens réussis mais année non diplômante, cycle adapté)"),
+        (32, "l’apprenti(e) a suivi la 3è année du cycle mais ne l’a pas validée (échec aux examens, interruption ou abandon de formation)"),
+        (40, "l’apprenti(e) a achevé le 1er cycle de l’enseignement secondaire (collège)"),
+        (41, "l’apprenti(e) a interrompu ses études en classe de 3è"),
+        (42, "l’apprenti(e) a interrompu ses études en classe de 4è"),
     )
 
     DEPARTEMENT_NAISSANCE = (
@@ -181,6 +181,11 @@ class Alternant(models.Model):
         ("099", "099 Né(e) l’étranger"),
     )
 
+    CIVILITE = (
+        (1, "Madame"),
+        (2, "Monsieur"),
+    )
+
     # Le related name permet de renvoyer l'alternant depuis le user avec la syntaxe user.alternant
     user = models.OneToOneField(User,on_delete=models.CASCADE, primary_key=True, related_name="alternant")
     nom = models.CharField(max_length=70, blank=True, null=True)
@@ -189,8 +194,8 @@ class Alternant(models.Model):
     date_naissance = models.DateField(verbose_name="Date de naissance", blank=True, null=True)
     numero_departement_naissance = models.CharField(verbose_name="Département de naissance", max_length=3, choices=DEPARTEMENT_NAISSANCE, help_text="Sélectionnez votre département de naissance ou '099 Né(e) à l'étranger'", blank=True, null=True)
     commune_naissance = models.CharField(verbose_name="Commune de naissance", max_length=60, blank=True, null=True)
-    adresse_1 = models.CharField(verbose_name="Adresse", max_length=100, blank=True, null=True)
-    adresse_2 = models.CharField(verbose_name="Complément d'adresse", max_length=100, blank=True, null=True)
+    adresse_numero = models.CharField(verbose_name="Numéro", max_length=10, blank=True, null=True)
+    adresse_voie = models.CharField(verbose_name="Voie", max_length=100, blank=True, null=True)
     code_postal = models.CharField(verbose_name="Code postal", max_length=5, blank=True, null=True)
     ville = models.CharField(max_length=60, blank=True, null=True)
     telephone = models.CharField(verbose_name="Téléphone", max_length=15, blank=True, null=True)
@@ -207,10 +212,11 @@ class Alternant(models.Model):
                                                         help_text="Saisissez le libellé précis du dernier diplôme préparé.",
                                                         blank=True, null=True)
     diplome_le_plus_eleve = models.PositiveSmallIntegerField(verbose_name="Diplôme le plus élevé obtenu", choices=DIPLOME, blank=True, null=True)
+    civilite_representant = models.CharField(max_length=12,choices=CIVILITE, blank=True, null=True)
     nom_representant = models.CharField(verbose_name="Nom", max_length=70, blank=True, null=True)
     prenom_representant = models.CharField(verbose_name="Prénom", max_length=35, blank=True, null=True)
-    adresse_1_representant = models.CharField(verbose_name="Adresse", max_length=100, blank=True, null=True)
-    adresse_2_representant = models.CharField(verbose_name="Complément d'adresse", max_length=100, blank=True, null=True)
+    adresse_numero_representant = models.CharField(verbose_name="Numéro", max_length=10, blank=True, null=True)
+    adresse_voie_representant = models.CharField(verbose_name="Voie", max_length=100, blank=True, null=True)
     code_postal_representant = models.CharField(verbose_name="Code postal", max_length=5, blank=True, null=True)
     ville_representant = models.CharField(max_length=60, blank=True, null=True)
     date_maj = models.DateTimeField(default=datetime.datetime.now())
@@ -262,23 +268,24 @@ class Entreprise(models.Model):
     )
 
     id = models.AutoField(primary_key=True)
-    raison_sociale = models.CharField(max_length=70, blank=True, null=True)
-    numero_SIRET = models.CharField(max_length=14, blank=True, null=True)
-    adresse_1 = models.CharField(max_length=100, blank=True, null=True)
-    adresse_2 = models.CharField(max_length=100, blank=True, null=True)
+    raison_sociale = models.CharField(verbose_name="Raison sociale ou nom du dirigeant", max_length=70, blank=True, null=True,help_text="Entrez la raison sociale de l'entreprise ou les nom et prénom du dirigeant pour un employeur individuel.")
+    numero_SIRET = models.CharField(verbose_name="SIRET", max_length=14, blank=True, null=True, help_text="Entrez le SIRET (14 chiffres) de l'établissement où vous effectuerez votre apprentissage.")
+    adresse_numero = models.CharField(verbose_name="N°", max_length=10, blank=True, null=True)
+    adresse_voie = models.CharField(verbose_name="Voie", max_length=100, blank=True, null=True)
+    adresse_complement = models.CharField(verbose_name="Complement d'adresse", max_length=100, blank=True, null=True)
     code_postal = models.CharField(max_length=5, blank=True, null=True)
     ville = models.CharField(max_length=70, blank=True, null=True)
     type_employeur = models.PositiveSmallIntegerField(choices=TYPE_EMPLOYEUR, blank=True, null=True)
     secteur_employeur = models.PositiveSmallIntegerField(choices=SECTEUR_EMPLOYEUR, default=1)
-    employeur_specifique = models.PositiveSmallIntegerField(choices=EMPLOYEUR_SPECIFIQUE, default=0)
+    employeur_specifique = models.PositiveSmallIntegerField(verbose_name="Employeur spécifique", choices=EMPLOYEUR_SPECIFIQUE, default=0)
     code_APE = models.CharField(max_length=5, blank=True, null=True)
-    effectif_entreprise = models.PositiveSmallIntegerField(blank=True, null=True)
-    telephone = models.CharField(max_length=15, blank=True, null=True)
-    telecopie = models.CharField(max_length=15, blank=True, null=True)
+    effectif_entreprise = models.PositiveSmallIntegerField(verbose_name="Effectif de l'entreprise", blank=True, null=True)
+    telephone = models.CharField(verbose_name="Téléphone", max_length=15, blank=True, null=True)
+    telecopie = models.CharField(verbose_name="Télécopie", max_length=15, blank=True, null=True)
     courriel = models.CharField(max_length=40, blank=True, null=True)
-    code_convention_collective = models.CharField(max_length=4, blank=True, null=True, help_text="Saisissez le code de la convention collective (4 chiffres). Si la convention collective n'est pas encore entrée en vigueur saisissez 9998. S'il n'y a aucune convention collective, saisissez 9999.")
-    libelle_convention_collective = models.CharField(max_length=200, blank=True, null=True, help_text="Cette donnée est obligatoire. Si le code de convention existe, elle sera renseignée automatiquement.")
-    adhesion_regime_assurance_chomage = models.BooleanField(default=False, help_text="Cochez cette case si l'employeur appartient au secteur public et si l'apprenti adhère au régime spécifique d'assurance chômage.")
+    code_convention_collective = models.CharField(verbose_name="Code de la convention collective", max_length=4, blank=True, null=True, help_text="Saisissez le code de la convention collective (4 chiffres). Si la convention collective n'est pas encore entrée en vigueur saisissez 9998. S'il n'y a aucune convention collective, saisissez 9999.")
+    libelle_convention_collective = models.CharField(verbose_name="Libellé de la convention collective", max_length=200, blank=True, null=True, help_text="Cette donnée est obligatoire. Si le code de convention existe, elle sera renseignée automatiquement.")
+    adhesion_regime_assurance_chomage = models.BooleanField(default=False, help_text="Cochez cette case si l'employeur appartient au secteur public et si l'apprenti(e) adhère au régime spécifique d'assurance chômage.")
     date_maj = models.DateTimeField(default=datetime.datetime.now())
     date_maj_contacts = models.DateTimeField(default=datetime.datetime.now())
 
@@ -316,8 +323,9 @@ class Personnel(models.Model):
 class CFA(models.Model):
     numeroUAI = models.CharField(max_length=8,primary_key=True)
     nom = models.CharField(max_length=70)
-    adresse_1 = models.CharField(max_length=100)
-    adresse_2 = models.CharField(max_length=100, blank=True)
+    adresse_numero = models.CharField(max_length=10, blank=True)
+    adresse_voie = models.CharField(max_length=100)
+    adresse_complement = models.CharField(max_length=100, blank=True)
     code_postal = models.CharField(max_length=5)
     ville = models.CharField(max_length=60)
 
@@ -401,7 +409,7 @@ class Contrat(models.Model):
     )
 
     TYPE_DEROGATION = (
-        (11,"Age de l’apprenti inférieur à 16 ans"),
+        (11,"Age de l’apprenti(e) inférieur à 16 ans"),
         (12,"Age supérieur à 25 ans : cas spécifiques prévus dans le code du travail"),
         (21,"Réduction de la durée du contrat ou de la période d’apprentissage"),
         (22,"Allongement  de la durée du contrat ou de la période d’apprentissage"),
@@ -410,10 +418,17 @@ class Contrat(models.Model):
         (50,"Cumul de dérogations"),
         (60,"Autre dérogation"),
     )
-    
+
     BASE = (
         (1,"SMIC"),
         (2,"SMC"),
+    )
+
+    AVIS_RAF = (
+        (0, "En attente de validation"),
+        (1, "Mission valide"),
+        (2, "Réserve"),
+        (3, "Rejet"),
     )
 
     id = models.AutoField(primary_key=True)
@@ -423,12 +438,12 @@ class Contrat(models.Model):
     formation = models.ForeignKey(Formation, on_delete=models.CASCADE, blank=True, null=True)
     mission = models.TextField(blank=True, null=True)
     type_contrat_avenant = models.PositiveSmallIntegerField(choices=TYPE_CONTRAT_AVENANT, blank=True, null=True)
-    date_inscription = models.DateField(blank=True, null=True)
+    date_inscription = models.DateField(verbose_name="Date d'inscription", blank=True, null=True)
     type_derogation = models.PositiveSmallIntegerField(verbose_name="Type de dérogation", choices=TYPE_DEROGATION, blank=True, null=True)
     numero_contrat_anterieur = models.CharField(max_length=8, blank=True, null=True)
-    date_embauche = models.DateField(blank=True, null=True)
-    date_debut_contrat = models.DateField(blank=True, null=True)
-    date_effet_avenant = models.DateField(blank=True, null=True)
+    date_embauche = models.DateField(verbose_name="Date d'embauche", blank=True, null=True)
+    date_debut_contrat = models.DateField(verbose_name="Date de début du contrat", blank=True, null=True)
+    date_effet_avenant = models.DateField(verbose_name="Date d'effet de l'avenant", blank=True, null=True,help_text="S'il s'agit d'un avenant à un contrat existant, vous devez en indiquer la date d'antrée en vigueur.")
     date_fin_contrat = models.DateField(blank=True, null=True)
     duree_hebdomadaire_travail = models.DurationField(blank=True, null=True)
     risques_particuliers = models.BooleanField(default=False)
@@ -481,6 +496,8 @@ class Contrat(models.Model):
     date_exportation_CFA = models.DateTimeField(blank=True, null=True)
     nombre_annees = models.PositiveSmallIntegerField(blank=True, null=True)
     contrat_courant = models.BooleanField(default=True)
+    avis_raf = models.PositiveSmallIntegerField(choices=AVIS_RAF, default=0)
+    motif = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return "Contrat %i" % self.id
@@ -498,8 +515,7 @@ class SMIC (models.Model):
 
 class Minima (models.Model):
     annee = models.PositiveSmallIntegerField()
-    age_de = models.PositiveSmallIntegerField()
-    age_a = models.PositiveSmallIntegerField()
+    age = models.PositiveSmallIntegerField()
     taux_minimum = models.FloatField()
 
     def __str__(self):

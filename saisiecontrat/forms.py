@@ -73,14 +73,14 @@ class CreationEntrepriseForm(forms.ModelForm):
         else:
             return raisonsociale
 
-    def clean_adresse_1(self):
+    def clean_adresse_voie(self):
 
-        adresse1 = self.cleaned_data["adresse_1"]
+        adresse_voie = self.cleaned_data["adresse_voie"]
 
-        if adresse1 is None:
+        if adresse_voie is None:
             raise forms.ValidationError("L'adresse doit être renseignée.")
         else:
-            return adresse1
+            return adresse_voie
 
     def clean_code_postal(self):
 
@@ -255,6 +255,12 @@ class CreationAlternantForm(forms.ModelForm):
 
         }
 
+    def clean_handicape(self):
+        if self.cleaned_data["handicape"] == "on":
+            return True
+        else:
+            return False
+
     def clean_nom(self):
 
         nom = self.cleaned_data.get("nom")
@@ -300,14 +306,14 @@ class CreationAlternantForm(forms.ModelForm):
         else:
             return commune_naissance
 
-    def clean_adresse_1(self):
+    def clean_adresse_voie(self):
 
-        adresse_1 = self.cleaned_data.get("adresse_1")
+        adresse_voie = self.cleaned_data.get("adresse_voie")
 
-        if adresse_1 is None:
-            raise forms.ValidationError("L'adresse doit être renseignée.")
+        if adresse_voie is None:
+            raise forms.ValidationError("La voie doit être renseignée.")
         else:
-            return adresse_1
+            return adresse_voie
 
     def clean_code_postal(self):
 
