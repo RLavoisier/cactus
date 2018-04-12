@@ -336,13 +336,11 @@ class liste_formation(ListView):
         context = super().get_context_data(object_list=None, **kwargs)
         specialites = Formation.objects.order_by("specialite").values_list("specialite", flat=True).distinct()
         villes = Formation.objects.order_by("ville").values_list("ville", flat=True).distinct()
-        min_max_annees = Formation.objects.all().aggregate(Min("nombre_annees"), Max("nombre_annees"))
-        nombre_annees = [i for i in
-                         range(min_max_annees.get("nombre_annees__min"), min_max_annees.get("nombre_annees__max") + 1)]
+        diplomes = Formation.DIPLOME
 
         context["specialites"] = ["Toutes"] + list(specialites)
         context["villes"] = ["Toutes"] + list(villes)
-        context["nombre_annees"] = ["Toutes"] + nombre_annees
+        context["diplomes"] = ((0, "Tous"),) + diplomes
         context["request"] = self.request
 
         return context
@@ -354,11 +352,11 @@ class liste_formation(ListView):
         filters = {
             "specialite": self.request.GET.get("specialite"),
             "ville": self.request.GET.get("ville"),
-            "nombre_annees": self.request.GET.get("nombre_annees"),
+            "diplome": self.request.GET.get("diplome"),
         }
 
         for attr, filter in filters.items():
-            if filter and filter != "Toutes":
+            if filter and filter not in ["Toutes", 0]:
                 queryset = queryset.filter(**{attr: filter})
 
         return queryset
