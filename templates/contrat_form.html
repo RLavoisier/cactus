@@ -1,15 +1,17 @@
 {% extends "base.html" %}
+{% load crispy_forms_tags %}
 
 {% block content %}
-    <form action="{% url 'informationcontrat' %}" method="post">
-    {% csrf_token %}
-    {% if error %}
-        <p class="error">{{ error }}</p>
-    {% endif %}
-    {{ form.as_p }}
-    <p>
-        <input type="submit" value="Valider" />
-    </p>
-
-    </form>
+    {% crispy form %}
+    <script type="text/javascript">
+        $(document).ready(
+            function(){
+                $(".datepicker").datepicker(
+                    {
+                    changeMonth: true,
+                    changeYear: true
+                });
+            }
+        );
+    </script>
 {% endblock %}
