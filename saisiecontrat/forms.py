@@ -413,7 +413,7 @@ class InformationContratForm(forms.ModelForm):
 
         # Si vous souhaitez, éditez les widgets des champs (si ceux par défaut ne vous conviennent pas
         widgets = {
-
+            "date_embauche": forms.DateInput(attrs={"class": "form-control"})
         }
 
     def clean_date_embauche(self):

@@ -208,10 +208,11 @@ def create_alternant(request):
             alternant.derniere_annee_suivie = form.cleaned_data["derniere_annee_suivie"]
             alternant.intitule_dernier_diplome_prepare = form.cleaned_data["intitule_dernier_diplome_prepare"]
             alternant.diplome_le_plus_eleve = form.cleaned_data["diplome_le_plus_eleve"]
+            alternant.civilite_representant = form.cleaned_data["civilite_representant"]
             alternant.nom_representant = form.cleaned_data["nom_representant"]
             alternant.prenom_representant = form.cleaned_data["prenom_representant"]
-            alternant.adresse_1_representant = form.cleaned_data["adresse_1_representant"]
-            alternant.adresse_2_representant = form.cleaned_data["adresse_2_representant"]
+            alternant.adresse_numero_representant = form.cleaned_data["adresse_numero_representant"]
+            alternant.adresse_voie_representant = form.cleaned_data["adresse_voie_representant"]
             alternant.code_postal_representant = form.cleaned_data["code_postal_representant"]
             alternant.ville_representant = form.cleaned_data["ville_representant"]
             alternant.date_maj = datetime.now()

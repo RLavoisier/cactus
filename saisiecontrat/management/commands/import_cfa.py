@@ -18,8 +18,9 @@ class Command(BaseCommand):
             _, created = CFA.objects.get_or_create(
                 numeroUAI=row[0],
                 nom=row[1],
-                adresse_1=row[2],
-                adresse_2 = row[3],
-                code_postal = row[4],
-                ville = row[5]
+                adresse_numero=row[2],
+                adresse_voie=row[3],
+                adresse_complement=row[4],
+                code_postal=row[5],
+                ville=row[6]
             )
