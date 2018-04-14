@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
-
+from crispy_forms.bootstrap import InlineField
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit, Layout
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse
 
 from saisiecontrat.models import Contrat, Entreprise, NAF, Alternant, Personnel, ConventionCollective
 
@@ -415,6 +418,22 @@ class InformationContratForm(forms.ModelForm):
         widgets = {
             "date_embauche": forms.DateInput(attrs={"class": "form-control"})
         }
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+
+        super().__init__(*args, **kwargs)
+
+        # Ajout du helper crispyform
+        self.helper = FormHelper()
+        self.helper.form_id = "information_contrat_form"
+        self.helper.form_method = "POST"
+        self.helper.form_action = reverse("informationcontrat")
+        self.helper.add_input(Submit("submit", "Valider"))
+        self.helper.layout = Layout(
+            InlineField("date_debut_contrat", css_class="datepicker")
+        )
+
 
     def clean_date_embauche(self):
 

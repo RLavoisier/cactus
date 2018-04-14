@@ -5,3 +5,4 @@ django-bootstrap3==9.1.0
 bcrypt==3.1.4
 django[argon2]
 fdfgen==0.16.1
+django-crispy-forms==1.7.2

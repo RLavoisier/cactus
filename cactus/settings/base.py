@@ -14,7 +14,7 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'saisiecontrat',
     'cactus',
     'django.contrib.admin',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -58,7 +59,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
+            TEMPLATE_DIR,
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -80,6 +81,8 @@ LOGIN_URL = "comptes:signup_or_login"
 LOGOUT_REDIRECT_URL = LOGIN_URL
 #LOGIN_REDIRECT_URL = "accueil"
 LOGIN_REDIRECT_URL = "creationcontrat"
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases

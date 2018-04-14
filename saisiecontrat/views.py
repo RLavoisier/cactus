@@ -245,7 +245,7 @@ def inform_contrat(request):
 
     if len(request.POST) > 0:
 
-        form = InformationContratForm(request.POST)
+        form = InformationContratForm(request.POST, request=request)
 
         if form.is_valid():
 
@@ -253,21 +253,17 @@ def inform_contrat(request):
             contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
             formation =  Formation.objects.get(formation=contrat.formation)
             if contrat.nombre_année is None:
-                nombre_années = formation.nombre_annees
+                nombre_annees = formation.nombre_annees
             else:
-                nombre_années = contrat.nombre_annees
+                nombre_annees = contrat.nombre_annees
 
-            annee_debut = formation.annee_remuneration_annee_diplome + 1 - nombre_années
+            annee_debut = formation.annee_remuneration_annee_diplome + 1 - nombre_annees
 
             i = annee_debut
 
             while i <= formation.annee_remuneration_annee_diplome:
 
                 pass
-
-
-
-
 
             return render(request, "contrat_form.html", {"form": form})
         else:
@@ -276,7 +272,7 @@ def inform_contrat(request):
 
         # Il faut que la date de naissance de l'alternant soit renseignée avant l'appel à ce formulaire
 
-        form = InformationContratForm()
+        form = InformationContratForm(request=request)
 
         return render(request, "contrat_form.html", {"form": form})
 
