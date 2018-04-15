@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from crispy_forms.bootstrap import InlineField
+from crispy_forms.bootstrap import InlineField, TabHolder, Tab
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, Layout
+from crispy_forms.layout import Submit, Layout, Fieldset, Field, Div
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
@@ -414,25 +414,52 @@ class InformationContratForm(forms.ModelForm):
                    "date_maj", "date_generation_CERFA", "date_exportation_CFA","date_saisie_complete","nombre_années",
                    "attestation_pieces", "attestation_maitre_apprentissage"]
 
+        labels = {
+            "an_1_per_1_du": "Période 1 du :",
+            "an_1_per_1_au": "Période 1 au :",
+            "an_1_per_1_taux": "Taux :",
+            "an_1_per_1_base": "Base :",
+            "an_1_per_2_du": "Période 2 du :",
+            "an_1_per_2_au": "Période 2 au :",
+            "an_1_per_2_taux": "Taux :",
+            "an_1_per_2_base": "Base :",
+            "an_2_per_1_du": "Période 1 du :",
+            "an_2_per_1_au": "Période 1 au :",
+            "an_2_per_1_taux": "Taux :",
+            "an_2_per_1_base": "Base :",
+            "an_2_per_2_du": "Période 2 du :",
+            "an_2_per_2_au": "Période 2 au :",
+            "an_2_per_2_taux": "Taux :",
+            "an_2_per_2_base": "Base :",
+        }
+
         # Si vous souhaitez, éditez les widgets des champs (si ceux par défaut ne vous conviennent pas
         widgets = {
-            "date_embauche": forms.DateInput(attrs={"class": "form-control"})
+            "date_embauche": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "date_debut_contrat": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "date_fin_contrat": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "date_effet_avenant": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "an_1_per_1_du": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "an_1_per_1_au": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "an_1_per_2_du": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "an_1_per_2_au": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "an_1_per_1_taux": forms.TextInput(attrs={"class": "form-control"}),
+            "an_1_per_1_base": forms.TextInput(attrs={"class": "form-control"}),
+            "an_1_per_2_taux": forms.TextInput(attrs={"class": "form-control"}),
+            "an_1_per_2_base": forms.TextInput(attrs={"class": "form-control"}),
+            "an_2_per_1_du": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "an_2_per_1_au": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "an_2_per_2_du": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "an_2_per_2_au": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "an_2_per_1_taux": forms.TextInput(attrs={"class": "form-control"}),
+            "an_2_per_1_base": forms.TextInput(attrs={"class": "form-control"}),
+            "an_2_per_2_taux": forms.TextInput(attrs={"class": "form-control"}),
+            "an_2_per_2_base": forms.TextInput(attrs={"class": "form-control"}),
         }
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")
-
         super().__init__(*args, **kwargs)
-
-        # Ajout du helper crispyform
-        self.helper = FormHelper()
-        self.helper.form_id = "information_contrat_form"
-        self.helper.form_method = "POST"
-        self.helper.form_action = reverse("informationcontrat")
-        self.helper.add_input(Submit("submit", "Valider"))
-        self.helper.layout = Layout(
-            InlineField("date_debut_contrat", css_class="datepicker")
-        )
 
 
     def clean_date_embauche(self):

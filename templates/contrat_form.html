@@ -1,17 +1,105 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
 
 {% block content %}
-    {% crispy form %}
-    <script type="text/javascript">
-        $(document).ready(
-            function(){
-                $(".datepicker").datepicker(
-                    {
-                    changeMonth: true,
-                    changeYear: true
-                });
-            }
-        );
-    </script>
+    <form action="." method="POST">
+        {% csrf_token %}
+        <fieldset>
+            <legend>Contrat</legend>
+            {{  form.type_derogation.label_tag }}
+            {{  form.type_derogation }}
+            {{  form.date_embauche.label_tag }}
+            {{  form.date_embauche }}
+
+            <div class="row">
+                <div class="col-md-4">
+                    {{  form.date_debut_contrat.label_tag }}
+                    {{  form.date_debut_contrat }}
+                </div>
+                <div class="col-md-4">
+                    {{  form.date_fin_contrat.label_tag }}
+                    {{  form.date_fin_contrat }}
+                </div>
+                <div class="col-md-4">
+                    {{  form.date_effet_avenant.label_tag }}
+                    {{  form.date_effet_avenant }}
+                    <p>{{  form.date_effet_avenant.help_text }}</p>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Première année</legend>
+            <div class="row">
+                <div class="col-md-2">
+                    {{  form.an_1_per_1_du.label_tag }}
+                    {{  form.an_1_per_1_du }}
+                </div>
+                <div class="col-md-2">
+                    {{  form.an_1_per_1_au.label_tag }}
+                    {{  form.an_1_per_1_au }}
+                </div>
+                <div class="col-md-1">
+                    {{  form.an_1_per_1_taux.label_tag }}
+                    {{  form.an_1_per_1_taux }}
+                </div>
+                <div class="col-md-1">
+                    {{  form.an_1_per_1_base.label_tag }}
+                    {{  form.an_1_per_1_base }}
+                </div>
+                <div class="col-md-2">
+                    {{  form.an_1_per_2_du.label_tag }}
+                    {{  form.an_1_per_2_du }}
+                </div>
+                <div class="col-md-2">
+                    {{  form.an_1_per_2_au.label_tag }}
+                    {{  form.an_1_per_2_au }}
+                </div>
+                <div class="col-md-1">
+                    {{  form.an_1_per_2_taux.label_tag }}
+                    {{  form.an_1_per_2_taux }}
+                </div>
+                <div class="col-md-1">
+                    {{  form.an_1_per_2_base.label_tag }}
+                    {{  form.an_1_per_2_base }}
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend>Deuxième année</legend>
+            <div class="row">
+                <div class="col-md-2">
+                    {{  form.an_2_per_1_du.label_tag }}
+                    {{  form.an_2_per_1_du }}
+                </div>
+                <div class="col-md-2">
+                    {{  form.an_2_per_1_au.label_tag }}
+                    {{  form.an_2_per_1_au }}
+                </div>
+                <div class="col-md-1">
+                    {{  form.an_2_per_1_taux.label_tag }}
+                    {{  form.an_2_per_1_taux }}
+                </div>
+                <div class="col-md-1">
+                    {{  form.an_2_per_1_base.label_tag }}
+                    {{  form.an_2_per_1_base }}
+                </div>
+                <div class="col-md-2">
+                    {{  form.an_2_per_2_du.label_tag }}
+                    {{  form.an_2_per_2_du }}
+                </div>
+                <div class="col-md-2">
+                    {{  form.an_2_per_2_au.label_tag }}
+                    {{  form.an_2_per_2_au }}
+                </div>
+                <div class="col-md-1">
+                    {{  form.an_2_per_2_taux.label_tag }}
+                    {{  form.an_2_per_2_taux }}
+                </div>
+                <div class="col-md-1">
+                    {{  form.an_2_per_2_base.label_tag }}
+                    {{  form.an_2_per_2_base }}
+                </div>
+            </div>
+        </fieldset>
+    </form>
+    {{ form.as_p }}
 {% endblock %}
