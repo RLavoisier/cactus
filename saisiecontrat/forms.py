@@ -240,6 +240,13 @@ class CreationEntrepriseForm(forms.ModelForm):
         else:
             return date_naissance_ma_1
 
+    def clean_adhesion_regime_assurance_chomage(self):
+
+        # Verrue pour corroger une diférence de notation du booléen
+        if self.cleaned_data["adhesion_regime_assurance_chomage"] == "on":
+            return True
+        else:
+            return False
 
 class CreationAlternantForm(forms.ModelForm):
 
@@ -412,7 +419,8 @@ class InformationContratForm(forms.ModelForm):
         exclude = ["date_maj", "type_contrat_avenant", "mode_contractuel", "numero_contrat_anterieur", "alternant",
                    "formation", "entreprise", "mission", "date_inscription", "contrat_courant", "date_maj_mission",
                    "date_maj", "date_generation_CERFA", "date_exportation_CFA","date_saisie_complete","nombre_années",
-                   "attestation_pieces", "attestation_maitre_apprentissage"]
+                   "attestation_pieces", "attestation_maitre_apprentissage","salaire_minimum_conventionnel",
+                   "avis_raf", "motif", "nombre_annees"]
 
         # Si vous souhaitez, éditez les widgets des champs (si ceux par défaut ne vous conviennent pas
         widgets = {
@@ -430,9 +438,9 @@ class InformationContratForm(forms.ModelForm):
         self.helper.form_method = "POST"
         self.helper.form_action = reverse("informationcontrat")
         self.helper.add_input(Submit("submit", "Valider"))
-        self.helper.layout = Layout(
-            InlineField("date_debut_contrat", css_class="datepicker")
-        )
+        #self.helper.layout = Layout(
+        #    InlineField("date_debut_contrat", css_class="datepicker")
+        #)
 
 
     def clean_date_embauche(self):
@@ -459,7 +467,7 @@ class InformationContratForm(forms.ModelForm):
         alternant = Alternant(user=self.request.user)
         contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
 
-        if contrat.type_contrat_avenant in (31, 32, 33,34,35,36):
+        if contrat.type_contrat_avenant in (31, 32, 33, 34, 35, 36):
             if date_effet_avenant is None:
                 raise forms.ValidationError("La date d'effet de l'avenant doit être renseignée.")
             else:
@@ -489,7 +497,7 @@ class InformationMissionForm(forms.ModelForm):
     class Meta:
         """
         Cette classe est propre au form de type "Model Form"
-        On y paramètre toutes les information du modèle lié ainsi que la définition des champs
+        On y paramètre toutes les informations du modèle lié ainsi que la définition des champs
         """
         model = Contrat
         fields = ['mission']

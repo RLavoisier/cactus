@@ -1,5 +1,8 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+
+import re
 from django.db.models import Min, Max
+
 from django.shortcuts import render, redirect
 from datetime import datetime
 
@@ -7,8 +10,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView
 
 from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm, CreationAlternantForm, InformationContratForm, InformationMissionForm
-from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel, Formation
+from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel, Formation, CFA
 from django.core.exceptions import ObjectDoesNotExist
+
+from saisiecontrat.utils.pdf_generator import PDFGenerator
+
 
 def creationcontrat(request):
 
@@ -83,23 +89,26 @@ def create_entreprise(request):
             contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
             entreprise = contrat.entreprise
 
-            entreprise.raison_sociale = request.POST.get("raison_sociale")
-            entreprise.numero_SIRET = request.POST.get("numero_SIRET")
-            entreprise.adresse_numero = request.POST.get("adresse_numero")
-            entreprise.adresse_voie = request.POST.get("adresse_voie")
-            entreprise.adresse_complement = request.POST.get("adresse_complement")
-            entreprise.code_postal = request.POST.get("code_postal")
-            entreprise.ville = request.POST.get("ville")
-            entreprise.type_employeur = request.POST.get("type_employeur")
-            entreprise.employeur_specifique=request.POST.get("employeur_specifique")
-            entreprise.code_APE = request.POST.get("code_APE")
-            entreprise.effectif_entreprise = request.POST.get("effectif_entreprise")
-            entreprise.telephone = request.POST.get("telephone")
-            entreprise.telecopie = request.POST.get("telecopie")
-            entreprise.courriel = request.POST.get("courriel")
-            entreprise.code_convention_collective = request.POST.get("code_convention_collective")
-            entreprise.adhesion_regime_assurance_chomage = request.POST.get("adhesion_regime_assurance_chomage", False)
-            entreprise.secteur_employeur = int(request.POST.get("type_employeur")[1])
+            entreprise.raison_sociale = form.cleaned_data["raison_sociale"]
+            entreprise.numero_SIRET = form.cleaned_data["numero_SIRET"]
+            entreprise.adresse_numero = form.cleaned_data["adresse_numero"]
+            entreprise.adresse_voie = form.cleaned_data["adresse_voie"]
+            entreprise.adresse_complement = form.cleaned_data["adresse_complement"]
+            entreprise.code_postal = form.cleaned_data["code_postal"]
+            entreprise.ville = form.cleaned_data["ville"]
+            entreprise.type_employeur = form.cleaned_data["type_employeur"]
+            entreprise.employeur_specifique=form.cleaned_data["employeur_specifique"]
+            entreprise.code_APE = form.cleaned_data["code_APE"]
+            entreprise.effectif_entreprise = form.cleaned_data["effectif_entreprise"]
+            entreprise.telephone = form.cleaned_data["telephone"]
+            entreprise.telecopie = form.cleaned_data["telecopie"]
+            entreprise.courriel = form.cleaned_data["courriel"]
+            entreprise.code_convention_collective = form.cleaned_data["code_convention_collective"]
+            entreprise.adhesion_regime_assurance_chomage = form.cleaned_data["adhesion_regime_assurance_chomage"]
+            if form.cleaned_data["type_employeur"] in (11, 12, 13, 14, 15, 16):
+                entreprise.secteur_employeur = 1
+            else:
+                entreprise.secteur_employeur = 2
 
             if len(entreprise.code_convention_collective) > 0:
                 try:
@@ -122,12 +131,14 @@ def create_entreprise(request):
                                       civilite=request.POST.get("civilite_ma_1"),
                                       nom=request.POST.get("nom_ma_1"),
                                       prenom=request.POST.get("prenom_ma_1"),
+                                      date_naissance=request.POST.get("date_naissance_ma_1"),
                                       role=2)
                 personnel.save()
             else:
                 personnel.civilite = request.POST.get("civilite_ma_1")
                 personnel.nom = request.POST.get("nom_ma_1")
                 personnel.prenom = request.POST.get("prenom_ma_1")
+                personnel.date_naissance = request.POST.get("date_naissance_ma_1")
                 personnel.save()
 
             if request.POST.get("nom_ma_2") is None:
@@ -141,12 +152,14 @@ def create_entreprise(request):
                                           civilite=request.POST.get("civilite_ma_2"),
                                           nom=request.POST.get("nom_ma_2"),
                                           prenom=request.POST.get("prenom_ma_2"),
+                                          date_naissance=request.POST.get("date_naissance_ma_2"),
                                           role=2)
                     personnel.save()
                 else:
                     personnel.civilite = request.POST.get("civilite_ma_2")
                     personnel.nom = request.POST.get("nom_ma_2")
                     personnel.prenom = request.POST.get("prenom_ma_2")
+                    personnel.date_naissance = request.POST.get("date_naissance_ma_2")
                     personnel.save()
 
             return render(request, "entreprise_form.html", {"form": form})
@@ -175,6 +188,7 @@ def create_entreprise(request):
             form.fields["civilite_ma_1"].initial = personnel.civilite
             form.fields["nom_ma_1"].initial = personnel.nom
             form.fields["prenom_ma_1"].initial = personnel.prenom
+            form.fields["date_naissance_ma_1"].initial = personnel.date_naissance
 
 
         return render(request, "entreprise_form.html", {"form": form})
@@ -193,6 +207,7 @@ def create_alternant(request):
             alternant.nom = form.cleaned_data["nom"]
             alternant.prenom = form.cleaned_data["prenom"]
             alternant.date_naissance = form.cleaned_data["date_naissance"]
+            alternant.commune_naissance = form.cleaned_data["commune_naissance"]
             alternant.numero_departement_naissance = form.cleaned_data["numero_departement_naissance"]
             alternant.adresse_numero = form.cleaned_data["adresse_numero"]
             alternant.adresse_voie = form.cleaned_data["adresse_voie"]
@@ -249,45 +264,72 @@ def inform_contrat(request):
 
         if form.is_valid():
 
-            alternant = request.user.alternant
-            contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
-            formation =  Formation.objects.get(formation=contrat.formation)
-            if contrat.nombre_année is None:
-                nombre_annees = formation.nombre_annees
-            else:
-                nombre_annees = contrat.nombre_annees
+            contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
 
-            annee_debut = formation.annee_remuneration_annee_diplome + 1 - nombre_annees
+            contrat.type_derogation = form.cleaned_data["type_derogation"]
+            contrat.date_embauche = form.cleaned_data["date_embauche"]
+            contrat.date_debut_contrat = form.cleaned_data["date_debut_contrat"]
+            contrat.date_effet_avenant = form.cleaned_data["date_effet_avenant"]
+            contrat.date_fin_contrat = form.cleaned_data["date_fin_contrat"]
+            contrat.duree_hebdomadaire_travail = form.cleaned_data["duree_hebdomadaire_travail"]
+            contrat.risques_particuliers = form.cleaned_data["risques_particuliers"]
+            contrat.caisse_retraite_complementaire = form.cleaned_data["caisse_retraite_complementaire"]
+            contrat.salaire_brut_mensuel = form.cleaned_data["salaire_brut_mensuel"]
+            contrat.nourriture = form.cleaned_data["nourriture"]
+            contrat.logement = form.cleaned_data["logement"]
+            contrat.prime_panier = form.cleaned_data["prime_panier"]
+            contrat.fait_a = form.cleaned_data["fait_a"]
+            contrat.fait_le = form.cleaned_data["fait_le"]
 
-            i = annee_debut
+            contrat.an_1_per_1_du = form.cleaned_data["an_1_per_1_du"]
+            contrat.an_1_per_1_au = form.cleaned_data["an_1_per_1_au"]
+            contrat.an_1_per_1_taux = form.cleaned_data["an_1_per_1_taux"]
+            contrat.an_1_per_1_base = form.cleaned_data["an_1_per_1_base"]
+            contrat.an_1_per_2_du = form.cleaned_data["an_1_per_2_du"]
+            contrat.an_1_per_2_au = form.cleaned_data["an_1_per_2_au"]
+            contrat.an_1_per_2_taux = form.cleaned_data["an_1_per_2_taux"]
+            contrat.an_1_per_2_base = form.cleaned_data["an_1_per_2_base"]
 
-            while i <= formation.annee_remuneration_annee_diplome:
+            contrat.an_2_per_1_du = form.cleaned_data["an_2_per_1_du"]
+            contrat.an_2_per_1_au = form.cleaned_data["an_2_per_1_au"]
+            contrat.an_2_per_1_taux = form.cleaned_data["an_2_per_1_taux"]
+            contrat.an_2_per_1_base = form.cleaned_data["an_2_per_1_base"]
+            contrat.an_2_per_2_du = form.cleaned_data["an_2_per_2_du"]
+            contrat.an_2_per_2_au = form.cleaned_data["an_2_per_2_au"]
+            contrat.an_2_per_2_taux = form.cleaned_data["an_2_per_2_taux"]
+            contrat.an_2_per_2_base = form.cleaned_data["an_2_per_2_base"]
 
-                pass
+            contrat.an_3_per_1_du = form.cleaned_data["an_3_per_1_du"]
+            contrat.an_3_per_1_au = form.cleaned_data["an_3_per_1_au"]
+            contrat.an_3_per_1_taux = form.cleaned_data["an_3_per_1_taux"]
+            contrat.an_3_per_1_base = form.cleaned_data["an_3_per_1_base"]
+            contrat.an_3_per_2_du = form.cleaned_data["an_3_per_2_du"]
+            contrat.an_3_per_2_au = form.cleaned_data["an_3_per_2_au"]
+            contrat.an_3_per_2_taux = form.cleaned_data["an_3_per_2_taux"]
+            contrat.an_3_per_2_base = form.cleaned_data["an_3_per_2_base"]
+
+            contrat.an_4_per_1_du = form.cleaned_data["an_4_per_1_du"]
+            contrat.an_4_per_1_au = form.cleaned_data["an_4_per_1_au"]
+            contrat.an_4_per_1_taux = form.cleaned_data["an_4_per_1_taux"]
+            contrat.an_4_per_1_base = form.cleaned_data["an_4_per_1_base"]
+            contrat.an_4_per_2_du = form.cleaned_data["an_4_per_2_du"]
+            contrat.an_4_per_2_au = form.cleaned_data["an_4_per_2_au"]
+            contrat.an_4_per_2_taux = form.cleaned_data["an_4_per_2_taux"]
+            contrat.an_4_per_2_base = form.cleaned_data["an_4_per_2_base"]
+
+            contrat.date_maj=datetime.now()
+
+            contrat.save()
 
             return render(request, "contrat_form.html", {"form": form})
         else:
             return render(request, "contrat_form.html", {"form": form})
     else:
 
-        # Il faut que la date de naissance de l'alternant soit renseignée avant l'appel à ce formulaire
+        contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
 
-        form = InformationContratForm(request=request)
-
+        form = InformationContratForm(instance=contrat)
         return render(request, "contrat_form.html", {"form": form})
-
-
-def date_anniversaire(date_naissance, date_reference):
-    return datetime(date_reference.year, date_naissance.month, date_naissance.day)
-
-
-def age(date_naissance, date_reference):
-    date_anniversaire = date_anniversaire(date_naissance, date_reference)
-    annees=date_anniversaire.year-date_naissance.year
-    if date_reference<date_anniversaire:
-        annees-=1
-    return annees
-
 
 
 def inform_mission(request):
@@ -318,7 +360,9 @@ def inform_mission(request):
         else:
             return render(request, "mission_form.html", {"form": form})
     else:
-        form = InformationMissionForm()
+        contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
+
+        form = InformationMissionForm(instance=contrat)
         return render(request, "mission_form.html", {"form": form})
 
 
@@ -418,3 +462,296 @@ class appliquer_formation(DetailView):
 
         return redirect("detail_formation")
 
+
+class creerpdf(DetailView):
+    model = Contrat
+
+    def get(self, request, *args, **kwargs):
+        # Recuperer les infos qui nous interesse pour le pdf
+
+
+        alternant = Alternant.objects.get(user=request.user)
+        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        entreprise = contrat.entreprise
+        formation = contrat.formation
+        cfa = formation.cfa
+
+        try:
+            ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
+        except ObjectDoesNotExist:
+            ma_1 = None
+
+        try:
+            ma_2 = Personnel.objects.get(entreprise=entreprise, role=3)
+        except ObjectDoesNotExist:
+            ma_2 = None
+
+        # Construction du dictionnaire des valeur du pdf
+        data = {}
+        if entreprise.secteur_employeur == 1:
+            data["emp_prive"] = 1
+        else:
+            data["emp_public"] = 1
+
+        if contrat.type_contrat_avenant in (31,32,33,34,35,36):
+            data["avenant"] = 1
+        else:
+            data["contrat"] = 1
+
+        data["mode_Contrat"] = contrat.mode_contractuel
+        data["emp_siret"] = entreprise.numero_SIRET
+        data["emp_adr_num"] = entreprise.adresse_numero
+        data["emp_adr_voie"] = entreprise.adresse_voie.upper()
+        if entreprise.adresse_complement is not None:
+            data["emp_adr_compl"] = entreprise.adresse_complement.upper()
+        data["emp_adr_cp"] = entreprise.code_postal
+        data["emp_adr_ville"] = entreprise.ville.upper()
+        data["emp_tel"] = entreprise.telephone
+        data["emp_fax"] = entreprise.telecopie
+
+        data["emp_mail1"] = entreprise.courriel[0:entreprise.courriel.find('@')]
+        data["emp_mail2"] = entreprise.courriel[entreprise.courriel.find('@')+1:]
+        data["emp_type"] = entreprise.type_employeur
+        data["emp_specifique"] = entreprise.employeur_specifique
+        data["emp_naf"] = entreprise.code_APE
+        data["emp_eff"] = entreprise.effectif_entreprise
+
+        data["emp_conv_coll"] = entreprise.libelle_convention_collective
+
+        data["emp_idcc"] = entreprise.code_convention_collective
+        data["emp_denom"] = entreprise.raison_sociale.upper()
+        data["emp_adh_chomage"] = entreprise.adhesion_regime_assurance_chomage
+
+        data["alt_nom"] = "%s %s" % (alternant.nom.upper(), alternant.prenom.upper())
+        data["alt_mail1"] = request.user.email
+        data["alt_tel"] = alternant.telephone
+        data["alt_adr_ville"] = alternant.ville
+        data["alt_adr_cp"] = alternant.code_postal
+        data["alt_adr_num"] = alternant.adresse_numero
+        data["alt_adr_voie"] = alternant.adresse_voie.upper()
+        data["alt_repr_adr_ville"] = alternant.ville_representant
+        data["alt_repr_adr_cp"] = alternant.code_postal_representant
+        data["alt_repr_adr_voie"] = alternant.adresse_voie_representant
+        data["alt_repr_adr_num"] = alternant.adresse_numero_representant
+        nom_prenom_representant = "%s %s" % (alternant.nom_representant, alternant.prenom_representant)
+        data["alt_repr_nom"] = nom_prenom_representant
+
+        data["alt_ddn_jour"] = str(alternant.date_naissance.day).zfill(2)
+        data["alt_ddn_mois"] = str(alternant.date_naissance.month).zfill(2)
+        data["alt_ddn_annee"] = alternant.date_naissance.year
+
+        data["alt_departement_naissance"] = alternant.numero_departement_naissance
+        data["alt_regime"] = alternant.regime_social
+        data["alt_nationnalite"] = alternant.nationalite
+        data["alt_derniere_situation"] = alternant.situation_avant_contrat
+        data["alt_dernier_diplome"] = alternant.dernier_diplome_prepare
+        data["alt_derniere_classe"] = alternant.derniere_annee_suivie
+        data["alt_dernier_diplome_intitule"] = alternant.intitule_dernier_diplome_prepare
+        data["alt_diplome"] = alternant.diplome_le_plus_eleve
+
+        if alternant.sexe == 'M':
+            data["alt_sexe_m"] = 1
+        else:
+            data["alt_sexe_f"] = 1
+
+        if alternant.handicape:
+            data["alt_handicape_oui"] = 1
+        else:
+            data["alt_handicape_non"] = 1
+
+        data["commune_naissance"] = alternant.commune_naissance
+
+        data["maitre1_nom"] = "%s %s" % (ma_1.nom, ma_1.prenom)
+        data["maitre1_ddn_jour"] = str(ma_1.date_naissance.day).zfill(2)
+        data["maitre1_ddn_mois"] = str(ma_1.date_naissance.month).zfill(2)
+        data["maitre1_ddn_annee"] = ma_1.date_naissance.year
+
+        if ma_2 is not None:
+            data["maitre2_nom"] = "%s %s" % (ma_2.nom, ma_2.prenom)
+            data["maitre2_ddn_jour"] = str(ma_2.date_naissance.day).zfill(2)
+            data["maitre2_ddn_mois"] = str(ma_2.date_naissance.month).zfill(2)
+            data["maitre2_ddn_annee"] = ma_2.date_naissance.year
+
+        if contrat.attestation_maitre_apprentissage:
+            data["maitre_attestation"] = 1
+        data["contrat_type"] = contrat.type_contrat_avenant
+        data["contrat_derog"] = contrat.type_derogation
+
+        if contrat.numero_contrat_anterieur is not None:
+            data["contrat_num_prec"] = contrat.numero_contrat_anterieur
+
+        data["contrat_debut_jour"] = str(contrat.date_embauche.day).zfill(2)
+        data["contrat_debut_mois"] = str(contrat.date_embauche.month).zfill(2)
+        data["contrat_debut_annee"] = contrat.date_embauche.year
+        data["execution_fin_annee"] = contrat.date_debut_contrat.year
+        data["execution_fin_mois"] = str(contrat.date_debut_contrat.month).zfill(2)
+        data["execution_fin_jour"] = str(contrat.date_debut_contrat.day).zfill(2)
+
+        data["contrat_duree_hebdo_heures"] = contrat.duree_hebdomadaire_travail
+        data["contrat_duree_hebdo_minutes"] = contrat.duree_hebdomadaire_travail
+
+        if contrat.risques_particuliers:
+            data["contrat_risques_oui"] = 1
+        else:
+            data["contrat_risques_non"] = 1
+
+        data["contrat_remu_annee1_taux1"] = str(int(contrat.an_1_per_1_taux*100))
+        data["contrat_remu_annee2_taux1"] = str(int(contrat.an_2_per_1_taux*100))
+        data["contrat_remu_annee3_taux1"] = str(int(contrat.an_3_per_1_taux*100))
+        data["contrat_remu_annee4_taux1"] = str(int(contrat.an_4_per_1_taux*100))
+        data["contrat_remu_annee1_du1_jour"] = str(contrat.an_1_per_1_du.day).zfill(2)
+        data["contrat_remu_annee1_du1_mois"] = str(contrat.an_1_per_1_du.month).zfill(2)
+        data["contrat_remu_annee1_du1_annee"] = contrat.an_1_per_1_du.year
+        data["contrat_remu_annee2_du1_jour"] = str(contrat.an_2_per_1_du.day).zfill(2)
+        data["contrat_remu_annee2_du1_mois"] = str(contrat.an_2_per_1_du.month).zfill(2)
+        data["contrat_remu_annee2_du1_annee"] = contrat.an_2_per_1_du.year
+        data["contrat_remu_annee3_du1_jour"] = str(contrat.an_3_per_1_du.day).zfill(2)
+        data["contrat_remu_annee3_du1_mois"] = str(contrat.an_3_per_1_du.month).zfill(2)
+        data["contrat_remu_annee3_du1_annee"] = contrat.an_3_per_1_du.year
+        data["contrat_remu_annee4_du1_jour"] = str(contrat.an_4_per_1_du.day).zfill(2)
+        data["contrat_remu_annee4_du1_mois"] = str(contrat.an_4_per_1_du.month).zfill(2)
+        data["contrat_remu_annee4_du1_annee"] = contrat.an_4_per_1_du.year
+        data["contrat_remu_annee1_au1_jour"] = str(contrat.an_1_per_1_au.day).zfill(2)
+        data["contrat_remu_annee1_au1_mois"] = str(contrat.an_1_per_1_au.month).zfill(2)
+        data["contrat_remu_annee1_au1_annee"] = contrat.an_1_per_1_au.year
+        data["contrat_remu_annee2_au1_jour"] = str(contrat.an_2_per_1_au.day).zfill(2)
+        data["contrat_remu_annee2_au1_mois"] = str(contrat.an_2_per_1_au.month).zfill(2)
+        data["contrat_remu_annee2_au1_annee"] = contrat.an_2_per_1_au.year
+        data["contrat_remu_annee3_au1_jour"] = str(contrat.an_3_per_1_au.day).zfill(2)
+        data["contrat_remu_annee3_au1_mois"] = str(contrat.an_3_per_1_au.month).zfill(2)
+        data["contrat_remu_annee3_au1_annee"] = contrat.an_3_per_1_au.year
+        data["contrat_remu_annee4_au1_jour"] = str(contrat.an_4_per_1_au.day).zfill(2)
+        data["contrat_remu_annee4_au1_mois"] = str(contrat.an_4_per_1_au.month).zfill(2)
+        data["contrat_remu_annee4_au1_annee"] = contrat.an_4_per_1_au.year
+        data["contrat_remu_annee1_ref1"] = Contrat.BASE[contrat.an_1_per_1_base - 1][1]
+        data["contrat_remu_annee2_ref1"] = Contrat.BASE[contrat.an_2_per_1_base - 1][1]
+        data["contrat_remu_annee3_ref1"] = Contrat.BASE[contrat.an_3_per_1_base - 1][1]
+        data["contrat_remu_annee4_ref1"] = Contrat.BASE[contrat.an_4_per_1_base - 1][1]
+        data["contrat_remu_annee1_taux2"] = str(int(contrat.an_1_per_2_taux*100))
+        data["contrat_remu_annee2_taux2"] = str(int(contrat.an_2_per_2_taux*100))
+        data["contrat_remu_annee3_taux2"] = str(int(contrat.an_3_per_2_taux*100))
+        data["contrat_remu_annee4_taux2"] = str(int(contrat.an_4_per_2_taux*100))
+        data["contrat_remu_annee1_du2_jour"] = str(contrat.an_1_per_2_du.day).zfill(2)
+        data["contrat_remu_annee1_du2_mois"] = str(contrat.an_1_per_2_du.month).zfill(2)
+        data["contrat_remu_annee1_du2_annee"] = contrat.an_1_per_2_du.year
+        data["contrat_remu_annee2_du2_jour"] = str(contrat.an_2_per_2_du.day).zfill(2)
+        data["contrat_remu_annee2_du2_mois"] = str(contrat.an_2_per_2_du.month).zfill(2)
+        data["contrat_remu_annee2_du2_annee"] = contrat.an_2_per_2_du.year
+        data["contrat_remu_annee3_du2_jour"] = str(contrat.an_3_per_2_du.day).zfill(2)
+        data["contrat_remu_annee3_du2_mois"] = str(contrat.an_3_per_2_du.month).zfill(2)
+        data["contrat_remu_annee3_du2_annee"] = contrat.an_3_per_2_du.year
+        data["contrat_remu_annee4_du2_jour"] = str(contrat.an_4_per_2_du.day).zfill(2)
+        data["contrat_remu_annee4_du2_mois"] = str(contrat.an_4_per_2_du.month).zfill(2)
+        data["contrat_remu_annee4_du2_annee"] = contrat.an_4_per_2_du.year
+        data["contrat_remu_annee1_au2_jour"] = str(contrat.an_1_per_2_au.day).zfill(2)
+        data["contrat_remu_annee1_au2_mois"] = str(contrat.an_1_per_2_au.month).zfill(2)
+        data["contrat_remu_annee1_au2_annee"] = contrat.an_1_per_2_au.year
+        data["contrat_remu_annee2_au2_jour"] = str(contrat.an_2_per_2_au.day).zfill(2)
+        data["contrat_remu_annee2_au2_mois"] = str(contrat.an_2_per_2_au.month).zfill(2)
+        data["contrat_remu_annee2_au2_annee"] = contrat.an_2_per_2_au.year
+        data["contrat_remu_annee3_au2_jour"] = str(contrat.an_3_per_2_au.day).zfill(2)
+        data["contrat_remu_annee3_au2_mois"] = str(contrat.an_3_per_2_au.month).zfill(2)
+        data["contrat_remu_annee3_au2_annee"] = contrat.an_3_per_2_au.year
+        data["contrat_remu_annee4_au2_jour"] = str(contrat.an_4_per_2_au.day).zfill(2)
+        data["contrat_remu_annee4_au2_mois"] = str(contrat.an_4_per_2_au.month).zfill(2)
+        data["contrat_remu_annee4_au2_annee"] = contrat.an_4_per_2_au.year
+        data["contrat_remu_annee1_ref2"] = Contrat.BASE[contrat.an_1_per_2_base - 1][1]
+        data["contrat_remu_annee2_ref2"] = Contrat.BASE[contrat.an_2_per_2_base - 1][1]
+        data["contrat_remu_annee3_ref2"] = Contrat.BASE[contrat.an_3_per_2_base - 1][1]
+        data["contrat_remu_annee4_ref2"] = Contrat.BASE[contrat.an_4_per_2_base - 1][1]
+
+        entier = int(contrat.salaire_brut_mensuel)
+        decimal = contrat.salaire_brut_mensuel - entier
+        data["contrat_salaire1"] = entier
+        data["contrat_salaire2"] = str(int(decimal)).zfill(2)
+
+        if contrat.nourriture is not None:
+            entier = int(contrat.nourriture)
+            decimal = (contrat.nourriture - entier)*100
+            data["contrat_avantg_nourr1"] = entier
+            data["contrat_avantg_nourr2"] = str(int(decimal)).zfill(2)
+
+        if contrat.logement is not None:
+            entier = int(contrat.logement)
+            decimal = (contrat.logement - entier)*100
+            data["contrat_avantg_logt1"] = entier
+            data["contrat_avantg_logt2"] =  str(int(decimal)).zfill(2)
+
+
+        if contrat.prime_panier is not None:
+            entier = int(contrat.prime_panier)
+            decimal = (contrat.prime_panier - entier)*100
+            data["panier_avantg_logt1"] = entier
+            data["panier_avantg_logt2"] =  str(int(decimal)).zfill(2)
+
+
+        if contrat.date_effet_avenant is not None:
+            data["avenant_debut_jour"] = str(contrat.date_effet_avenant.day).zfill(2)
+            data["avenant_debut_mois"] = str(contrat.date_effet_avenant.month).zfill(2)
+            data["avenant_debut_annee"] = contrat.date_effet_avenant.year
+
+        data["contrat_fin_jour"] = str(contrat.date_fin_contrat.day).zfill(2)
+        data["contrat_fin_mois"] = str(contrat.date_fin_contrat.month).zfill(2)
+        data["contrat_fin_annee"] = contrat.date_fin_contrat.year
+        data["retraite_caisse_comp"] = contrat.caisse_retraite_complementaire
+
+        data["formation_nom"] = cfa.nom
+        data["formation_uai"] = cfa.numeroUAI
+
+        data["formation_adr_voie"] = cfa.adresse_voie
+        data["formation_adr_num"] = cfa.adresse_numero
+        data["formation_adr_compl"] = cfa.adresse_complement
+        data["formation_adr_cp"] = cfa.code_postal
+        data["formation_adr_ville"] = cfa.ville
+        data["formation_inspect_pedag"] = formation.inspection_pedagogique_competente
+        data["signature_date_annee"] = contrat.fait_le.year
+        data["signature_date_mois"] = str(contrat.fait_le.month).zfill(2)
+        data["signature_date_jour"] = str(contrat.fait_le.day).zfill(2)
+        data["signature_lieu"] = contrat.fait_a
+        if contrat.attestation_pieces:
+            data["signature_emp_attestation"] = 1
+        data["formation_intitule"] = formation.intitule_diplome
+        data["formation_diplome"] = formation.diplome
+        data["formation_diplome_code"] = formation.numero_UAI
+
+        if contrat.date_inscription is not None:
+            data["inscription_annee"] = contrat.date_inscription.year
+            data["inscription_mois"] = str(contrat.date_inscription.month).zfill(2)
+            data["inscription_jour"] = str(contrat.date_inscription.day).zfill(2)
+
+        if formation.heures_an_1 is not None:
+            data["formation_annee2_heure"] = formation.heures_an_1
+        if formation.an_1_du is not None:
+            data["formation_annee1_du_jour"] = str(formation.an_1_du.day).zfill(2)
+            data["formation_annee1_du_mois"] = str(formation.an_1_du.month).zfill(2)
+            data["formation_annee1_du_annee"] = formation.an_1_du.year
+        if formation.an_1_au is not None:
+            data["formation_annee1_au_jour"] = str(formation.an_1_au.day).zfill(2)
+            data["formation_annee1_au_mois"] = str(formation.an_1_au.month).zfill(2)
+            data["formation_annee1_au_annee"] = formation.an_1_au.year
+
+        if formation.heures_an_2 is not None:
+            data["formation_annee2_heure"] = formation.heures_an_2
+        if formation.an_2_du is not None:
+            data["formation_annee2_du_jour"] = str(formation.an_2_du.day).zfill(2)
+            data["formation_annee2_du_mois"] = str(formation.an_2_du.month).zfill(2)
+            data["formation_annee2_du_annee"] = formation.an_2_du.year
+        if formation.an_2_au is not None:
+            data["formation_annee2_au_jour"] = str(formation.an_2_au.day).zfill(2)
+            data["formation_annee2_au_mois"] = str(formation.an_2_au.month).zfill(2)
+            data["formation_annee2_au_annee"] = formation.an_2_au.year
+
+        if formation.heures_an_3 is not None:
+            data["formation_annee3_heure"] = formation.heures_an_3
+        if formation.an_3_du is not None:
+            data["formation_annee3_du_jour"] = str(formation.an_3_du.day).zfill(2)
+            data["formation_annee3_du_mois"] = str(formation.an_3_du.month).zfill(2)
+            data["formation_annee3_du_annee"] = formation.an_3_du.year
+        if formation.an_3_au is not None:
+            data["formation_annee3_au_jour"] = str(formation.an_3_au.day).zfill(2)
+            data["formation_annee3_au_mois"] = str(formation.an_3_au.month).zfill(2)
+            data["formation_annee3_au_annee"] = formation.an_3_au.year
+
+        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(data)
+
+        return redirect("informationmission")

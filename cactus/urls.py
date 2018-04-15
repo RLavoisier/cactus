@@ -19,7 +19,7 @@ from saisiecontrat.views import create_alternant, inform_contrat, inform_mission
 from django.urls import path, include
 
 from cactus.views import accueil
-from saisiecontrat.views import creationcontrat, create_entreprise
+from saisiecontrat.views import creationcontrat, create_entreprise,creerpdf
 
 urlpatterns = [
     path('comptes/', include("comptes.urls"), name="comptes"),
@@ -33,5 +33,6 @@ urlpatterns = [
     path('informationmission/', inform_mission, name="informationmission"),
     path('liste_formation/', liste_formation.as_view(), name="liste_formation"),
     path('appliquer_formation/<int:pk>', appliquer_formation.as_view(), name="appliquer_formation"),
-    path('detail_formation/', detail_formation.as_view(), name='detail_formation')
+    path('detail_formation/', detail_formation.as_view(), name='detail_formation'),
+    path('creerpdf/', creerpdf.as_view(), name='creerpdf')
 ]
