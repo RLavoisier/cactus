@@ -42,7 +42,7 @@ class PDFGenerator:
         return filename
 
     @classmethod
-    def __format_input_datas_dict(self, input_datas):
+    def __format_input_datas_dict(cls, input_datas):
         """
         Cette méthode modifie les clés du dictionnaire input data pour coller
         au nom donné dans le pdf
@@ -56,5 +56,6 @@ class PDFGenerator:
         :return: le dict formaté
         :rtype: dict
         """
+        # Attention si plusieurs pages dns le pdf. Ne fonctionne pas !
         return {"topmostSubform[0].Page1[0].%s[0]" % k: v
                 for k, v in input_datas.items()}
