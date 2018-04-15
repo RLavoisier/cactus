@@ -435,6 +435,7 @@ class InformationContratForm(forms.ModelForm):
 
         # Si vous souhaitez, éditez les widgets des champs (si ceux par défaut ne vous conviennent pas
         widgets = {
+            "type_derogation": forms.Select(attrs={"class": "form-control"}),
             "date_embauche": forms.DateInput(attrs={"class": "form-control datepicker"}),
             "date_debut_contrat": forms.DateInput(attrs={"class": "form-control datepicker"}),
             "date_fin_contrat": forms.DateInput(attrs={"class": "form-control datepicker"}),
