@@ -19,7 +19,6 @@ from saisiecontrat.utils.pdf_generator import PDFGenerator
 def creationcontrat(request):
 
 # EXEMPLE DE FORMULAIRE GERE SANS RECOURS AUX MODELSFORMS
-
     if len(request.POST) > 0:
 
         form=CreationContratForm(request.POST)
@@ -54,10 +53,13 @@ def creationcontrat(request):
         else:
             return render(request, 'creationcontrat.html', {'form': form})
     else:
+        context = {}
         try:
             contrat=Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
         except ObjectDoesNotExist:
             contrat = None
+
+        context["contrat"] = contrat
 
             # A faire charger l'objet contrat dans le formulaire si trouvé
 
@@ -70,7 +72,10 @@ def creationcontrat(request):
         else:
             form = CreationContratForm()
 
-        return render(request, 'creationcontrat.html', {'form': form})
+        context["form"] = form
+        context["toto"] = 1
+
+        return render(request, 'creationcontrat.html', context)
 
 def create_entreprise(request):
 
@@ -328,7 +333,8 @@ def inform_contrat(request):
 
         contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
 
-        form = InformationContratForm(instance=contrat)
+        # dans le formulaire on utilise l'objet user de la request qui n'existe pas dans le formulaire
+        form = InformationContratForm(instance=contrat, request=request)
         return render(request, "contrat_form.html", {"form": form})
 
 
@@ -587,8 +593,8 @@ class creerpdf(DetailView):
         data["execution_fin_mois"] = str(contrat.date_debut_contrat.month).zfill(2)
         data["execution_fin_jour"] = str(contrat.date_debut_contrat.day).zfill(2)
 
-        data["contrat_duree_hebdo_heures"] = contrat.duree_hebdomadaire_travail
-        data["contrat_duree_hebdo_minutes"] = contrat.duree_hebdomadaire_travail
+        data["contrat_duree_hebdo_heures"] = str(contrat.duree_hebdomadaire_travail).split(":")[1]
+        data["contrat_duree_hebdo_minutes"] = str(contrat.duree_hebdomadaire_travail).split(":")[2]
 
         if contrat.risques_particuliers:
             data["contrat_risques_oui"] = 1
@@ -696,6 +702,7 @@ class creerpdf(DetailView):
         data["retraite_caisse_comp"] = contrat.caisse_retraite_complementaire
 
         data["formation_nom"] = cfa.nom
+        print(cfa.nom)
         data["formation_uai"] = cfa.numeroUAI
 
         data["formation_adr_voie"] = cfa.adresse_voie
@@ -752,6 +759,6 @@ class creerpdf(DetailView):
             data["formation_annee3_au_mois"] = str(formation.an_3_au.month).zfill(2)
             data["formation_annee3_au_annee"] = formation.an_3_au.year
 
-        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(data)
+        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(data, flatten=False)
 
         return redirect("informationmission")

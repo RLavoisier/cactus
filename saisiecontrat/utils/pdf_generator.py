@@ -12,7 +12,7 @@ class PDFGenerator:
     OUTPUT_DIR = os.path.join(settings.BASE_DIR, "pdf_outputs")
 
     @classmethod
-    def generate_cerfa_pdf_with_datas(cls, input_datas):
+    def generate_cerfa_pdf_with_datas(cls, input_datas, flatten=True):
         """
         Cette méthode prends en argument un dictionnaire contenant les nom des champs
         du pdf et les valeurs à injecter
@@ -36,7 +36,7 @@ class PDFGenerator:
         output_file_path = os.path.join(cls.OUTPUT_DIR, filename)
 
         # Remplissage du pdf
-        pypdftk.fill_form(pdf_path=cerfa_pdf,
+        pypdftk.fill_form(pdf_path=cerfa_pdf, flatten=flatten,
                           datas=formatted_datas, out_file=output_file_path)
 
         return filename

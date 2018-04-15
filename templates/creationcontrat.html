@@ -5,6 +5,9 @@
 {% block bodyId %}{% endblock %}
 
 {% block content %}
+{% if contrat %}
+<h5>Vous avez un contrat en cours d'édition. Rendez-vous sur les onglets suivants pour en compléter la saisie.</h5>
+{% endif %}
 <form action="{% url 'creationcontrat' %}" method="post">
     {% csrf_token %}
     {% if error %}
@@ -14,6 +17,6 @@
     <p>
         <input type="submit" value="Créer" />
     </p>
-
+<!-- Commentaire -->
 </form>
 {% endblock %}

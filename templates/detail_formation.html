@@ -6,8 +6,10 @@
 
 {% block content %}
     <h1>{{ formation.intitule_formation }}</h1>
-    <p>{{ formation.code_formation }}</p>
-    <p>{{ formation.nom_cfa }}</p>
+    <div class="row">
+        <div class="col-md-6"><p>{{ formation.code_formation }}</p></div>
+        <div class="col-md-6"><p>{{ formation.nom_cfa }}</p></div>
+    </div>
     <p>{{ formation.numeroUAI }}</p>
     <p>{{ formation.adresse_numero }}</p>
     <p>{{ formation.adresse_voie }}</p>

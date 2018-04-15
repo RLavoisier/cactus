@@ -423,8 +423,8 @@ class InformationContratForm(forms.ModelForm):
                    "avis_raf", "motif", "nombre_annees"]
 
         labels = {
-            "an_1_per_1_du": "Période 1 du :",
-            "an_1_per_1_au": "Période 1 au :",
+            "an_1_per_1_du": "Période 1 du",
+            "an_1_per_1_au": "Période 1 au",
             "an_1_per_1_taux": "Taux :",
             "an_1_per_1_base": "Base :",
             "an_1_per_2_du": "Période 2 du :",
@@ -448,22 +448,22 @@ class InformationContratForm(forms.ModelForm):
             "date_debut_contrat": forms.DateInput(attrs={"class": "form-control datepicker"}),
             "date_fin_contrat": forms.DateInput(attrs={"class": "form-control datepicker"}),
             "date_effet_avenant": forms.DateInput(attrs={"class": "form-control datepicker"}),
-            "an_1_per_1_du": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "an_1_per_1_du": forms.DateInput(attrs={"class": "form-control datepicker "}),
             "an_1_per_1_au": forms.DateInput(attrs={"class": "form-control datepicker"}),
             "an_1_per_2_du": forms.DateInput(attrs={"class": "form-control datepicker"}),
             "an_1_per_2_au": forms.DateInput(attrs={"class": "form-control datepicker"}),
             "an_1_per_1_taux": forms.TextInput(attrs={"class": "form-control"}),
-            "an_1_per_1_base": forms.TextInput(attrs={"class": "form-control"}),
+            "an_1_per_1_base": forms.Select(attrs={"class": "form-control"}),
             "an_1_per_2_taux": forms.TextInput(attrs={"class": "form-control"}),
-            "an_1_per_2_base": forms.TextInput(attrs={"class": "form-control"}),
+            "an_1_per_2_base": forms.Select(attrs={"class": "form-control"}),
             "an_2_per_1_du": forms.DateInput(attrs={"class": "form-control datepicker"}),
             "an_2_per_1_au": forms.DateInput(attrs={"class": "form-control datepicker"}),
             "an_2_per_2_du": forms.DateInput(attrs={"class": "form-control datepicker"}),
             "an_2_per_2_au": forms.DateInput(attrs={"class": "form-control datepicker"}),
             "an_2_per_1_taux": forms.TextInput(attrs={"class": "form-control"}),
-            "an_2_per_1_base": forms.TextInput(attrs={"class": "form-control"}),
+            "an_2_per_1_base": forms.Select(attrs={"class": "form-control"}),
             "an_2_per_2_taux": forms.TextInput(attrs={"class": "form-control"}),
-            "an_2_per_2_base": forms.TextInput(attrs={"class": "form-control"}),
+            "an_2_per_2_base": forms.Select(attrs={"class": "form-control"}),
         }
 
     def __init__(self, *args, **kwargs):
