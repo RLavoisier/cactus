@@ -29,7 +29,6 @@ body#loginPage section#footer {
 body#loginPage section#rightside {
   position: absolute;
   top: 170px;
-  bottom: 50px;
   right:0px;
   width: 20%;
   border-left: 1px solid #133783;
@@ -55,13 +54,51 @@ ul.errorlist {
     padding: 5px
 }
 
+.col-md-5 {
+    padding: 5px
+}
+
+.col-md-7 {
+    padding: 5px
+}
+
+.col-md-6 {
+    padding: 5px
+}
+
+.col-md-8 {
+    padding: 5px
+}
+
 .col-md-2 {
     padding: 5px
 }
+
 .col-md-1 {
     padding: 5px
 }
 
+.col-md-3 {
+    padding: 5px
+}
+
+.col-md-9 {
+    padding: 5px
+}
+
+.col-md-10 {
+    padding: 5px
+}
+
+.col-md-12 {
+    padding: 5px
+}
+
+.col-externe{
+    padding: 0px
+}
+
 .row {
     margin: 0
+
 }

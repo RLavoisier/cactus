@@ -64,16 +64,13 @@ class Alternant(models.Model):
     )
 
     DERNIERE_ANNEE_SUIVIE = (
-        (1, "l’apprenti(e) a suivi la dernière année du cycle de formation et a obtenu le diplôme ou titre"),
-        (11, "l’apprenti(e) a suivi la 1ère année du cycle et l’a validée (examens réussis mais année non diplômante)"),
-        (12, "l’apprenti(e) a suivi la 1ère année du cycle mais ne l’a pas validée (échec aux examens, interruption ou abandon de formation)"),
-        (21, "l’apprenti(e) a suivi la 2è année du cycle et l’a validée (examens réussis mais année non diplômante)"),
-        (22, "l’apprenti(e) a suivi la 2è année du cycle mais ne l’a pas validée (échec aux examens, interruption ou abandon de formation)"),
-        (31, "l’apprenti(e) a suivi la 3è année du cycle et l’a validée (examens réussis mais année non diplômante, cycle adapté)"),
-        (32, "l’apprenti(e) a suivi la 3è année du cycle mais ne l’a pas validée (échec aux examens, interruption ou abandon de formation)"),
-        (40, "l’apprenti(e) a achevé le 1er cycle de l’enseignement secondaire (collège)"),
-        (41, "l’apprenti(e) a interrompu ses études en classe de 3è"),
-        (42, "l’apprenti(e) a interrompu ses études en classe de 4è"),
+        (1, "Vous avez obtenu le diplôme ou titre."),
+        (11, "Vous avez suivi la 1ère année d'un cycle et vous l’avez validée (examens réussis mais année non diplômante)."),
+        (12, "Vous avez suivi la 1ère année d'un cycle mais vous ne l’avez pas validée (échec aux examens, interruption ou abandon de formation)"),
+        (21, "Vous avez suivi la 2è année d'un cycle et vous l’avez validée (examens réussis mais année non diplômante)"),
+        (22, "Vous avez suivi la 2è année d'un cycle mais vous ne l’avez pas validée (échec aux examens, interruption ou abandon de formation)"),
+        (31, "Vous avez suivi la 3è année d'un cycle et vous l’avez validée (examens réussis mais année non diplômante, cycle adapté)"),
+        (32, "Vous avez suivi la 3è année d'un cycle mais vous ne l’avez pas validée (échec aux examens, interruption ou abandon de formation)"),
     )
 
     DEPARTEMENT_NAISSANCE = (
@@ -359,14 +356,14 @@ class Formation(models.Model):
         (60,"Aucun diplôme ni titre professionnel"),
     )
 
-    code_formation = models.AutoField(max_length=13, primary_key=True)
+    code_formation = models.AutoField(max_length=14, primary_key=True)
     cfa = models.ForeignKey(CFA, on_delete=models.CASCADE)
     intitule_formation = models.CharField(max_length=150,blank=True, null=True)
     ville = models.CharField(max_length=35,blank=True, null=True)
     specialite = models.CharField(max_length=50,blank=True, null=True)
     diplome = models.PositiveSmallIntegerField(choices=DIPLOME, blank=True, null=True)
     intitule_diplome = models.CharField(max_length=100,blank=True, null=True)
-    numero_UAI = models.CharField(max_length=8,blank=True, null=True)
+    code_diplome_apprentissage = models.CharField(max_length=9,blank=True, null=True)
     an_1_du = models.DateField(blank=True, null=True)
     an_1_au = models.DateField(blank=True, null=True)
     heures_an_1 = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -389,32 +386,32 @@ class Formation(models.Model):
 class Contrat(models.Model):
 
     MODE_CONTRACTUEL = (
-        (1,"dans le cadre d'un CDD"),
-        (2,"dans le cadre d'un CDI"),
-        (3,"entreprise de travail temporaire"),
-        (4,"activités saisonnières à deux employeurs"),
+        (1,"Dans le cadre d'un CDD"),
+        (2,"Dans le cadre d'un CDI"),
+        (3,"Entreprise de travail temporaire"),
+        (4,"Activité saisonnière à deux employeurs"),
     )
 
     TYPE_CONTRAT_AVENANT = (
-        (11,"Premier contrat d’apprentissage de l’apprenti"),
-        (21,"Renouvellement de contrat chez le même employeur"),
-        (22,"Contrat avec un apprenti qui a terminé son précédent contrat auprès d’un autre employeur"),
-        (23,"Contrat avec un apprenti dont le précédent contrat auprès d’un autre employeur a été rompu"),
-        (31,"Modification de la situation juridique de l’employeur"),
-        (32,"Changement d’employeur dans le cadre d’un contrat saisonnier"),
-        (33,"Prolongation du contrat suite à un échec à l’examen de l’apprenti"),
-        (34,"Prolongation du contrat suite à la reconnaissance de l’apprenti comme travailleur handicapé"),
-        (35,"Modification du diplôme préparé par l’apprenti"),
-        (36, "Autres changements : changement de maître d’apprentissage, de durée de travail hebdomadaire, etc ..."),
+        (11,"C'est votre tout premier contrat d'apprentissage."),
+        (21,"Vous signez un nouveau contrat avec le même employeur."),
+        (22,"Vous signez un nouveau contrat avec un nouvel employeur."),
+        (23,"Vous signez un nouveau contrat avec un nouvel employeur après une rupture du contrat précédent."),
+        (31,"Vous modifiez un contrat existant : la situation juridique de votre employeur a changé."),
+        (32,"Vous modifiez un contrat existant : vous changez d'employeur dans le cadre d’un contrat saisonnier"),
+        (33,"Vous modifiez un contrat existant : vous prolongez votre contrat suite à un échec à l’examen."),
+        (34,"Vous modifiez un contrat existant : vous venez d'être reconnu comme travailleur handicapé."),
+        (35,"Vous modifiez un contrat existant : vous changez de diplôme préparé en cours de contrat."),
+        (36,"Vous modifiez un contrat existant : d'autres changements sont intervenus (maître d’apprentissage, durée de travail hebdo, etc ..."),
     )
 
     TYPE_DEROGATION = (
-        (11,"Age de l’apprenti(e) inférieur à 16 ans"),
-        (12,"Age supérieur à 25 ans : cas spécifiques prévus dans le code du travail"),
+        (11,"Vous avez moins de 16 ans."),
+        (12,"Vous avez plus de 25 ans (cas spécifiques prévus dans le code du travail)."),
         (21,"Réduction de la durée du contrat ou de la période d’apprentissage"),
-        (22,"Allongement  de la durée du contrat ou de la période d’apprentissage"),
+        (22,"Allongement de la durée du contrat ou de la période d’apprentissage"),
         (31,"Début de l’apprentissage hors période légale (plus de 3 mois avant ou après la date de début du cycle de formation)"),
-        (40,"Troisième contrat pour une formation de même niveau"),
+        (40,"C'est votre Troisième contrat pour une formation de même niveau"),
         (50,"Cumul de dérogations"),
         (60,"Autre dérogation"),
     )
@@ -440,12 +437,12 @@ class Contrat(models.Model):
     type_contrat_avenant = models.PositiveSmallIntegerField(choices=TYPE_CONTRAT_AVENANT, blank=True, null=True)
     date_inscription = models.DateField(verbose_name="Date d'inscription", blank=True, null=True)
     type_derogation = models.PositiveSmallIntegerField(verbose_name="Type de dérogation", choices=TYPE_DEROGATION, blank=True, null=True)
-    numero_contrat_anterieur = models.CharField(max_length=8, blank=True, null=True)
-    date_embauche = models.DateField(verbose_name="Date d'embauche", blank=True, null=True)
+    numero_contrat_anterieur = models.CharField(verbose_name="Numéro du contrat précédent", max_length=8, blank=True, null=True)
+    date_embauche = models.DateField(verbose_name="Date d'embauche", blank=True, null=True, help_text="C'est la date à laquelle est conclu le contrat de travail par les deux parties.")
     date_debut_contrat = models.DateField(verbose_name="Date de début du contrat", blank=True, null=True)
-    date_effet_avenant = models.DateField(verbose_name="Date d'effet de l'avenant", blank=True, null=True,help_text="S'il s'agit d'un avenant à un contrat existant, vous devez en indiquer la date d'antrée en vigueur.")
+    date_effet_avenant = models.DateField(verbose_name="Date d'effet de l'avenant", blank=True, null=True,help_text="S'il s'agit d'un avenant à un contrat existant, vous devez en indiquer la date d'entrée en vigueur.")
     date_fin_contrat = models.DateField(blank=True, null=True)
-    duree_hebdomadaire_travail = models.DurationField(blank=True, null=True)
+    duree_hebdomadaire_travail = models.DurationField(blank=True, null=True, help_text="Entrez la durée hebdomadaire du travail sous le format hh:mm (par exemple 35:45 pour 35 heures 30 minutes.")
     risques_particuliers = models.BooleanField(default=False)
     salaire_minimum_conventionnel = models.FloatField(blank=True, null=True)
     salaire_brut_mensuel = models.FloatField(blank=True, null=True)
@@ -459,35 +456,35 @@ class Contrat(models.Model):
     attestation_maitre_apprentissage = models.BooleanField(default=True)
     an_1_per_1_du = models.DateField(blank=True, null=True)
     an_1_per_1_au = models.DateField(blank=True, null=True)
-    an_1_per_1_taux = models.FloatField(blank=True, null=True)
+    an_1_per_1_taux = models.PositiveSmallIntegerField(blank=True, null=True)
     an_1_per_1_base = models.PositiveSmallIntegerField(choices=BASE, blank=True, null=True)
     an_1_per_2_du = models.DateField(blank=True, null=True)
     an_1_per_2_au = models.DateField(blank=True, null=True)
-    an_1_per_2_taux = models.FloatField(blank=True, null=True)
+    an_1_per_2_taux = models.PositiveSmallIntegerField(blank=True, null=True)
     an_1_per_2_base = models.PositiveSmallIntegerField( choices=BASE, blank=True, null=True)
     an_2_per_1_du = models.DateField(blank=True, null=True)
     an_2_per_1_au = models.DateField(blank=True, null=True)
-    an_2_per_1_taux = models.FloatField(blank=True, null=True)
+    an_2_per_1_taux = models.PositiveSmallIntegerField(blank=True, null=True)
     an_2_per_1_base = models.PositiveSmallIntegerField(choices=BASE, blank=True, null=True)
     an_2_per_2_du = models.DateField(blank=True, null=True)
     an_2_per_2_au = models.DateField(blank=True, null=True)
-    an_2_per_2_taux = models.FloatField(blank=True, null=True)
+    an_2_per_2_taux = models.PositiveSmallIntegerField(blank=True, null=True)
     an_2_per_2_base = models.PositiveSmallIntegerField(choices=BASE, blank=True, null=True)
     an_3_per_1_du = models.DateField(blank=True, null=True)
     an_3_per_1_au = models.DateField(blank=True, null=True)
-    an_3_per_1_taux = models.FloatField(blank=True, null=True)
+    an_3_per_1_taux = models.PositiveSmallIntegerField(blank=True, null=True)
     an_3_per_1_base = models.PositiveSmallIntegerField(choices=BASE, blank=True, null=True)
     an_3_per_2_du = models.DateField(blank=True, null=True)
     an_3_per_2_au = models.DateField(blank=True, null=True)
-    an_3_per_2_taux = models.FloatField(blank=True, null=True)
+    an_3_per_2_taux = models.PositiveSmallIntegerField(blank=True, null=True)
     an_3_per_2_base = models.PositiveSmallIntegerField(choices=BASE, blank=True, null=True)
     an_4_per_1_du = models.DateField(blank=True, null=True)
     an_4_per_1_au = models.DateField(blank=True, null=True)
-    an_4_per_1_taux = models.FloatField(blank=True, null=True)
+    an_4_per_1_taux = models.PositiveSmallIntegerField(blank=True, null=True)
     an_4_per_1_base = models.PositiveSmallIntegerField(choices=BASE, blank=True, null=True)
     an_4_per_2_du = models.DateField(blank=True, null=True)
     an_4_per_2_au = models.DateField(blank=True, null=True)
-    an_4_per_2_taux = models.FloatField(blank=True, null=True)
+    an_4_per_2_taux = models.PositiveSmallIntegerField(blank=True, null=True)
     an_4_per_2_base = models.PositiveSmallIntegerField(choices=BASE, blank=True, null=True)
     date_maj = models.DateTimeField(default=datetime.datetime.now())
     date_maj_mission = models.DateTimeField(blank=True, null=True)
@@ -516,10 +513,10 @@ class SMIC (models.Model):
 class Minima (models.Model):
     annee = models.PositiveSmallIntegerField()
     age = models.PositiveSmallIntegerField()
-    taux_minimum = models.FloatField()
+    taux_minimum = models.PositiveSmallIntegerField()
 
     def __str__(self):
-        return "Année %i de %i à %i" % (self.annee, self.age_de, self.age_a)
+        return "Année %i âge %i" % (self.annee, self.age)
 
 
 class Parametre (models.Model):

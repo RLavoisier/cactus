@@ -15,7 +15,8 @@ $(document).ready(
             dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
             dayNamesMin: ['D', 'L', 'M', 'M', 'J', 'V', 'S'],
             weekHeader: 'Sem.',
-            dateFormat: 'dd/mm/yy'
+            dateFormat: 'dd/mm/y',
+            shortYearCutoff: 99
         });
     }
 );

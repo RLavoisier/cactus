@@ -18,10 +18,11 @@ class CreationContratForm(forms.Form):
     mode_contractuel = forms.IntegerField(label='Mode contractuel :',
                                       widget=forms.Select(choices=Contrat.MODE_CONTRACTUEL),
                                       )
-    date_effet_avenant = forms.DateField(required=False)
+    date_effet_avenant = forms.DateField(required=False,
+                                         widget=forms.DateInput(attrs={"class": "datepicker"},
+                                                                format="%d/%m/%y"))
+    #date_effet_avenant = forms.DateInput(attrs={"class": "form-control datepicker"})
     numero_contrat_anterieur = forms.CharField(required=False)
-
-
 
     def clean(self):
 
@@ -29,6 +30,7 @@ class CreationContratForm(forms.Form):
         type_contrat_avenant = cleaned_data.get("type_contrat_avenant")
         mode_contractuel = cleaned_data.get("mode_contractuel")
         numero_contrat_anterieur = cleaned_data.get("numero_contrat_anterieur")
+        date_effet_avenant = cleaned_data.get("date_effet_avenant")
 
         # Vérifie que les deux champs sont valides
         if not (type_contrat_avenant and mode_contractuel):
@@ -36,6 +38,10 @@ class CreationContratForm(forms.Form):
         else:
             if len(numero_contrat_anterieur) == 0 and type_contrat_avenant in (21,31,32,33,34,35,36):
                 raise forms.ValidationError("Le numéro de contrat antérieur doit être renseigné pour les avenants et les renouvellements de contrat chez le même employeur.")
+
+        if date_effet_avenant is None and type_contrat_avenant in (31,32,33,34,35,36):
+            raise forms.ValidationError(
+                "En cas de modification de contrat (avenant), vous devez indiquer la date d'effet de cette modification.")
 
         return cleaned_data
 
@@ -63,8 +69,36 @@ class CreationEntrepriseForm(forms.ModelForm):
 
         # Si vous souhaitez éditez les widgets des champs (si ceux par défaut ne vous conviennent pas
         widgets = {
-            "courriel": forms.EmailInput(),
+            "raison_sociale": forms.TextInput(attrs={"class": "form-control"}),
+            "adresse_numero": forms.TextInput(attrs={"class": "form-control"}),
+            "adresse_voie": forms.TextInput(attrs={"class": "form-control"}),
+            "adresse_complement": forms.TextInput(attrs={"class": "form-control"}),
+            "code_postal": forms.TextInput(attrs={"class": "form-control"}),
+            "ville": forms.TextInput(attrs={"class": "form-control"}),
+            "telephone": forms.TextInput(attrs={"class": "form-control"}),
+            "telecopie": forms.TextInput(attrs={"class": "form-control"}),
+            "numero_SIRET": forms.TextInput(attrs={"class": "form-control"}),
+            "code_APE": forms.TextInput(attrs={"class": "form-control"}),
 
+            "travailleur_handicape": forms.CheckboxInput(attrs={"class": "form-control"}),
+            "numero_departement_naissance": forms.Select(attrs={"class": "form-control"}),
+            "sexe": forms.Select(attrs={"class": "form-control"}),
+            "date_naissance": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "commune_naissance": forms.TextInput(attrs={"class": "form-control"}),
+            "nationalite": forms.Select(attrs={"class": "form-control"}),
+            "regime_social": forms.Select(attrs={"class": "form-control"}),
+            "situation_avant_contrat": forms.Select(attrs={"class": "form-control"}),
+            "dernier_diplome_prepare": forms.Select(attrs={"class": "form-control"}),
+            "derniere_annee_suivie": forms.Select(attrs={"class": "form-control"}),
+            "intitule_dernier_diplome_prepare": forms.TextInput(attrs={"class": "form-control"}),
+            "diplome_le_plus_eleve": forms.Select(attrs={"class": "form-control"}),
+            "civilite_representant": forms.Select(attrs={"class": "form-control"}),
+            "nom_representant": forms.TextInput(attrs={"class": "form-control"}),
+            "prenom_representant": forms.TextInput(attrs={"class": "form-control"}),
+            "adresse_numero_representant": forms.TextInput(attrs={"class": "form-control"}),
+            "adresse_voie_representant": forms.TextInput(attrs={"class": "form-control"}),
+            "code_postal_representant": forms.TextInput(attrs={"class": "form-control"}),
+            "ville_representant": forms.TextInput(attrs={"class": "form-control"}),
         }
 
     def clean_raison_sociale(self):
@@ -262,7 +296,32 @@ class CreationAlternantForm(forms.ModelForm):
 
         # Si vous souhaitez éditez les widgets des champs (si ceux par défaut ne vous conviennent pas
         widgets = {
-
+            "nom": forms.TextInput(attrs={"class": "form-control"}),
+            "prenom": forms.TextInput(attrs={"class": "form-control"}),
+            "adresse_numero": forms.TextInput(attrs={"class": "form-control"}),
+            "adresse_voie": forms.TextInput(attrs={"class": "form-control"}),
+            "code_postal": forms.TextInput(attrs={"class": "form-control"}),
+            "ville": forms.TextInput(attrs={"class": "form-control"}),
+            "telephone": forms.TextInput(attrs={"class": "form-control"}),
+            "travailleur_handicape": forms.CheckboxInput(attrs={"class": "form-control"}),
+            "numero_departement_naissance": forms.Select(attrs={"class": "form-control"}),
+            "sexe": forms.Select(attrs={"class": "form-control"}),
+            "date_naissance": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "commune_naissance": forms.TextInput(attrs={"class": "form-control"}),
+            "nationalite": forms.Select(attrs={"class": "form-control"}),
+            "regime_social": forms.Select(attrs={"class": "form-control"}),
+            "situation_avant_contrat": forms.Select(attrs={"class": "form-control"}),
+            "dernier_diplome_prepare": forms.Select(attrs={"class": "form-control"}),
+            "derniere_annee_suivie": forms.Select(attrs={"class": "form-control"}),
+            "intitule_dernier_diplome_prepare": forms.TextInput(attrs={"class": "form-control"}),
+            "diplome_le_plus_eleve": forms.Select(attrs={"class": "form-control"}),
+            "civilite_representant": forms.Select(attrs={"class": "form-control"}),
+            "nom_representant": forms.TextInput(attrs={"class": "form-control"}),
+            "prenom_representant": forms.TextInput(attrs={"class": "form-control"}),
+            "adresse_numero_representant": forms.TextInput(attrs={"class": "form-control"}),
+            "adresse_voie_representant": forms.TextInput(attrs={"class": "form-control"}),
+            "code_postal_representant": forms.TextInput(attrs={"class": "form-control"}),
+            "ville_representant": forms.TextInput(attrs={"class": "form-control"}),
         }
 
     def clean_handicape(self):
@@ -424,46 +483,55 @@ class InformationContratForm(forms.ModelForm):
 
         labels = {
             "an_1_per_1_du": "Période 1 du",
-            "an_1_per_1_au": "Période 1 au",
-            "an_1_per_1_taux": "Taux :",
-            "an_1_per_1_base": "Base :",
-            "an_1_per_2_du": "Période 2 du :",
-            "an_1_per_2_au": "Période 2 au :",
-            "an_1_per_2_taux": "Taux :",
-            "an_1_per_2_base": "Base :",
-            "an_2_per_1_du": "Période 1 du :",
-            "an_2_per_1_au": "Période 1 au :",
-            "an_2_per_1_taux": "Taux :",
-            "an_2_per_1_base": "Base :",
-            "an_2_per_2_du": "Période 2 du :",
-            "an_2_per_2_au": "Période 2 au :",
-            "an_2_per_2_taux": "Taux :",
-            "an_2_per_2_base": "Base :",
         }
 
         # Si vous souhaitez, éditez les widgets des champs (si ceux par défaut ne vous conviennent pas
         widgets = {
             "type_derogation": forms.Select(attrs={"class": "form-control"}),
-            "date_embauche": forms.DateInput(attrs={"class": "form-control datepicker"}),
-            "date_debut_contrat": forms.DateInput(attrs={"class": "form-control datepicker"}),
-            "date_fin_contrat": forms.DateInput(attrs={"class": "form-control datepicker"}),
-            "date_effet_avenant": forms.DateInput(attrs={"class": "form-control datepicker"}),
-            "an_1_per_1_du": forms.DateInput(attrs={"class": "form-control datepicker "}),
-            "an_1_per_1_au": forms.DateInput(attrs={"class": "form-control datepicker"}),
-            "an_1_per_2_du": forms.DateInput(attrs={"class": "form-control datepicker"}),
-            "an_1_per_2_au": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "date_embauche": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "date_debut_contrat": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "date_fin_contrat": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            #"date_effet_avenant": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "duree_hebdomadaire_travail": forms.TextInput(attrs={"class": "form-control"}),
+            "risques_particuliers": forms.CheckboxInput(attrs={}),
+            "salaire_brut_mensuel": forms.TextInput(attrs={"class": "form-control"}),
+            "nourriture": forms.TextInput(attrs={"class": "form-control"}),
+            "logement": forms.TextInput(attrs={"class": "form-control"}),
+            "prime_panier": forms.TextInput(attrs={"class": "form-control"}),
+            "caisse_retraite_complementaire": forms.TextInput(attrs={"class": "form-control"}),
+
+            "an_1_per_1_du": forms.DateInput(attrs={"class": "form-control datepicker "}, format="%d/%m/%y"),
+            "an_1_per_1_au": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "an_1_per_2_du": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "an_1_per_2_au": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
             "an_1_per_1_taux": forms.TextInput(attrs={"class": "form-control"}),
             "an_1_per_1_base": forms.Select(attrs={"class": "form-control"}),
             "an_1_per_2_taux": forms.TextInput(attrs={"class": "form-control"}),
             "an_1_per_2_base": forms.Select(attrs={"class": "form-control"}),
-            "an_2_per_1_du": forms.DateInput(attrs={"class": "form-control datepicker"}),
-            "an_2_per_1_au": forms.DateInput(attrs={"class": "form-control datepicker"}),
-            "an_2_per_2_du": forms.DateInput(attrs={"class": "form-control datepicker"}),
-            "an_2_per_2_au": forms.DateInput(attrs={"class": "form-control datepicker"}),
+            "an_2_per_1_du": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "an_2_per_1_au": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "an_2_per_2_du": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "an_2_per_2_au": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
             "an_2_per_1_taux": forms.TextInput(attrs={"class": "form-control"}),
             "an_2_per_1_base": forms.Select(attrs={"class": "form-control"}),
             "an_2_per_2_taux": forms.TextInput(attrs={"class": "form-control"}),
             "an_2_per_2_base": forms.Select(attrs={"class": "form-control"}),
+            "an_3_per_1_du": forms.DateInput(attrs={"class": "form-control datepicker "}, format="%d/%m/%y"),
+            "an_3_per_1_au": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "an_3_per_2_du": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "an_3_per_2_au": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "an_3_per_1_taux": forms.TextInput(attrs={"class": "form-control"}),
+            "an_3_per_1_base": forms.Select(attrs={"class": "form-control"}),
+            "an_3_per_2_taux": forms.TextInput(attrs={"class": "form-control"}),
+            "an_3_per_2_base": forms.Select(attrs={"class": "form-control"}),
+            "an_4_per_1_du": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "an_4_per_1_au": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "an_4_per_2_du": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "an_4_per_2_au": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "an_4_per_1_taux": forms.TextInput(attrs={"class": "form-control"}),
+            "an_4_per_1_base": forms.Select(attrs={"class": "form-control"}),
+            "an_4_per_2_taux": forms.TextInput(attrs={"class": "form-control"}),
+            "an_4_per_2_base": forms.Select(attrs={"class": "form-control"}),
         }
 
     def __init__(self, *args, **kwargs):

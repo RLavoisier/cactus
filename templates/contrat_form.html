@@ -1,143 +1,364 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block content %}
     <form action="." method="POST">
         {% csrf_token %}
         <fieldset>
-            <legend>Contrat</legend>
-            {{  form.type_derogation.label_tag }}
-            {{  form.type_derogation }}
-            {{  form.date_embauche.label_tag }}
-            {{  form.date_embauche }}
-
             <div class="row">
-                <div class="col-md-4">
-                    {{  form.date_debut_contrat.label_tag }}
-                    {{  form.date_debut_contrat }}
+                <div class="col-md-2">
+                    <div class="col-md-12">
+                        <h5>Type de dérogation</h5>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    {{  form.date_fin_contrat.label_tag }}
-                    {{  form.date_fin_contrat }}
-                </div>
-                <div class="col-md-4">
-                    {{  form.date_effet_avenant.label_tag }}
-                    {{  form.date_effet_avenant }}
-                    <p>{{  form.date_effet_avenant.help_text }}</p>
+                <div class="col-md-10" >
+                    <div class="col-md-12">
+                        {{  form.type_derogation }}
+                    </div>
                 </div>
             </div>
         </fieldset>
+
         <fieldset>
             <div class="row">
-                <div class="row">
-                    <div class="col-md-2">
-
-                    </div>
-                    <div class="col-md-10">
-
-                        <div class="col-md-2">
-                            <p class="text-center">{{  form.an_1_per_1_du.label_tag }}</p>
-                        </div>
-                        <div class="col-md-2">
-                            {{  form.an_1_per_1_au.label_tag }}
-                        </div>
-                        <div class="col-md-1">
-                            {{  form.an_1_per_1_taux.label_tag }}
-                        </div>
-                        <div class="col-md-1">
-                            {{  form.an_1_per_1_base.label_tag }}
-                        </div>
-                        <div class="col-md-2">
-                            {{  form.an_1_per_2_du.label_tag }}
-                        </div>
-                        <div class="col-md-2">
-                            {{  form.an_1_per_2_au.label_tag }}
-                        </div>
-                        <div class="col-md-1">
-                            {{  form.an_1_per_2_taux.label_tag }}
-                        </div>
-                        <div class="col-md-1">
-                            {{  form.an_1_per_2_base.label_tag }}
-                        </div>
+                <div  class="col-md-6">
+                    <div class="col-md-4">
+                        <h5>Date de début de contrat</h5>
                     </div>
                     <div class="col-md-2">
-                        <h5></h5>
+                        {{  form.date_debut_contrat }}
                     </div>
-
+                    <div class="col-md-4">
+                        <h5 align="center">Date de fin de contrat</h5>
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.date_fin_contrat }}
+                    </div>
+                </div>
+                <div  class="col-md-6">
+                    <div class="col-md-3">
+                        <h5 align="center">Date d'embauche</h5>
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.date_embauche }}
+                    </div>
+                    <div class="col-md-1">
+                    </div>
+                    <div class="col-md-4">
+                    </div>
+                    <div class="col-md-2">
+                    </div>
                 </div>
             </div>
         </fieldset>
-            <div class="row">
-                <fieldset>
-                    <div class="row">
-                        <div class="col-md-2">
-                            <h5>Première Année</h5>
-                        </div>
-                        <div class="col-md-10">
 
-                            <div class="col-md-2">
-                                {{  form.an_1_per_1_du }}
-                            </div>
-                            <div class="col-md-2">
-                                {{  form.an_1_per_1_au }}
-                            </div>
-                            <div class="col-md-1">
-                                {{  form.an_1_per_1_taux }}
-                            </div>
-                            <div class="col-md-1">
-                                {{  form.an_1_per_1_base }}
-                            </div>
-                            <div class="col-md-2">
-                                {{  form.an_1_per_2_du }}
-                            </div>
-                            <div class="col-md-2">
-                                {{  form.an_1_per_2_au }}
-                            </div>
-                            <div class="col-md-1">
-                                {{  form.an_1_per_2_taux }}
-                            </div>
-                            <div class="col-md-1">
-                                {{  form.an_1_per_2_base }}
-                            </div>
-                        </div>
-
+        <fieldset>
+            <div class="row" align="center">
+                <div class="col-md-6">
+                    <div class="col-md-3">
                     </div>
-                </fieldset>
+                    <div class="col-md-1">
+                    </div>
+                    <div class="col-md-2">
+                        <h5>Du</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5>Au</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5>Minimum</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5>Base</h5>
+                    </div>
+
+                </div>
+                <div class="col-md-6">
+                    <div class="col-md-1">
+                    </div>
+                    <div class="col-md-2">
+                        <h5>Du</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5>Au</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5>Minimum</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5>Base</h5>
+                    </div>
+                    <div class="col-md-3">
+                    </div>
+                </div>
+
             </div>
+        </fieldset>
+
         <fieldset>
             <div class="row">
-                <div class="row">
-                    <div class="col-md-2">
-                        <h5>Deuxième Année</h5>
+                <div class="col-md-6 ext">
+                    <div class="col-md-3">
+                        <h5>Première année</h5>
                     </div>
-                    <div class="col-md-10">
+                    <div class="col-md-1">
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_1_per_1_du }}
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_1_per_1_au }}
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            {{  form.an_1_per_1_taux }}
+                            <span class="input-group-addon">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_1_per_1_base }}
+                    </div>
+                </div>
+                <div class="col-md-6 ext">
+                    <div class="col-md-1">
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_1_per_2_du }}
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_1_per_2_au }}
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            {{  form.an_1_per_2_taux }}
+                            <span class="input-group-addon">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_1_per_2_base }}
+                    </div>
+                    <div class="col-md-3">
+                    </div>
+                </div>
 
-                        <div class="col-md-2">
-                            {{  form.an_2_per_1_du }}
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="col-md-3">
+                        <h5>Deuxième année</h5>
+                    </div>
+                    <div class="col-md-1">
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_2_per_1_du }}
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_2_per_1_au }}
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            {{  form.an_2_per_1_taux }}
+                            <span class="input-group-addon">%</span>
                         </div>
-                        <div class="col-md-2">
-                            {{  form.an_2_per_1_au }}
-                        </div>
-                        <div class="col-md-1">
-                            {{  form.an_2_per_1_taux }} %
-                        </div>
-                        <div class="col-md-1">
-                            {{  form.an_2_per_1_base }}
-                        </div>
-                        <div class="col-md-2">
-                            {{  form.an_2_per_2_du }}
-                        </div>
-                        <div class="col-md-2">
-                            {{  form.an_2_per_2_au }}
-                        </div>
-                        <div class="col-md-1">
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_2_per_1_base }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="col-md-1">
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_2_per_2_du }}
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_2_per_2_au }}
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
                             {{  form.an_2_per_2_taux }}
+                            <span class="input-group-addon">%</span>
                         </div>
-                        <div class="col-md-1">
-                            {{  form.an_2_per_2_base }}
-                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_2_per_2_base }}
+                    </div>
+                    <div class="col-md-3">
                     </div>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="col-md-3">
+                        <h5>Troisième année</h5>
+                    </div>
+                    <div class="col-md-1">
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_3_per_1_du }}
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_2_per_1_au }}
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            {{  form.an_2_per_1_taux }}
+                            <span class="input-group-addon">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_2_per_1_base }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="col-md-1">
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_2_per_2_du }}
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_2_per_2_au }}
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            {{  form.an_2_per_2_taux }}
+                            <span class="input-group-addon">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_2_per_2_base }}
+                    </div>
+                    <div class="col-md-3">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="col-md-3">
+                        <h5>Quatrième année</h5>
+                    </div>
+                    <div class="col-md-1">
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_4_per_1_du }}
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_4_per_1_au }}
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            {{  form.an_4_per_1_taux }}
+                            <span class="input-group-addon">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_4_per_1_base }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="col-md-1">
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_4_per_2_du }}
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_4_per_2_au }}
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            {{  form.an_4_per_2_taux }}
+                            <span class="input-group-addon">%</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        {{  form.an_4_per_2_base }}
+                    </div>
+                    <div class="col-md-3">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="col-md-12">
+                        <h5>Salaire brut mensuel</h5>
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            {{  form.salaire_brut_mensuel }}
+                            <span class="input-group-addon">€</span>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+
+                    </div>
+                    <div class="col-md-3">
+                        <h5 align="center">Caisse de retraite complémentaire</h5>
+                    </div>
+                    <div class="col-md-3">
+                        {{  form.caisse_retraite_complementaire }}
+                    </div>
+                    <div class="col-md-2">
+                        <h5 align="center">Risques particuliers</h5>
+                    </div>
+                    <div class="col-md-1">
+                        <div class="checkbox">
+                            {{  form.risques_particuliers }}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="col-md-12">
+                        <h5 align="">Avantages en nature</h5>
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div class="col-md-1">
+                        <h5>Nourriture</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            {{ form.nourriture }}
+                            <span class="input-group-addon">€ / jour</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <h5 align="center">Logement</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            {{  form.logement }}
+                            <span class="input-group-addon">€ / mois</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <h5 align="center">Prime panier</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            {{  form.prime_panier }}
+                            <span class="input-group-addon">€ / mois</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <p>
+                <input type="submit" value="Valider" />
+            </p>
         </fieldset>
+
+
     </form>
 {% endblock %}

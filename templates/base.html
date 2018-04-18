@@ -23,6 +23,7 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'accueil' %}">Accueil</a>
           </li>
+          {% if contrat %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'creationalternant' %}">Vous</a>
           </li>
@@ -38,6 +39,7 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'informationmission' %}">Votre mission</a>
           </li>
+          {% endif %}
         </ul>
         {% block content %}
         {% endblock %}
@@ -51,6 +53,6 @@
     {% block rightsidecontent %}{% endblock %}
     </section>{% endcomment %}
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="/static/js/cactus.js"></script>
+  <script type="text/javascript" src="/static/js/cactus.js?no_cache=1"></script>
   </body>
 </html>

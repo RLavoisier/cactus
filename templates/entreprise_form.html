@@ -3,10 +3,241 @@
 {% block content %}
 <form action="{% url 'creationentreprise' %}" method="post">
   {% csrf_token %}
+
+        <fieldset>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-3">
+                        <h5>Raison sociale</h5>
+                      </div>
+                      <div class="col-md-5">
+                          {{ form.nom }}
+                      </div>
+                      <div class="col-md-4">
+                          {{ form.prenom }}
+                      </div>
+                    </div>
+                </div>
+                <div class="col-md-6" >
+                    <div class="col-md-4">
+                        <h5>Date de naissance</h5>
+                    </div>
+                    <div class="col-md-2">
+                        {{ form.date_naissance }}
+                    </div>
+                    <div class="col-md-2">
+                        <h5 align="center">Sexe</h5>
+                    </div>
+                    <div class="col-md-2">
+                        {{ form.sexe }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-3">
+                        <h5>Adresse</h5>
+                      </div>
+                      <div class="col-md-2">
+                          {{ form.adresse_numero }}
+                      </div>
+                      <div class="col-md-7">
+                          {{ form.adresse_voie }}
+                      </div>
+                    </div>
+                </div>
+                <div class="col-md-6" >
+                    <div class="col-md-4">
+                        <h5>Département de naissance</h5>
+                    </div>
+                    <div class="col-md-8">
+                          {{ form.numero_departement_naissance }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-3">
+                        <h5></h5>
+                      </div>
+                      <div class="col-md-2">
+                          {{ form.code_postal }}
+                      </div>
+                      <div class="col-md-7">
+                          {{ form.ville }}
+                      </div>
+                    </div>
+                </div>
+                <div class="col-md-6" >
+                    <div class="col-md-4">
+                        <h5>Ville de naissance</h5>
+                    </div>
+                    <div class="col-md-8">
+                          {{ form.commune_naissance }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-3">
+                        <h5>Représentant légal</h5>
+                      </div>
+                      <div class="col-md-2">
+                          {{ form.civilité_representant }}
+                      </div>
+                      <div class="col-md-4">
+                          {{ form.nom_representant }}
+                      </div>
+                      <div class="col-md-3">
+                          {{ form.prenom_representant }}
+                      </div>
+                    </div>
+                </div>
+                <div class="col-md-6" >
+                    <div class="col-md-4">
+                        <h5>Nationalité</h5>
+                    </div>
+                    <div class="col-md-8">
+                          {{ form.nationalite }}
+                    </div>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-3">
+                        <h5>Adresse</h5>
+                      </div>
+                      <div class="col-md-2">
+                          {{ form.adresse_numero_representant }}
+                      </div>
+                      <div class="col-md-7">
+                          {{ form.adresse_voie_representant }}
+                      </div>
+                    </div>
+                </div>
+                <div class="col-md-6" >
+                    <div class="col-md-4">
+                        <h5>Régime social</h5>
+                    </div>
+                    <div class="col-md-3">
+                          {{ form.regime_social }}
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Travailleur handicapé</h5>
+                    </div>
+                    <div class="col-md-1">
+                          {{ form.travailleur_handicape }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-3">
+                        <h5></h5>
+                      </div>
+                      <div class="col-md-2">
+                          {{ form.code_postal_representant }}
+                      </div>
+                      <div class="col-md-7">
+                          {{ form.ville_representant }}
+                      </div>
+                    </div>
+                </div>
+                <div class="col-md-6" >
+                    <div class="col-md-2">
+                    </div>
+                    <div class="col-md-2">
+                    </div>
+                    <div class="col-md-2">
+                    </div>
+                    <div class="col-md-2">
+                    </div>
+                    <div class="col-md-2">
+                    </div>
+                    <div class="col-md-2">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-3">
+                          <h5><b>Parcours</b></h5>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="col-md-4">
+                        <h5>Situation avant ce contrat</h5>
+                    </div>
+                    <div class="col-md-8">
+                        {{ form.situation_avant_contrat }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="col-md-4">
+                        <h5>Diplôme le plus elevé</h5>
+                    </div>
+                    <div class="col-md-8">
+                        {{ form.diplome_le_plus_eleve }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <h5>Dernier diplôme préparé et intitulé précis</h5>
+                      </div>
+                      <div class="col-md-8">
+                          {{ form.dernier_diplome_prepare }}
+                      </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                      <div class="col-md-12">
+                          {{ form.intitule_dernier_diplome_prepare }}
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="col-md-12">
+                        <h5>Dernière année suivie</h5>
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div class="col-md-12">
+                        {{ form.derniere_annee_suivie }}
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+
+
   {% if error %}
   <p class="error">{{ error }}</p>
   {% endif %}
-  {{ form.as_p }}
+
   <p>
     <input type="submit" value="Valider" />
   </p>

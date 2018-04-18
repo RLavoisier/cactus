@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'saisiecontrat',
     'cactus',
     'django.contrib.admin',
-    'crispy_forms',
+    'django.contrib.humanize'
 ]
 
 MIDDLEWARE = [

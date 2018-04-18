@@ -1,6 +1,8 @@
 # coding: utf-8
 
 import re
+from copy import deepcopy
+
 from django.db.models import Min, Max
 
 from django.shortcuts import render, redirect
@@ -19,6 +21,7 @@ from saisiecontrat.utils.pdf_generator import PDFGenerator
 def creationcontrat(request):
 
 # EXEMPLE DE FORMULAIRE GERE SANS RECOURS AUX MODELSFORMS
+
     if len(request.POST) > 0:
 
         form=CreationContratForm(request.POST)
@@ -31,25 +34,50 @@ def creationcontrat(request):
             except ObjectDoesNotExist:
                 contrat = None
 
-            # Si aucun contrat n'existe on crée un nouveau contrat
+            context = {}
 
+            # Si aucun contrat n'existe on crée un nouveau contrat
             if contrat is None:
 
                 contrat=Contrat(alternant=request.user.alternant,
                                 type_contrat_avenant=request.POST['type_contrat_avenant'],
                                 mode_contractuel=request.POST['mode_contractuel'],
                                 numero_contrat_anterieur=request.POST['numero_contrat_anterieur'],
-                )
+                                date_effet_avenant=request.POST['date_effet_avenant'],
+                                )
                 contrat.save()
-
+                context["message"] = "Le contrat a bien été créé vous pouvez maintenant le compléter dans les onglets suivants."
             else:
-                nouveaucontrat=contrat
+                # copy ll'objet (si on écrit nouveaucontrat=contrat on crée juste un pointeur sur contrat)
+                # Cette syntaxe python fonctionne sur tout type d'objet et  dictionnaire
+                nouveaucontrat = deepcopy(contrat)
+
                 nouveaucontrat.id=None
+                nouveaucontrat.type_contrat_avenant = request.POST['type_contrat_avenant']
+                nouveaucontrat.mode_contractuel = request.POST['mode_contractuel']
+                nouveaucontrat.numero_contrat_anterieur = request.POST['numero_contrat_anterieur']
+                if request.POST['date_effet_avenant'] is not None:
+                    nouveaucontrat.date_effet_avenant = request.POST['date_effet_avenant']
+
                 nouveaucontrat.save()
+
                 contrat.contrat_courant = False
                 contrat.save()
 
-            return redirect("creationalternant")
+                context["message"] = "Un contrat a bien été créé. Les données du contrat précédent on été reprises vous pouver modifier les données dans les onglets suivants."
+
+            form = CreationContratForm(initial={
+                "type_contrat_avenant": nouveaucontrat.type_contrat_avenant,
+                "mode_contractuel": nouveaucontrat.mode_contractuel,
+                "numero_contrat_anterieur": nouveaucontrat.numero_contrat_anterieur,
+                "date_effet_avenant": nouveaucontrat.date_effet_avenant,
+            })
+
+            context["form"] = form
+            context["contrat"] = contrat
+            return render(request, 'creationcontrat.html', context)
+
+            # return redirect("creationalternant")
         else:
             return render(request, 'creationcontrat.html', {'form': form})
     else:
@@ -59,8 +87,6 @@ def creationcontrat(request):
         except ObjectDoesNotExist:
             contrat = None
 
-        context["contrat"] = contrat
-
             # A faire charger l'objet contrat dans le formulaire si trouvé
 
         if contrat is not None:
@@ -68,12 +94,13 @@ def creationcontrat(request):
                 "type_contrat_avenant": contrat.type_contrat_avenant,
                 "mode_contractuel": contrat.mode_contractuel,
                 "numero_contrat_anterieur": contrat.numero_contrat_anterieur,
+                "date_effet_avenant": contrat.date_effet_avenant,
             })
         else:
             form = CreationContratForm()
 
         context["form"] = form
-        context["toto"] = 1
+        context["contrat"]=contrat
 
         return render(request, 'creationcontrat.html', context)
 
@@ -326,9 +353,7 @@ def inform_contrat(request):
 
             contrat.save()
 
-            return render(request, "contrat_form.html", {"form": form})
-        else:
-            return render(request, "contrat_form.html", {"form": form})
+        return render(request, "contrat_form.html", {"form": form})
     else:
 
         contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
@@ -418,7 +443,6 @@ class detail_formation(DetailView):
         # self.contrat permet de récupérer le contrat ailleurs dans la class
         self.contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
         formation = self.contrat.formation
-        self.cfa = formation.cfa
 
         # la fonction du return est d'envoyer les infos à la page
         return formation
@@ -434,13 +458,13 @@ class detail_formation(DetailView):
         # pas besoin de else: le return return sort de la fonction
         context = self.get_context_data(object=self.object)
         context["nombre_annees"] = self.contrat.nombre_annees
-        context["nom_cfa"] = self.cfa.nom
-        context["numeroUAI"] = self.cfa.numeroUAI
-        context["adresse_numero"] = self.cfa.adresse_numero
-        context["adresse_voie"] = self.cfa.adresse_voie
-        context["adresse_complement"] = self.cfa.adresse_complement
-        context["code_postal"] = self.cfa.code_postal
-        context["ville"] = self.cfa.ville
+        context["nom_cfa"] = self.object.cfa.nom
+        context["numeroUAI"] = self.object.cfa.numeroUAI
+        context["adresse_numero"] = self.object.cfa.adresse_numero
+        context["adresse_voie"] = self.object.cfa.adresse_voie
+        context["adresse_complement"] = self.object.cfa.adresse_complement
+        context["code_postal"] = self.object.cfa.code_postal
+        context["ville"] = self.object.cfa.ville
 
         return self.render_to_response(context)
 
@@ -601,10 +625,10 @@ class creerpdf(DetailView):
         else:
             data["contrat_risques_non"] = 1
 
-        data["contrat_remu_annee1_taux1"] = str(int(contrat.an_1_per_1_taux*100))
-        data["contrat_remu_annee2_taux1"] = str(int(contrat.an_2_per_1_taux*100))
-        data["contrat_remu_annee3_taux1"] = str(int(contrat.an_3_per_1_taux*100))
-        data["contrat_remu_annee4_taux1"] = str(int(contrat.an_4_per_1_taux*100))
+        data["contrat_remu_annee1_taux1"] = str(contrat.an_1_per_1_taux)
+        data["contrat_remu_annee2_taux1"] = str(contrat.an_2_per_1_taux)
+        data["contrat_remu_annee3_taux1"] = str(contrat.an_3_per_1_taux)
+        data["contrat_remu_annee4_taux1"] = str(contrat.an_4_per_1_taux)
         data["contrat_remu_annee1_du1_jour"] = str(contrat.an_1_per_1_du.day).zfill(2)
         data["contrat_remu_annee1_du1_mois"] = str(contrat.an_1_per_1_du.month).zfill(2)
         data["contrat_remu_annee1_du1_annee"] = contrat.an_1_per_1_du.year
@@ -633,10 +657,10 @@ class creerpdf(DetailView):
         data["contrat_remu_annee2_ref1"] = Contrat.BASE[contrat.an_2_per_1_base - 1][1]
         data["contrat_remu_annee3_ref1"] = Contrat.BASE[contrat.an_3_per_1_base - 1][1]
         data["contrat_remu_annee4_ref1"] = Contrat.BASE[contrat.an_4_per_1_base - 1][1]
-        data["contrat_remu_annee1_taux2"] = str(int(contrat.an_1_per_2_taux*100))
-        data["contrat_remu_annee2_taux2"] = str(int(contrat.an_2_per_2_taux*100))
-        data["contrat_remu_annee3_taux2"] = str(int(contrat.an_3_per_2_taux*100))
-        data["contrat_remu_annee4_taux2"] = str(int(contrat.an_4_per_2_taux*100))
+        data["contrat_remu_annee1_taux2"] = str(contrat.an_1_per_2_taux)
+        data["contrat_remu_annee2_taux2"] = str(contrat.an_2_per_2_taux)
+        data["contrat_remu_annee3_taux2"] = str(contrat.an_3_per_2_taux)
+        data["contrat_remu_annee4_taux2"] = str(contrat.an_4_per_2_taux)
         data["contrat_remu_annee1_du2_jour"] = str(contrat.an_1_per_2_du.day).zfill(2)
         data["contrat_remu_annee1_du2_mois"] = str(contrat.an_1_per_2_du.month).zfill(2)
         data["contrat_remu_annee1_du2_annee"] = contrat.an_1_per_2_du.year
@@ -719,7 +743,7 @@ class creerpdf(DetailView):
             data["signature_emp_attestation"] = 1
         data["formation_intitule"] = formation.intitule_diplome
         data["formation_diplome"] = formation.diplome
-        data["formation_diplome_code"] = formation.numero_UAI
+        data["formation_diplome_code"] = formation.code_diplome_apprentissage
 
         if contrat.date_inscription is not None:
             data["inscription_annee"] = contrat.date_inscription.year

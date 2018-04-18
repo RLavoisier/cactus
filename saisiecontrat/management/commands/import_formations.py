@@ -28,7 +28,7 @@ class Command(BaseCommand):
                 specialite=row[4],
                 diplome=row[5] or random.randint(21, 24),
                 intitule_diplome=row[6],
-                numero_UAI=row[7],
+                code_diplome_apprentissage=row[7],
                 heures_an_1=row[10],
                 niveau=row[17],
                 nombre_annees=row[18],

@@ -5,20 +5,64 @@
 {% block bodyId %}loginPage{% endblock %}
 
 {% block content %}
-    <h1>{{ formation.intitule_formation }}</h1>
-    <div class="row">
-        <div class="col-md-6"><p>{{ formation.code_formation }}</p></div>
-        <div class="col-md-6"><p>{{ formation.nom_cfa }}</p></div>
-    </div>
-    <p>{{ formation.numeroUAI }}</p>
-    <p>{{ formation.adresse_numero }}</p>
-    <p>{{ formation.adresse_voie }}</p>
-    <p>{{ formation.adresse_complement }}</p>
-    <p>{{ formation.code_postal }}</p>
-    <p>{{ formation.intitule_formation }}</p>
-    <p>{{ formation.diplome }}</p>
-    <p>{{ formation.intitule_diplome }}</p>
-    <p>{{ formation.numero_UAI }}</p>
+
+    <fieldset>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="col-md-12">
+                    <h3>{{ formation.intitule_formation }} ({{ formation.code_formation }})</h3>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="col-md-12">
+                    <h3></h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <div class="col-md-12">
+                    <h5>CFA</h5>
+                </div>
+            </div>
+            <div class="col-md-10" >
+                <div class="col-md-12">
+                    <h5>{{ nom_cfa }} ({{ numeroUAI }}) {{ adresse_numero }} {{ adresse_voie }} {{ adresse_complement }} {{ code_postal }} {{ ville }}</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <div class="col-md-12">
+                    <h5>Diplôme</h5>
+                </div>
+            </div>
+            <div class="col-md-10" >
+                <div class="col-md-12">
+                    <h5>{{ formation.intitule_diplome }} ({{ formation.code_diplome_apprentissage }})</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <div class="col-md-12">
+                    <h5></h5>
+                </div>
+            </div>
+            <div class="col-md-10" >
+                <div class="col-md-12">
+                    <h5>{{ formation.diplome }}</h5>
+                </div>
+            </div>
+        </div>
+
+    <p></p>
+    <p></p>
+    <p></p>
 
     {% if formation.heures_an_1 != None %}
         <p>{{ formation.an_1_du }}</p>
@@ -40,6 +84,8 @@
 
     <p>{{ formation.inspection_pedagogique_competente }}</p>
     <p>{{ formation.nombre_annees }}</p>
+
+    </fieldset>
 
     <form action="." method="POST">
         {% csrf_token %}
