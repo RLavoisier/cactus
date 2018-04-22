@@ -40,10 +40,10 @@ def creationcontrat(request):
             if contrat is None:
 
                 contrat=Contrat(alternant=request.user.alternant,
-                                type_contrat_avenant=request.POST['type_contrat_avenant'],
-                                mode_contractuel=request.POST['mode_contractuel'],
-                                numero_contrat_anterieur=request.POST['numero_contrat_anterieur'],
-                                date_effet_avenant=request.POST['date_effet_avenant'],
+                                type_contrat_avenant=form.cleaned_data['type_contrat_avenant'],
+                                mode_contractuel=form.cleaned_data['mode_contractuel'],
+                                numero_contrat_anterieur=form.cleaned_data['numero_contrat_anterieur'],
+                                date_effet_avenant=form.cleaned_data['date_effet_avenant'],
                                 )
                 contrat.save()
                 context["message"] = "Le contrat a bien été créé vous pouvez maintenant le compléter dans les onglets suivants."
@@ -360,6 +360,7 @@ def inform_contrat(request):
 
         # dans le formulaire on utilise l'objet user de la request qui n'existe pas dans le formulaire
         form = InformationContratForm(instance=contrat, request=request)
+
         return render(request, "contrat_form.html", {"form": form})
 
 
@@ -428,7 +429,7 @@ class liste_formation(ListView):
         }
 
         for attr, filter in filters.items():
-            if filter and filter not in ["Toutes", 0]:
+            if filter and filter not in ["Toutes", "0"]:
                 queryset = queryset.filter(**{attr: filter})
 
         return queryset

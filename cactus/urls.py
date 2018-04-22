@@ -23,6 +23,7 @@ from saisiecontrat.views import creationcontrat, create_entreprise,creerpdf
 
 urlpatterns = [
     path('comptes/', include("comptes.urls"), name="comptes"),
+    path('api/', include("cactus_api.urls"), name="api"),
     path('admin/', admin.site.urls),
     path('', accueil, name="accueil"),
     path('accueil/', accueil, name="accueil"),

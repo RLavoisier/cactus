@@ -1,7 +1,6 @@
 body {
   margin: 0;
   font-family: "Lucida Grande", Tahoma, Verdana, Arial, sans-serif;
-  font-size: 11px;
   color: #000333;
 }
 
@@ -13,8 +12,6 @@ header {
   background: #ffffff url('../img/logo.png') no-repeat 25px 10px;
   background-size: 30%;
   border-bottom: 1px solid #133783;
-  text-align:right;
-  text-align:bottom;
 }
 
 body#loginPage section#footer {

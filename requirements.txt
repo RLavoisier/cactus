@@ -6,3 +6,4 @@ bcrypt==3.1.4
 django[argon2]
 fdfgen==0.16.1
 django-bootstrap3==9.1.0
+python-dateutil==2.7.2

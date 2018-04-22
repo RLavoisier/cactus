@@ -29,6 +29,33 @@ class PDFGenerator:
         # Transformation des nom de champ du dictionnaire
         formatted_datas = cls.__format_input_datas_dict(input_datas)
 
+        return cls.__fill_pdf(cerfa_pdf, formatted_datas, flatten)
+
+
+    @classmethod
+    def generate_mission_pdf_with_datas(cls, input_datas, flatten=True):
+        """
+        Cette méthode génère un pdf avec les données passées en argument
+
+        :param input_datas: Dictionnaire des valeurs
+        :type input_datas: dict
+
+        :return: Le nom du fichier généré
+        :rtype: str
+        """
+        template_pdf = os.path.join(settings.TEMPLATE_DIR, "pdf", "fiche_mission.pdf")
+        return cls.__fill_pdf(template_pdf, input_datas, flatten)
+
+    @classmethod
+    def __fill_pdf(cls, template, datas, flatten=True):
+        """
+        Cette méthode injecte les données dans le template pdf passé en argument
+
+        :param template:
+        :param datas:
+        :param flatten:
+        :return:
+        """
         # génération du nom de fichier
         filename = "%s.pdf" % str(uuid.uuid4())
 
@@ -36,8 +63,8 @@ class PDFGenerator:
         output_file_path = os.path.join(cls.OUTPUT_DIR, filename)
 
         # Remplissage du pdf
-        pypdftk.fill_form(pdf_path=cerfa_pdf, flatten=flatten,
-                          datas=formatted_datas, out_file=output_file_path)
+        pypdftk.fill_form(pdf_path=template, flatten=flatten,
+                          datas=datas, out_file=output_file_path)
 
         return filename
 

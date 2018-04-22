@@ -10,6 +10,18 @@ from django.urls import reverse
 from saisiecontrat.models import Contrat, Entreprise, NAF, Alternant, Personnel, ConventionCollective
 
 
+class LocalizedModelForm(forms.ModelForm):
+    """
+    Class modifiée pour Model form pour le formattage spécifique des champs
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.base_fields.values():
+            print(field)
+            if type(field) in (forms.FloatField, forms.DecimalField):
+                field.localize = True
+                field.widget.is_localized = True
+
 class CreationContratForm(forms.Form):
 
     type_contrat_avenant = forms.IntegerField(label='Type de contrat/avenant :',
@@ -465,7 +477,8 @@ class CreationAlternantForm(forms.ModelForm):
         else:
             return intitule_dernier_diplome_prepare
 
-class InformationContratForm(forms.ModelForm):
+
+class InformationContratForm(LocalizedModelForm):
 
     class Meta:
         """

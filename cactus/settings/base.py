@@ -39,8 +39,10 @@ INSTALLED_APPS = [
     'comptes',
     'saisiecontrat',
     'cactus',
+    'cactus_api',
     'django.contrib.admin',
-    'django.contrib.humanize'
+    'django.contrib.humanize',
+
 ]
 
 MIDDLEWARE = [
@@ -129,6 +131,8 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+DECIMAL_SEPARATOR = ","
 
 
 # Static files (CSS, JavaScript, Images)
