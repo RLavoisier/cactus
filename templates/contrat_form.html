@@ -361,4 +361,22 @@
 
 
     </form>
+
+    <script type="text/javascript">
+
+    $("#id_date_debut_contrat").change(function(){
+        $.post(
+            'http://127.0.0.1:8000/api/valider_date_debut_contrat/',
+            {
+                date_saisie: $("#id_date_debut_contrat").val()
+            },
+            function(response){
+                if(!response.success){
+                    alert(response.success);
+                }
+            }
+        );
+    });
+
+    </script>
 {% endblock %}
