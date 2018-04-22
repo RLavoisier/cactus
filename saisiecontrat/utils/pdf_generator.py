@@ -12,7 +12,7 @@ class PDFGenerator:
     OUTPUT_DIR = os.path.join(settings.BASE_DIR, "pdf_outputs")
 
     @classmethod
-    def generate_cerfa_pdf_with_datas(cls, input_datas, flatten=True):
+    def generate_pdf_with_datas(cls, input_datas, nom_template, flatten=True, cerfa_pdf=False):
         """
         Cette méthode prends en argument un dictionnaire contenant les nom des champs
         du pdf et les valeurs à injecter
@@ -25,9 +25,13 @@ class PDFGenerator:
         :return: Le nom du fichier généré
         :rtype: str
         """
-        cerfa_pdf = os.path.join(settings.TEMPLATE_DIR, "pdf", "cerfa_10103.pdf")
-        # Transformation des nom de champ du dictionnaire
-        formatted_datas = cls.__format_input_datas_dict(input_datas)
+        pdf = os.path.join(settings.TEMPLATE_DIR, "pdf", nom_template)
+
+        if pdf:
+            # Transformation des nom de champ du dictionnaire
+            formatted_datas = cls.__format_input_datas_dict(input_datas)
+        else:
+            formatted_datas = input_datas
 
         # génération du nom de fichier
         filename = "%s.pdf" % str(uuid.uuid4())
@@ -36,7 +40,7 @@ class PDFGenerator:
         output_file_path = os.path.join(cls.OUTPUT_DIR, filename)
 
         # Remplissage du pdf
-        pypdftk.fill_form(pdf_path=cerfa_pdf, flatten=flatten,
+        pypdftk.fill_form(pdf_path=pdf, flatten=flatten,
                           datas=formatted_datas, out_file=output_file_path)
 
         return filename

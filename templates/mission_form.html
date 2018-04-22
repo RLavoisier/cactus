@@ -3,16 +3,48 @@
 {% block content %}
 <form action="{% url 'informationmission' %}" method="post">
   {% csrf_token %}
+
+    <fieldset>
+        <div class="row">
+            <div class="col-md-2 col-externe">
+                <div class="col-md-12">
+                    <h5><b>Mission</b></h5>
+                </div>
+            </div>
+            <div class="col-md-10 col-externe">
+                <div class="col-md-12">
+                      {{  form.mission }}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2 col-externe">
+                <div class="col-md-12">
+                    <input type="submit" value="Valider" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2 col-externe">
+                <div class="col-md-12">
+                    <h5><a href="{% url 'creerCERFA' %}">Créer CERFA</a></h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2 col-externe">
+                <div class="col-md-12">
+                    <h5><a href="{% url 'creerfichemission' %}">Créer fiche mission</a></h5>
+                </div>
+            </div>
+        </div>
+
+    </fieldset>
+
   {% if error %}
   <p class="error">{{ error }}</p>
   {% endif %}
-  {{ form.as_p }}
-  <p>
-    <input type="submit" value="Valider" />
-
-
-    <a href="{% url 'creerpdf' %}">Créer PDF</a>
-  </p>
 
 </form>
 {% endblock %}

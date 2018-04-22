@@ -6,7 +6,7 @@
 
         <fieldset>
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe" >
                     <div class="row">
                       <div class="col-md-3">
                         <h5>Nom prénom</h5>
@@ -19,7 +19,10 @@
                       </div>
                     </div>
                 </div>
-                <div class="col-md-6" >
+                <div class="col-md-6 col-externe" >
+                    <div class="col-md-1">
+                        <h5></h5>
+                    </div>
                     <div class="col-md-4">
                         <h5>Date de naissance</h5>
                     </div>
@@ -35,7 +38,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="row">
                       <div class="col-md-3">
                         <h5>Adresse</h5>
@@ -48,18 +51,21 @@
                       </div>
                     </div>
                 </div>
-                <div class="col-md-6" >
+                <div class="col-md-6 col-externe" >
+                    <div class="col-md-1">
+                        <h5></h5>
+                    </div>
                     <div class="col-md-4">
                         <h5>Département de naissance</h5>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-7">
                           {{ form.numero_departement_naissance }}
                     </div>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="row">
                       <div class="col-md-3">
                         <h5></h5>
@@ -72,26 +78,29 @@
                       </div>
                     </div>
                 </div>
-                <div class="col-md-6" >
+                <div class="col-md-6 col-externe" >
+                    <div class="col-md-1">
+                        <h5></h5>
+                    </div>
                     <div class="col-md-4">
                         <h5>Ville de naissance</h5>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-7">
                           {{ form.commune_naissance }}
                     </div>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="row">
                       <div class="col-md-3">
                         <h5>Représentant légal</h5>
                       </div>
-                      <div class="col-md-2">
-                          {{ form.civilité_representant }}
+                      <div class="col-md-3">
+                          {{ form.civilite_representant }}
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                           {{ form.nom_representant }}
                       </div>
                       <div class="col-md-3">
@@ -99,18 +108,21 @@
                       </div>
                     </div>
                 </div>
-                <div class="col-md-6" >
+                <div class="col-md-6 col-externe" >
+                    <div class="col-md-1">
+                        <h5></h5>
+                    </div>
                     <div class="col-md-4">
                         <h5>Nationalité</h5>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-7">
                           {{ form.nationalite }}
                     </div>
 
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="row">
                       <div class="col-md-3">
                         <h5>Adresse</h5>
@@ -123,24 +135,27 @@
                       </div>
                     </div>
                 </div>
-                <div class="col-md-6" >
+                <div class="col-md-6 col-externe" >
+                    <div class="col-md-1">
+                        <h5></h5>
+                    </div>
                     <div class="col-md-4">
                         <h5>Régime social</h5>
                     </div>
                     <div class="col-md-3">
                           {{ form.regime_social }}
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <h5>Travailleur handicapé</h5>
                     </div>
                     <div class="col-md-1">
-                          {{ form.travailleur_handicape }}
+                          {{ form.handicape }}
                     </div>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="row">
                       <div class="col-md-3">
                         <h5></h5>
@@ -153,7 +168,7 @@
                       </div>
                     </div>
                 </div>
-                <div class="col-md-6" >
+                <div class="col-md-6 col-externe" >
                     <div class="col-md-2">
                     </div>
                     <div class="col-md-2">
@@ -170,7 +185,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="row">
                       <div class="col-md-3">
                           <h5><b>Parcours</b></h5>
@@ -180,7 +195,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="col-md-4">
                         <h5>Situation avant ce contrat</h5>
                     </div>
@@ -188,11 +203,14 @@
                         {{ form.situation_avant_contrat }}
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
+                    <div class="col-md-1">
+                        <h5></h5>
+                    </div>
                     <div class="col-md-4">
                         <h5>Diplôme le plus elevé</h5>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-7">
                         {{ form.diplome_le_plus_eleve }}
                     </div>
                 </div>
@@ -211,8 +229,9 @@
                 </div>
                 <div class="col-md-6 col-externe">
                     <div class="row">
-                      <div class="col-md-12">
-                          {{ form.intitule_dernier_diplome_prepare }}
+
+                        <div class="col-md-12">
+                            {{ form.intitule_dernier_diplome_prepare }}
                       </div>
                     </div>
                 </div>

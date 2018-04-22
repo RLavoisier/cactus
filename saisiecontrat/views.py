@@ -185,13 +185,34 @@ def create_entreprise(request):
                                           nom=request.POST.get("nom_ma_2"),
                                           prenom=request.POST.get("prenom_ma_2"),
                                           date_naissance=request.POST.get("date_naissance_ma_2"),
-                                          role=2)
+                                          role=3)
                     personnel.save()
                 else:
                     personnel.civilite = request.POST.get("civilite_ma_2")
                     personnel.nom = request.POST.get("nom_ma_2")
                     personnel.prenom = request.POST.get("prenom_ma_2")
                     personnel.date_naissance = request.POST.get("date_naissance_ma_2")
+                    personnel.save()
+
+            if request.POST.get("nom_contact") is None:
+                try:
+                    personnel = Personnel.objects.get(entreprise=entreprise, role=4)
+                except ObjectDoesNotExist:
+                    personnel = None
+
+                if personnel is None:
+                    personnel = Personnel(entreprise=entreprise,
+                                          civilite=request.POST.get("civilite_contact"),
+                                          nom=request.POST.get("nom_contact"),
+                                          prenom=request.POST.get("prenom_contact"),
+                                          courriel=request.POST.get("courriel_contact"),
+                                          role=4)
+                    personnel.save()
+                else:
+                    personnel.civilite = request.POST.get("civilite_contact")
+                    personnel.nom = request.POST.get("nom_contact")
+                    personnel.prenom = request.POST.get("prenom_contact")
+                    personnel.courriel_contact = request.POST.get("courriel_contact")
                     personnel.save()
 
             return render(request, "entreprise_form.html", {"form": form})
@@ -221,6 +242,32 @@ def create_entreprise(request):
             form.fields["nom_ma_1"].initial = personnel.nom
             form.fields["prenom_ma_1"].initial = personnel.prenom
             form.fields["date_naissance_ma_1"].initial = personnel.date_naissance
+
+        try:
+            personnel = Personnel.objects.get(entreprise=entreprise, role=3)
+        except ObjectDoesNotExist:
+            personnel = None
+
+        form = CreationEntrepriseForm(instance=entreprise)
+
+        if personnel is not None:
+            form.fields["civilite_ma_2"].initial = personnel.civilite
+            form.fields["nom_ma_2"].initial = personnel.nom
+            form.fields["prenom_ma_2"].initial = personnel.prenom
+            form.fields["date_naissance_ma_2"].initial = personnel.date_naissance
+
+        try:
+            personnel = Personnel.objects.get(entreprise=entreprise, role=4)
+        except ObjectDoesNotExist:
+            personnel = None
+
+        form = CreationEntrepriseForm(instance=entreprise)
+
+        if personnel is not None:
+            form.fields["civilite_contact"].initial = personnel.civilite
+            form.fields["nom_contact"].initial = personnel.nom
+            form.fields["prenom_contact"].initial = personnel.prenom
+            form.fields["courriel_contact"].initial = personnel.courriel
 
 
         return render(request, "entreprise_form.html", {"form": form})
@@ -456,8 +503,12 @@ class detail_formation(DetailView):
         if not self.object:
             return redirect("liste_formation")
         # pas besoin de else: le return return sort de la fonction
+
         context = self.get_context_data(object=self.object)
-        context["nombre_annees"] = self.contrat.nombre_annees
+        if self.contrat.nombre_annees is None:
+            context["nombre_annees"] = context.get("formation").nombre_annees
+        else:
+            context["nombre_annees"] = self.contrat.nombre_annees
         context["nom_cfa"] = self.object.cfa.nom
         context["numeroUAI"] = self.object.cfa.numeroUAI
         context["adresse_numero"] = self.object.cfa.adresse_numero
@@ -466,13 +517,27 @@ class detail_formation(DetailView):
         context["code_postal"] = self.object.cfa.code_postal
         context["ville"] = self.object.cfa.ville
 
+        i=0
+
+        if context.get("formation").diplome is not None:
+            while context.get("formation").diplome != Formation.DIPLOME[i][0]:
+                i+=1
+
+        context["libelle_diplome"] = Formation.DIPLOME[i][1]
+
+        #if context.get("formation").inspection_pedagogique_competente is not None:
+        #    while context.get("formation").inspection_pedagogique_competente != Formation.INSPECTION_PEDAGOGIQUE[i][0]:
+        #        i+=1
+
+        #context["libelle_inspection_pedagogique_competente"] = Formation.INSPECTION_PEDAGOGIQUE[i][1]
+
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         nombre_annee = self.request.POST.get("nombre_annees")
         alternant = Alternant(user=request.user)
         contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
-        contrat.nombre_annees = request.POST.get("nombre_années")
+        contrat.nombre_annees = nombre_annee
         contrat.save()
 
         return redirect("detail_formation")
@@ -481,6 +546,10 @@ class appliquer_formation(DetailView):
     model = Formation
 
     def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
+            return redirect("comptes:login")
+
         # Cette vue ne sert qu'a enregistrer la formation sélectionnée dans le contrat actuel
         self.object = self.get_object()
 
@@ -493,7 +562,7 @@ class appliquer_formation(DetailView):
         return redirect("detail_formation")
 
 
-class creerpdf(DetailView):
+class creerCERFA(DetailView):
     model = Contrat
 
     def get(self, request, *args, **kwargs):
@@ -783,6 +852,52 @@ class creerpdf(DetailView):
             data["formation_annee3_au_mois"] = str(formation.an_3_au.month).zfill(2)
             data["formation_annee3_au_annee"] = formation.an_3_au.year
 
-        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(data, flatten=False)
+        nomfichier = PDFGenerator.generate_pdf_with_datas(data, nom_template="cerfa_10103.pdf", flatten=False, cerfa_pdf=True)
+
+        return redirect("informationmission")
+
+class creerfichemission(DetailView):
+    model = Contrat
+
+    def get(self, request, *args, **kwargs):
+
+        alternant = Alternant.objects.get(user=request.user)
+        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        entreprise = contrat.entreprise
+        formation = contrat.formation
+        cfa = formation.cfa
+
+        try:
+            ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
+        except ObjectDoesNotExist:
+            ma_1 = None
+
+        data = {}
+        data["numero"] = alternant.adresse_numero
+        data["voie"] = alternant.adresse_voie
+        data["codepostal"] = alternant.code_postal
+        data["ville"] = alternant.ville
+        data["neele"] = alternant.date_naissance
+        data["mail"] = request.user.email
+        data["telephone"] = alternant.telephone
+        data["nomprenom"] = "%s %s" % (alternant.nom, alternant.prenom)
+
+        data["raisonsociale"] = entreprise.raison_sociale
+        data["numero2"] = entreprise.adresse_numero
+        data["voie2"] = entreprise.adresse_voie
+        data["complement2"] = entreprise.adresse_complement
+        data["codepostal2"] = entreprise.code_postal
+        data["ville2"] = entreprise.ville
+        data["telephone2"] = entreprise.telephone
+        data["mail2"] = entreprise.courriel
+        data["siret"] = entreprise.numero_SIRET
+        data["codeape"] = entreprise.code_APE
+
+        if ma_1 is not None:
+            data["maitredapprentissage"] = "%s %s" % (ma_1.nom, ma_1.prenom)
+
+        data["mission"] = contrat.mission
+
+        nomfichier = PDFGenerator.generate_pdf_with_datas(data, nom_template="fiche_mission.pdf", flatten=False, cerfa_pdf=False)
 
         return redirect("informationmission")

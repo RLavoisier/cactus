@@ -7,98 +7,234 @@
 {% block content %}
 
     <fieldset>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="col-md-12">
-                    <h3>{{ formation.intitule_formation }} ({{ formation.code_formation }})</h3>
-                </div>
-            </div>
 
-            <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-6 col-externe">
                 <div class="col-md-12">
-                    <h3></h3>
+                    <h4><b>{{ formation.intitule_formation }}</b></h4>
                 </div>
             </div>
         </div>
 
         <div class="row">
-            <div class="col-md-2">
+            <div class="col-md-4 col-externe">
                 <div class="col-md-12">
-                    <h5>CFA</h5>
+                    <h5><b>Organisme de formation responsable</b></h5>
                 </div>
             </div>
-            <div class="col-md-10" >
+            <div class="col-md-8 col-externe">
                 <div class="col-md-12">
-                    <h5>{{ nom_cfa }} ({{ numeroUAI }}) {{ adresse_numero }} {{ adresse_voie }} {{ adresse_complement }} {{ code_postal }} {{ ville }}</h5>
+                    <h5><b>Diplôme</b></h5>
                 </div>
             </div>
         </div>
 
         <div class="row">
-            <div class="col-md-2">
-                <div class="col-md-12">
+            <div class="col-md-4 col-externe">
+                  <div class="col-md-4">
+                        <h5>Nom</h5>
+                  </div>
+                  <div class="col-md-8">
+                      <h5>{{ nom_cfa }} </h5>
+                  </div>
+            </div>
+            <div class="col-md-8 col-externe">
+                <div class="col-md-2">
+                    <h5>Intitulé</h5>
+                </div>
+                <div class="col-md-10">
+                    <h5>{{ formation.intitule_diplome }}</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 col-externe">
+                  <div class="col-md-4">
+                        <h5>Numéro UAI</h5>
+                  </div>
+                  <div class="col-md-8">
+                      <h5>{{ numeroUAI }}</h5>
+                  </div>
+            </div>
+            <div class="col-md-8 col-externe" >
+
+                <div class="col-md-2">
                     <h5>Diplôme</h5>
                 </div>
-            </div>
-            <div class="col-md-10" >
-                <div class="col-md-12">
-                    <h5>{{ formation.intitule_diplome }} ({{ formation.code_diplome_apprentissage }})</h5>
+                <div class="col-md-10">
+                    <h5>{{ libelle_diplome }}</h5>
                 </div>
             </div>
         </div>
 
         <div class="row">
-            <div class="col-md-2">
-                <div class="col-md-12">
-                    <h5></h5>
+            <div class="col-md-4 col-externe">
+                <div class="row">
+                  <div class="col-md-4">
+                        <h5>Adresse</h5>
+                  </div>
+                  <div class="col-md-8">
+                      <h5>{{ adresse_numero }} {{ adresse_voie }}</h5>
+                  </div>
                 </div>
             </div>
-            <div class="col-md-10" >
-                <div class="col-md-12">
-                    <h5>{{ formation.diplome }}</h5>
+            <div class="col-md-8 col-externe" >
+                <div class="col-md-2">
+                    <h5>Code</h5>
+                </div>
+                <div class="col-md-10">
+                    <h5>{{ formation.code_diplome_apprentissage }}</h5>
                 </div>
             </div>
         </div>
 
-    <p></p>
-    <p></p>
-    <p></p>
+        <div class="row">
+            <div class="col-md-4 col-externe">
+                  <div class="col-md-4">
+                    <h5></h5>
+                  </div>
+                  <div class="col-md-8">
+                      <h5>{{ code_postal }} {{ ville }}</h5>
+                  </div>
+            </div>
+            <div class="col-md-8 col-externe">
+                <div class="col-md-5">
+                    <h5>Inspection pédagogique compétente</h5>
+                </div>
+                <div class="col-md-2">
+                    <h5>{{ formation.inspection_pedagogique_competente }}</h5>
+                </div>
 
-    {% if formation.heures_an_1 != None %}
-        <p>{{ formation.an_1_du }}</p>
-        <p>{{ formation.an_1_au }}</p>
-        <p>{{ formation.heures_an_1 }}</p>
-    {% endif %}
+            </div>
+        </div>
 
-    {% if formation.an_2_du != None %}
-        <p>{{ formation.an_2_du }}</p>
-        <p>{{ formation.an_2_au }}</p>
-        <p>{{ formation.heures_an_2 }}</p>
-    {% endif %}
+        <div class="row">
+            <div class="col-md-4 col-externe">
 
-    {% if formation.an_3_du != None %}
-        <p>{{ formation.an_3_du }}</p>
-        <p>{{ formation.an_3_au }}</p>
-        <p>{{ formation.heures_an_3 }}</p>
-    {% endif %}
+            </div>
+            <div class="col-md-8 col-externe">
+                <b>
+                <div class="col-md-2">
+                    <h5><b>Organisation</b></h5>
+                </div>
+                <div class="col-md-2">
+                    <h5 align="center"><b>Du</b></h5>
+                </div>
+                <div class="col-md-2">
+                    <h5 align="center"><b>au</b></h5>
+                </div>
+                <div class="col-md-2">
+                    <h5 align="center"><b>Nb heures</b></h5>
+                </div>
+                </b>
+            </div>
+        </div>
 
-    <p>{{ formation.inspection_pedagogique_competente }}</p>
-    <p>{{ formation.nombre_annees }}</p>
+
+
+        <div class="row">
+            <div class="col-md-4 col-externe">
+            </div>
+            <div class="col-md-8 col-externe" >
+                {% if formation.heures_an_1 != None %}
+                    <div class="col-md-2">
+                        <h5>Première année</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5 align="center">{{ formation.an_1_du }}</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5 align="center">{{ formation.an_1_au }}</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5 align="center">{{ formation.heures_an_1 }}</h5>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 col-externe">
+            </div>
+            <div class="col-md-8 col-externe" >
+                {% if formation.heures_an_2 != None %}
+                    <div class="col-md-2">
+                        <h5>Deuxième année</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5 align="center">{{ formation.an_2_du }}</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5 align="center">{{ formation.an_2_au }}</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5 align="center">{{ formation.heures_an_2 }}</h5>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 col-externe">
+            </div>
+            <div class="col-md-8 col-externe" >
+                {% if formation.heures_an_3 != None %}
+                    <div class="col-md-2">
+                        <h5>Troisième année</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5 align="center">{{ formation.an_3_du }}</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5 align="center">{{ formation.an_3_au }}</h5>
+                    </div>
+                    <div class="col-md-2">
+                        <h5 align="center">{{ formation.heures_an_3 }}</h5>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
 
     </fieldset>
 
+    {% if formation.nombre_annees != 1 %}
     <form action="." method="POST">
         {% csrf_token %}
-        <input type="text" name="nombre_annees" value="{{ nombre_annees }}">
+        <fieldset>
+            <div class="row">
+                <div class="col-md-12 col-externe">
+                    <div class="col-md-12">
+                        <h5><b>Cursus incomplet : révision du nombre d'années</b></h5>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-11 col-externe" >
+                    <div class="col-md-12">
+                        <h5>Cette formation dure {{ formation.nombre_annees }} an(s). Si dans le cadre de votre apprentissage, vous n'effectuez pas toutes les années, indiquez ici le nombre d'années suivies. N'oubliez pas de valider.
+                    </div>
+                </div>
+                <div class="col-md-1 col-externe" >
+                    <div class="col-md-6">
+                        <input type="text" name="nombre_annees" class="form-control" value="{{ nombre_annees }}">
+                    </div>
+                </div>
+
+            </div>
+        </fieldset>
         <input type="submit" value="Valider" />
     </form>
+
+    {% endif %}
+
 
 {% endblock %}
 
 {% block menucontent %}
-  menu
+
 {% endblock %}
 
 {% block leftsidecontent %}
-  gauche
+
 {% endblock %}

@@ -56,6 +56,10 @@ class CreationEntrepriseForm(forms.ModelForm):
     nom_ma_2= forms.CharField(max_length=40, required=False)
     prenom_ma_2 = forms.CharField(max_length=40, required=False)
     date_naissance_ma_2 = forms.DateField(required=False)
+    civilite_contact = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE))
+    nom_contact = forms.CharField(max_length=40, required=False)
+    prenom_contact = forms.CharField(max_length=40, required=False)
+    courriel_contact = forms.DateField(required=False)
 
     class Meta:
         """
@@ -79,26 +83,24 @@ class CreationEntrepriseForm(forms.ModelForm):
             "telecopie": forms.TextInput(attrs={"class": "form-control"}),
             "numero_SIRET": forms.TextInput(attrs={"class": "form-control"}),
             "code_APE": forms.TextInput(attrs={"class": "form-control"}),
+            "type_employeur": forms.Select(attrs={"class": "form-control"}),
+            "effectif_entreprise": forms.TextInput(attrs={"class": "form-control"}),
+            "employeur_specifique": forms.Select(attrs={"class": "form-control"}),
+            "courriel": forms.EmailInput(attrs={"class": "form-control"}),
 
-            "travailleur_handicape": forms.CheckboxInput(attrs={"class": "form-control"}),
-            "numero_departement_naissance": forms.Select(attrs={"class": "form-control"}),
-            "sexe": forms.Select(attrs={"class": "form-control"}),
-            "date_naissance": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
-            "commune_naissance": forms.TextInput(attrs={"class": "form-control"}),
-            "nationalite": forms.Select(attrs={"class": "form-control"}),
-            "regime_social": forms.Select(attrs={"class": "form-control"}),
-            "situation_avant_contrat": forms.Select(attrs={"class": "form-control"}),
-            "dernier_diplome_prepare": forms.Select(attrs={"class": "form-control"}),
-            "derniere_annee_suivie": forms.Select(attrs={"class": "form-control"}),
-            "intitule_dernier_diplome_prepare": forms.TextInput(attrs={"class": "form-control"}),
-            "diplome_le_plus_eleve": forms.Select(attrs={"class": "form-control"}),
-            "civilite_representant": forms.Select(attrs={"class": "form-control"}),
-            "nom_representant": forms.TextInput(attrs={"class": "form-control"}),
-            "prenom_representant": forms.TextInput(attrs={"class": "form-control"}),
-            "adresse_numero_representant": forms.TextInput(attrs={"class": "form-control"}),
-            "adresse_voie_representant": forms.TextInput(attrs={"class": "form-control"}),
-            "code_postal_representant": forms.TextInput(attrs={"class": "form-control"}),
-            "ville_representant": forms.TextInput(attrs={"class": "form-control"}),
+            "civilite_ma_1": forms.Select(attrs={"class": "form-control"}),
+            "nom_ma_1": forms.TextInput(attrs={"class": "form-control"}),
+            "prenom_ma_1": forms.TextInput(attrs={"class": "form-control"}),
+            "date_naissance_ma_1": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "civilite_ma_2": forms.Select(attrs={"class": "form-control"}),
+            "nom_ma_2": forms.TextInput(attrs={"class": "form-control"}),
+            "prenom_ma_2": forms.TextInput(attrs={"class": "form-control"}),
+            "date_naissance_ma_2": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "civilite_contact": forms.Select(attrs={"class": "form-control"}),
+            "nom_contact": forms.TextInput(attrs={"class": "form-control"}),
+            "prenom_contact": forms.TextInput(attrs={"class": "form-control"}),
+            "courriel_contact": forms.EmailInput(attrs={"class": "form-control"}),
+
         }
 
     def clean_raison_sociale(self):
@@ -303,7 +305,7 @@ class CreationAlternantForm(forms.ModelForm):
             "code_postal": forms.TextInput(attrs={"class": "form-control"}),
             "ville": forms.TextInput(attrs={"class": "form-control"}),
             "telephone": forms.TextInput(attrs={"class": "form-control"}),
-            "travailleur_handicape": forms.CheckboxInput(attrs={"class": "form-control"}),
+            "handicape": forms.CheckboxInput(),
             "numero_departement_naissance": forms.Select(attrs={"class": "form-control"}),
             "sexe": forms.Select(attrs={"class": "form-control"}),
             "date_naissance": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
@@ -596,7 +598,11 @@ class InformationMissionForm(forms.ModelForm):
         On y paramètre toutes les informations du modèle lié ainsi que la définition des champs
         """
         model = Contrat
-        fields = ['mission']
+        fields = ['mission', 'avis_raf', 'motif']
+
+        widgets = {
+            "mission": forms.Textarea(attrs={"class": "form-control"}),
+        }
 
     def clean_mission(self):
 

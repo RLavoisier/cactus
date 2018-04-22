@@ -6,12 +6,12 @@
         {% csrf_token %}
         <fieldset>
             <div class="row">
-                <div class="col-md-2">
+                <div class="col-md-2 col-externe">
                     <div class="col-md-12">
                         <h5>Type de dérogation</h5>
                     </div>
                 </div>
-                <div class="col-md-10" >
+                <div class="col-md-10 col-externe" >
                     <div class="col-md-12">
                         {{  form.type_derogation }}
                     </div>
@@ -21,7 +21,7 @@
 
         <fieldset>
             <div class="row">
-                <div  class="col-md-6">
+                <div  class="col-md-6 col-externe">
                     <div class="col-md-4">
                         <h5>Date de début de contrat</h5>
                     </div>
@@ -35,7 +35,7 @@
                         {{  form.date_fin_contrat }}
                     </div>
                 </div>
-                <div  class="col-md-6">
+                <div  class="col-md-6 col-externe">
                     <div class="col-md-3">
                         <h5 align="center">Date d'embauche</h5>
                     </div>
@@ -54,7 +54,7 @@
 
         <fieldset>
             <div class="row" align="center">
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="col-md-3">
                     </div>
                     <div class="col-md-1">
@@ -73,7 +73,7 @@
                     </div>
 
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="col-md-1">
                     </div>
                     <div class="col-md-2">
@@ -97,7 +97,7 @@
 
         <fieldset>
             <div class="row">
-                <div class="col-md-6 ext">
+                <div class="col-md-6 col-externe">
                     <div class="col-md-3">
                         <h5>Première année</h5>
                     </div>
@@ -119,7 +119,7 @@
                         {{  form.an_1_per_1_base }}
                     </div>
                 </div>
-                <div class="col-md-6 ext">
+                <div class="col-md-6 col-externe">
                     <div class="col-md-1">
                     </div>
                     <div class="col-md-2">
@@ -144,7 +144,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="col-md-3">
                         <h5>Deuxième année</h5>
                     </div>
@@ -166,7 +166,7 @@
                         {{  form.an_2_per_1_base }}
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="col-md-1">
                     </div>
                     <div class="col-md-2">
@@ -190,7 +190,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="col-md-3">
                         <h5>Troisième année</h5>
                     </div>
@@ -200,35 +200,35 @@
                         {{  form.an_3_per_1_du }}
                     </div>
                     <div class="col-md-2">
-                        {{  form.an_2_per_1_au }}
+                        {{  form.an_3_per_1_au }}
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
-                            {{  form.an_2_per_1_taux }}
+                            {{  form.an_3_per_1_taux }}
                             <span class="input-group-addon">%</span>
                         </div>
                     </div>
                     <div class="col-md-2">
-                        {{  form.an_2_per_1_base }}
+                        {{  form.an_3_per_1_base }}
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="col-md-1">
                     </div>
                     <div class="col-md-2">
-                        {{  form.an_2_per_2_du }}
+                        {{  form.an_3_per_2_du }}
                     </div>
                     <div class="col-md-2">
-                        {{  form.an_2_per_2_au }}
+                        {{  form.an_3_per_2_au }}
                     </div>
                     <div class="col-md-2">
                         <div class="input-group">
-                            {{  form.an_2_per_2_taux }}
+                            {{  form.an_3_per_2_taux }}
                             <span class="input-group-addon">%</span>
                         </div>
                     </div>
                     <div class="col-md-2">
-                        {{  form.an_2_per_2_base }}
+                        {{  form.an_3_per_2_base }}
                     </div>
                     <div class="col-md-3">
                     </div>
@@ -236,7 +236,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="col-md-3">
                         <h5>Quatrième année</h5>
                     </div>
@@ -258,7 +258,7 @@
                         {{  form.an_4_per_1_base }}
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 col-externe">
                     <div class="col-md-1">
                     </div>
                     <div class="col-md-2">
@@ -282,12 +282,12 @@
             </div>
 
             <div class="row">
-                <div class="col-md-2">
+                <div class="col-md-2 col-externe">
                     <div class="col-md-12">
                         <h5>Salaire brut mensuel</h5>
                     </div>
                 </div>
-                <div class="col-md-10">
+                <div class="col-md-10 col-externe">
                     <div class="col-md-2">
                         <div class="input-group">
                             {{  form.salaire_brut_mensuel }}
@@ -316,12 +316,12 @@
             </div>
 
             <div class="row">
-                <div class="col-md-2">
+                <div class="col-md-2 col-externe">
                     <div class="col-md-12">
                         <h5 align="">Avantages en nature</h5>
                     </div>
                 </div>
-                <div class="col-md-10">
+                <div class="col-md-10 col-externe">
                     <div class="col-md-1">
                         <h5>Nourriture</h5>
                     </div>

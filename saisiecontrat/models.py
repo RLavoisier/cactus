@@ -257,11 +257,11 @@ class Entreprise(models.Model):
     )
 
     EMPLOYEUR_SPECIFIQUE = (
+        (0, "Aucun de ces cas"),
         (1, "Entreprise de travail temporaire"),
         (2, "Groupement d’employeurs"),
         (3, "Employeur saisonnier"),
         (4, "Apprentissage familial : l’employeur est un ascendant de l’apprenti"),
-        (0, "Aucun de ces cas"),
     )
 
     id = models.AutoField(primary_key=True)
@@ -277,8 +277,8 @@ class Entreprise(models.Model):
     employeur_specifique = models.PositiveSmallIntegerField(verbose_name="Employeur spécifique", choices=EMPLOYEUR_SPECIFIQUE, default=0)
     code_APE = models.CharField(max_length=5, blank=True, null=True)
     effectif_entreprise = models.PositiveSmallIntegerField(verbose_name="Effectif de l'entreprise", blank=True, null=True)
-    telephone = models.CharField(verbose_name="Téléphone", max_length=15, blank=True, null=True)
-    telecopie = models.CharField(verbose_name="Télécopie", max_length=15, blank=True, null=True)
+    telephone = models.CharField(verbose_name="Téléphone", max_length=18, blank=True, null=True)
+    telecopie = models.CharField(verbose_name="Télécopie", max_length=18, blank=True, null=True)
     courriel = models.CharField(max_length=40, blank=True, null=True)
     code_convention_collective = models.CharField(verbose_name="Code de la convention collective", max_length=4, blank=True, null=True, help_text="Saisissez le code de la convention collective (4 chiffres). Si la convention collective n'est pas encore entrée en vigueur saisissez 9998. S'il n'y a aucune convention collective, saisissez 9999.")
     libelle_convention_collective = models.CharField(verbose_name="Libellé de la convention collective", max_length=200, blank=True, null=True, help_text="Cette donnée est obligatoire. Si le code de convention existe, elle sera renseignée automatiquement.")
@@ -301,6 +301,7 @@ class Personnel(models.Model):
         (1, "Dirigeant"),
         (2, "Maître d'apprentissage 1"),
         (3, "Maître d'apprentissage 2"),
+        (4, "Personne à contacter"),
     )
 
     id = models.AutoField(primary_key=True)
@@ -356,6 +357,13 @@ class Formation(models.Model):
         (60,"Aucun diplôme ni titre professionnel"),
     )
 
+    INSPECTION_PEDAGOGIQUE = (
+        (1, "Education Nationale"),
+        (2, "Agriculture"),
+        (3, "Jeunesse et sport"),
+        (4, "Autre"),
+    )
+
     code_formation = models.AutoField(max_length=14, primary_key=True)
     cfa = models.ForeignKey(CFA, on_delete=models.CASCADE)
     intitule_formation = models.CharField(max_length=150,blank=True, null=True)
@@ -376,7 +384,7 @@ class Formation(models.Model):
     niveau = models.PositiveSmallIntegerField(blank=True, null=True)
     nombre_annees = models.PositiveSmallIntegerField(blank=True, null=True)
     annee_remuneration_annee_diplome = models.PositiveSmallIntegerField(blank=True, null=True)
-    inspection_pedagogique_competente = models.PositiveSmallIntegerField(blank=True, null=True)
+    inspection_pedagogique_competente = models.PositiveSmallIntegerField(choices=INSPECTION_PEDAGOGIQUE, blank=True, null=True)
 
 
     def __str__(self):
@@ -389,7 +397,8 @@ class Contrat(models.Model):
         (1,"Dans le cadre d'un CDD"),
         (2,"Dans le cadre d'un CDI"),
         (3,"Entreprise de travail temporaire"),
-        (4,"Activité saisonnière à deux employeurs"),
+        (4,"Activité saisonn"
+           "ière à deux employeurs"),
     )
 
     TYPE_CONTRAT_AVENANT = (
@@ -422,10 +431,11 @@ class Contrat(models.Model):
     )
 
     AVIS_RAF = (
-        (0, "En attente de validation"),
-        (1, "Mission valide"),
-        (2, "Réserve"),
-        (3, "Rejet"),
+        (0, "Non envoyée"),
+        (1, "En attente de validation"),
+        (2, "Mission valide"),
+        (3, "Réserve"),
+        (4, "Rejet"),
     )
 
     id = models.AutoField(primary_key=True)
@@ -489,6 +499,7 @@ class Contrat(models.Model):
     date_maj = models.DateTimeField(default=datetime.datetime.now())
     date_maj_mission = models.DateTimeField(blank=True, null=True)
     date_saisie_complete = models.DateTimeField(blank=True, null=True)
+    date_envoi_raf = models.DateTimeField(blank=True, null=True)
     date_generation_CERFA = models.DateTimeField(blank=True, null=True)
     date_exportation_CFA = models.DateTimeField(blank=True, null=True)
     nombre_annees = models.PositiveSmallIntegerField(blank=True, null=True)
