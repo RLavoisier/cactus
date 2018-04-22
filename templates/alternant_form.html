@@ -252,8 +252,8 @@
         </fieldset>
 
 
-  {% if error %}
-  <p class="error">{{ error }}</p>
+  {% if form.errors %}
+  <p class="error">{{ form.errors }}</p>
   {% endif %}
 
   <p>

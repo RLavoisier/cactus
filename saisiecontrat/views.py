@@ -3,6 +3,7 @@
 import re
 from copy import deepcopy
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Min, Max
 
 from django.shortcuts import render, redirect
@@ -20,7 +21,12 @@ from saisiecontrat.utils.pdf_generator import PDFGenerator
 
 def creationcontrat(request):
 
-# EXEMPLE DE FORMULAIRE GERE SANS RECOURS AUX MODELSFORMS
+
+    if not request.user.is_authenticated:
+        # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
+        return redirect("comptes:login")
+
+    # EXEMPLE DE FORMULAIRE GERE SANS RECOURS AUX MODELSFORMS
 
     if len(request.POST) > 0:
 
@@ -105,6 +111,10 @@ def creationcontrat(request):
         return render(request, 'creationcontrat.html', context)
 
 def create_entreprise(request):
+
+    if not request.user.is_authenticated:
+        # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
+        return redirect("comptes:login")
 
     if len(request.POST) > 0:
 
@@ -274,12 +284,15 @@ def create_entreprise(request):
 
 def create_alternant(request):
 
+    if not request.user.is_authenticated:
+        # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
+        return redirect("comptes:login")
 
     if len(request.POST) > 0:
         # On créé le formulaire en lui passant le contenu du post
         # Comme c'est un formulaire modèle, cela prépare également un objet de base de donnée
         form = CreationAlternantForm(request.POST)
-
+        print(form.is_valid())
         if form.is_valid():
 
             alternant = Alternant(user=request.user)
@@ -336,6 +349,10 @@ def create_alternant(request):
         return render(request, "alternant_form.html", {"form": form})
 
 def inform_contrat(request):
+
+    if not request.user.is_authenticated:
+        # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
+        return redirect("comptes:login")
 
     if len(request.POST) > 0:
 
@@ -413,6 +430,10 @@ def inform_contrat(request):
 
 def inform_mission(request):
 
+    if not request.user.is_authenticated:
+        # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
+        return redirect("comptes:login")
+
     contrat = request.user.alternant.get_contrat_courant()
 
     if len(request.POST) > 0:
@@ -445,7 +466,8 @@ def inform_mission(request):
         return render(request, "mission_form.html", {"form": form})
 
 
-class liste_formation(ListView):
+class liste_formation(LoginRequiredMixin, ListView):
+
     queryset = Formation.objects.order_by("code_formation")
     template_name = "formations_list.html"
     # variable contenant les objets pour les passer au template
@@ -481,7 +503,7 @@ class liste_formation(ListView):
 
         return queryset
 
-class detail_formation(DetailView):
+class detail_formation(LoginRequiredMixin, DetailView):
     model = Formation
     template_name = ("detail_formation.html")
     context_object_name = "formation"
@@ -543,13 +565,10 @@ class detail_formation(DetailView):
 
         return redirect("detail_formation")
 
-class appliquer_formation(DetailView):
+class appliquer_formation(LoginRequiredMixin, DetailView):
     model = Formation
 
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
-            return redirect("comptes:login")
 
         # Cette vue ne sert qu'a enregistrer la formation sélectionnée dans le contrat actuel
         self.object = self.get_object()
@@ -563,7 +582,7 @@ class appliquer_formation(DetailView):
         return redirect("detail_formation")
 
 
-class creerCERFA(DetailView):
+class creerCERFA(LoginRequiredMixin, DetailView):
     model = Contrat
 
     def get(self, request, *args, **kwargs):
@@ -857,7 +876,7 @@ class creerCERFA(DetailView):
 
         return redirect("informationmission")
 
-class creerfichemission(DetailView):
+class creerfichemission(LoginRequiredMixin, DetailView):
     model = Contrat
 
     def get(self, request, *args, **kwargs):
@@ -899,6 +918,6 @@ class creerfichemission(DetailView):
 
         data["mission"] = contrat.mission
 
-        nomfichier = PDFGenerator.generate_pdf_with_datas(data, nom_template="fiche_mission.pdf", flatten=False, cerfa_pdf=False)
+        nomfichier = PDFGenerator.generate_mission_pdf_with_datas(data, flatten=False)
 
         return redirect("informationmission")
