@@ -4,6 +4,29 @@
     <form action="{% url 'creationalternant' %}" method="post">
     {% csrf_token %}
 
+    {% if form.nationalite == "3" %}
+        <br />
+        <h5>
+        Attention : si vous êtes ressortissants hors UE, pour conclure un contrat d’apprentissage, vous devez avoir l’autorisation pour travailler à temps complet.<br />
+        Cette autorisation est déjà valable pour les détenteurs des titres de séjour suivants :<br />
+        - Titre de séjour portant la mention VT TOTALE<br />
+        - Vie privée et familiale<br />
+        - Carte de résident 10 ans<br />
+        <br />
+        Pour les détenteurs d’un titre de séjour étudiant portant la mention “autorise son titulaire à travailler à titre accessoire” il est obligatoire :<br />
+        1/ d’avoir déjà effectué une année d’étude complète sur le territoire français<br />
+        2/ d’avoir un titre de séjour en cours de validité au moment du projet de contrat d’apprentissage<br />
+        3/ d’obtenir une autorisation de travail complémentaire auprès de la Direccte du département dans lequel a été émis le titre de séjour.<br />
+        <br />
+        Ces démarches sont à effectuer un mois AVANT le démarrage du contrat et l’obtention de cette autorisation doit intervenir AVANT son démarrage.<br />
+        Pour plus d’information, appelez le CFA au 04 91 14 04 50 en précisant le nom de votre formation.
+        </h5>
+    {% endif %}
+
+    {% if form.errors %}
+        <p class="error">{{ form.errors }}</p>
+    {% endif %}
+
         <fieldset>
             <div class="row">
                 <div class="col-md-6 col-externe" >
@@ -95,6 +118,20 @@
                 <div class="col-md-6 col-externe">
                     <div class="row">
                       <div class="col-md-3">
+                        <h5>Téléphone</h5>
+                      </div>
+                      <div class="col-md-3">
+                          {{ form.telephone }}
+                      </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 col-externe">
+                    <div class="row">
+                      <div class="col-md-3">
                         <h5>Représentant légal</h5>
                       </div>
                       <div class="col-md-3">
@@ -125,7 +162,7 @@
                 <div class="col-md-6 col-externe">
                     <div class="row">
                       <div class="col-md-3">
-                        <h5>Adresse</h5>
+                        <h5>(pour les mineurs)</h5>
                       </div>
                       <div class="col-md-2">
                           {{ form.adresse_numero_representant }}
@@ -251,14 +288,9 @@
             </div>
         </fieldset>
 
-
-  {% if form.errors %}
-  <p class="error">{{ form.errors }}</p>
-  {% endif %}
-
-  <p>
-    <input type="submit" value="Valider" />
-  </p>
+    <p>
+        <input type="submit" value="Valider" />
+    </p>
 
 </form>
 {% endblock %}

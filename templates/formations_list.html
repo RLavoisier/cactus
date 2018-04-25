@@ -7,29 +7,49 @@
 {% block content %}
         <div class="card">
           <div class="card-header">
-            Recherche
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5>Dans les listes déroulantes ci-dessous, sélectionnez les critères correspondant à votre formation puis cliquez sur <b>Actualiser la liste</b>.
+                            Quand vous avez identifié votre formation dans la liste, cliquez sur le lien <b>Sélectionner</b> situé en fin de ligne.</h5>
+                    </div>
+                </div>
           </div>
           <div class="card-body">
               <form action="." method="GET" class="form">
-                  <label for="specialite">Specialité :</label>
-                  <select class="form-control form-control-sm" name="specialite">
-                      {% for specialite in specialites %}
-                          <option {% if request.GET.specialite == specialite %} selected="selected"{% endif %} value="{{ specialite }}">{{ specialite|default:"Sans specialite" }}</option>
-                      {% endfor %}
-                  </select>
-                  <label for="ville">Ville :</label>
-                    <select class="form-control form-control-sm" name="ville">
-                      {% for ville in villes %}
-                          <option {% if request.GET.ville == ville %} selected="selected"{% endif %} value="{{ ville }}">{{ ville|title }}</option>
-                      {% endfor %}
-                  </select>
-                    <label for="nombre_annees">Diplome :</label>
-                    <select class="form-control form-control-sm" name="diplome">
-                      {% for diplome in diplomes %}
-                          <option {% if request.GET.diplome == diplome.0|stringformat:"d" %} selected="selected"{% endif %} value="{{ diplome.0 }}">{{ diplome.1}}</option>
-                      {% endfor %}
-                  </select>
-                  <button type="submit" style="width:100%" class="btn btn-primary">Rechercher</button>
+                    <div class="row">
+                        <div class="col-md-1">
+                            <h5>Spécialité</h5>
+                        </div>
+                        <div class="col-md-3">
+                              <select class="form-control form-control-sm" name="specialite">
+                                  {% for specialite in specialites %}
+                                      <option {% if request.GET.specialite == specialite %} selected="selected"{% endif %} value="{{ specialite }}">{{ specialite|default:"Sans specialite" }}</option>
+                                  {% endfor %}
+                              </select>
+                        </div>
+                        <div class="col-md-1" align="center">
+                            <h5>Ville</h5>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control form-control-sm" name="ville">
+                              {% for ville in villes %}
+                                  <option {% if request.GET.ville == ville %} selected="selected"{% endif %} value="{{ ville }}">{{ ville|title }}</option>
+                              {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-1" align="center">
+                            <h5>Diplôme</h5>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-control form-control-sm" name="diplome">
+                              {% for diplome in diplomes %}
+                                  <option {% if request.GET.diplome == diplome.0|stringformat:"d" %} selected="selected"{% endif %} value="{{ diplome.0 }}">{{ diplome.1}}</option>
+                              {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                  <button type="submit" style="width:100%" class="btn btn-primary">Actualiser la liste</button>
               </form>
           </div>
         </div>

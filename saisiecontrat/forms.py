@@ -25,16 +25,20 @@ class LocalizedModelForm(forms.ModelForm):
 class CreationContratForm(forms.Form):
 
     type_contrat_avenant = forms.IntegerField(label='Type de contrat/avenant :',
-                                         widget=forms.Select(choices=((0, "---"),) + Contrat.TYPE_CONTRAT_AVENANT),
+                                         widget=forms.Select(choices=((0, "---"),) + Contrat.TYPE_CONTRAT_AVENANT,
+                                                             attrs={"class": "form-control"})
                                          )
+
     mode_contractuel = forms.IntegerField(label='Mode contractuel :',
-                                      widget=forms.Select(choices=Contrat.MODE_CONTRACTUEL),
-                                      )
+                                      widget=forms.Select(choices=Contrat.MODE_CONTRACTUEL,
+                                                          attrs={"class": "form-control"})
+                                          )
+
     date_effet_avenant = forms.DateField(required=False,
-                                         widget=forms.DateInput(attrs={"class": "datepicker"},
+                                         widget=forms.DateInput(attrs={"class": "datepicker form-control"},
                                                                 format="%d/%m/%y"))
-    #date_effet_avenant = forms.DateInput(attrs={"class": "form-control datepicker"})
-    numero_contrat_anterieur = forms.CharField(required=False)
+
+    numero_contrat_anterieur = forms.CharField(required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
 
     def clean(self):
 
@@ -60,18 +64,20 @@ class CreationContratForm(forms.Form):
 
 class CreationEntrepriseForm(forms.ModelForm):
 
-    civilite_ma_1 = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE))
-    nom_ma_1 = forms.CharField(max_length=40)
-    prenom_ma_1 = forms.CharField(max_length=40)
-    date_naissance_ma_1 = forms.DateField()
-    civilite_ma_2 = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE))
-    nom_ma_2= forms.CharField(max_length=40, required=False)
-    prenom_ma_2 = forms.CharField(max_length=40, required=False)
-    date_naissance_ma_2 = forms.DateField(required=False)
-    civilite_contact = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE))
-    nom_contact = forms.CharField(max_length=40, required=False)
-    prenom_contact = forms.CharField(max_length=40, required=False)
-    courriel_contact = forms.DateField(required=False)
+    civilite_ma_1 = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE, attrs={"class": "form-control"}))
+    nom_ma_1 = forms.CharField(max_length=40, widget=forms.TextInput(attrs={"class": "form-control"}))
+    prenom_ma_1 = forms.CharField(max_length=40, widget=forms.TextInput(attrs={"class": "form-control"}))
+    date_naissance_ma_1 = forms.DateField(widget=forms.DateInput(attrs={"class": "datepicker form-control"},
+                                                                format="%d/%m/%y"))
+    civilite_ma_2 = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE, attrs={"class": "form-control"}))
+    nom_ma_2= forms.CharField(max_length=40, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
+    prenom_ma_2 = forms.CharField(max_length=40, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
+    date_naissance_ma_2 = forms.DateField(required=False, widget=forms.DateInput(attrs={"class": "datepicker form-control"},
+                                                                format="%d/%m/%y"))
+    civilite_contact = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE, attrs={"class": "form-control"}))
+    nom_contact = forms.CharField(max_length=40, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
+    prenom_contact = forms.CharField(max_length=40, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
+    courriel_contact = forms.CharField(required=False, widget=forms.EmailInput(attrs={"class": "form-control"}))
 
     class Meta:
         """
@@ -99,19 +105,8 @@ class CreationEntrepriseForm(forms.ModelForm):
             "effectif_entreprise": forms.TextInput(attrs={"class": "form-control"}),
             "employeur_specifique": forms.Select(attrs={"class": "form-control"}),
             "courriel": forms.EmailInput(attrs={"class": "form-control"}),
-
-            "civilite_ma_1": forms.Select(attrs={"class": "form-control"}),
-            "nom_ma_1": forms.TextInput(attrs={"class": "form-control"}),
-            "prenom_ma_1": forms.TextInput(attrs={"class": "form-control"}),
-            "date_naissance_ma_1": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
-            "civilite_ma_2": forms.Select(attrs={"class": "form-control"}),
-            "nom_ma_2": forms.TextInput(attrs={"class": "form-control"}),
-            "prenom_ma_2": forms.TextInput(attrs={"class": "form-control"}),
-            "date_naissance_ma_2": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
-            "civilite_contact": forms.Select(attrs={"class": "form-control"}),
-            "nom_contact": forms.TextInput(attrs={"class": "form-control"}),
-            "prenom_contact": forms.TextInput(attrs={"class": "form-control"}),
-            "courriel_contact": forms.EmailInput(attrs={"class": "form-control"}),
+            "code_convention_collective": forms.TextInput(attrs={"class": "form-control"}),
+            "libelle_convention_collective": forms.TextInput(attrs={"class": "form-control"}),
 
         }
 
@@ -507,7 +502,8 @@ class InformationContratForm(LocalizedModelForm):
             "date_debut_contrat": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
             "date_fin_contrat": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
             #"date_effet_avenant": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
-            "duree_hebdomadaire_travail": forms.TextInput(attrs={"class": "form-control"}),
+            "duree_hebdomadaire_travail_heures": forms.TextInput(attrs={"class": "form-control"}),
+            "duree_hebdomadaire_travail_minutes": forms.TextInput(attrs={"class": "form-control"}),
             "risques_particuliers": forms.CheckboxInput(attrs={}),
             "salaire_brut_mensuel": forms.TextInput(attrs={"class": "form-control"}),
             "nourriture": forms.TextInput(attrs={"class": "form-control"}),
@@ -593,14 +589,14 @@ class InformationContratForm(LocalizedModelForm):
         else:
             return date_fin_contrat
 
-    def clean_duree_hebdomadaire_travail(self):
+    def clean_duree_hebdomadaire_travail_heures(self):
 
-        duree_hebdomadaire_travail = self.cleaned_data.get("duree_hebdomadaire_travail")
+        duree_hebdomadaire_travail_heures = self.cleaned_data.get("duree_hebdomadaire_travail_heures")
 
-        if duree_hebdomadaire_travail is None:
-            raise forms.ValidationError("La durée hebdomadaire du travail doit être renseignée.")
+        if duree_hebdomadaire_travail_heures is None:
+            raise forms.ValidationError("Le nombre d'heures de travail hebdomadaire doit être renseignée.")
         else:
-            return duree_hebdomadaire_travail
+            return duree_hebdomadaire_travail_heures
 
 
 class InformationMissionForm(forms.ModelForm):
@@ -611,7 +607,7 @@ class InformationMissionForm(forms.ModelForm):
         On y paramètre toutes les informations du modèle lié ainsi que la définition des champs
         """
         model = Contrat
-        fields = ['mission', 'avis_raf', 'motif']
+        fields = ['mission']
 
         widgets = {
             "mission": forms.Textarea(attrs={"class": "form-control"}),

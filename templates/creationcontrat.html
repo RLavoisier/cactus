@@ -7,25 +7,31 @@
 {% block content %}
 <h3>Vous avez choisi l'apprentissage. Bravo !</h3>
 <h5>Cet outil mis à disposition par le CFA Epure vous permet de remplir votre contrat d'apprentissage (le CERFA) et de gérer les échanges avec votre responsable de formation pour la validation de votre mission.</h5>
-<h5> </h5>
 <h3>Votre contrat</h3>
+
 {% if contrat %}
-<h5>Vous avez un contrat actuellement en cours d'édition. Rendez-vous sur les onglets suivants pour en compléter la saisie.</h5>
-<br />
-<h5>Si vous souhaitez créer un autre contrat ou déclarer une modification de votre contrat actuel (avenant) :</h5>
-<h5>    - sélectionnez le type de contrat/avenant correspondant à votre nouvelle situation ou aux événements intervenus,</h5>
-<h5>    - complétez au besoin le numéro de contrat précédent et la date d'effet de l'avenant,</h5>
-<h5>    - changez au besoin le mode contractuel (CDD, CDI, ...),</h5>
-<h5>    - enfin, cliquez sur le bouton Créer.</h5>
+
+<h5><b>Vous avez un contrat actuellement en cours d'édition. Rendez-vous sur les onglets suivants pour en compléter la saisie.</b></h5>
+<h5><b>ATTENTION : Pensez bien à cliquez sur le bouton Valider situé en bas de chaque page pour contrôler et enregistrer les données saisies.</b></h5>
+    <br>
+    <h5>Si vous souhaitez créer un autre contrat ou déclarer une modification de votre contrat actuel (avenant) :</h5>
+    <h5>    - sélectionnez le type de contrat/avenant correspondant à votre nouvelle situation ou aux événements intervenus,</h5>
+    <h5>    - complétez au besoin le numéro de contrat précédent et la date d'effet de l'avenant,</h5>
+    <h5>    - changez au besoin le mode contractuel (CDD, CDI, ...),</h5>
+    <h5>    - enfin, cliquez sur le bouton Créer.</h5>
 
 {% else %}
-<h5>Vous n'avez pas encore de contrat :</h5>
-<h5>    - sélectionnez le type de contrat ou d'avenant dans la liste,</h5>
-<h5>    - complétez au besoin le numéro de contrat précédent et la date d'effet de l'avenant (en cas d'incertitude, consultez l'aide de ces champs),</h5>
-<h5>    - sélectionnez le mode contractuel (CDD, CDI, ...),</h5>
-<h5>    - nfin, cliquez sur le bouton Créer.</h5>
+    <h5>Vous n'avez pas encore de contrat :</h5>
+    <br>
+    <h5>    - sélectionnez le type de contrat ou d'avenant dans la liste,</h5>
+    <h5>    - complétez au besoin le numéro de contrat précédent et la date d'effet de l'avenant (en cas d'incertitude, consultez l'aide de ces champs),</h5>
+    <h5>    - sélectionnez le mode contractuel (CDD, CDI, ...),</h5>
+    <h5>    - enfin, cliquez sur le bouton Créer.</h5>
 
 {% endif %}
+
+<br>
+
 <form action="{% url 'creationcontrat' %}" method="post">
     {% csrf_token %}
     {% if error %}
@@ -33,37 +39,34 @@
     {% endif %}
     <fieldset>
         <div class="row">
-            <div class="col-md-2">
-                {{  form.type_contrat_avenant.label_tag }}
+            <div class="col-md-3">
+                <h5>Type de contrat/avenant</h5>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-9">
                 {{  form.type_contrat_avenant }}
             </div>
-            <div class="col-md-2">
-            </div>
+
         </div>
         <div class="row">
-            <div class="col-md-2">
-                {{  form.numero_contrat_anterieur.label_tag }}
+            <div class="col-md-3">
+                <h5>Numéro du contrat précédent</h5>
             </div>
             <div class="col-md-2">
                 {{  form.numero_contrat_anterieur }}
             </div>
-            <div class="col-md-2">
-                {{  form.date_effet_avenant.label_tag }}
+            <div class="col-md-2" align="center">
+                <h5>Date d'effet de l'avenant</h5>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
                 {{  form.date_effet_avenant }}
             </div>
         </div>
         <div class="row">
-            <div class="col-md-2">
-                {{  form.mode_contractuel.label_tag }}
+            <div class="col-md-3">
+                <h5>Mode contractuel</h5>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-9">
                 {{  form.mode_contractuel }}
-            </div>
-            <div class="col-md-2">
             </div>
         </div>
 

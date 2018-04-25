@@ -2,49 +2,99 @@
 
 {% block content %}
 <form action="{% url 'informationmission' %}" method="post">
-  {% csrf_token %}
+    {% csrf_token %}
+
+    {% if form.errors %}
+    <p class="error">{{ form.errors }}</p>
+    {% endif %}
 
     <fieldset>
+
         <div class="row">
-            <div class="col-md-2 col-externe">
+            <div class="col-md-12 col-externe">
+                <div class="col-md-12">
+                    <h5><p>La mission est la description de votre poste et des tâches qui vous seront confiées chez votre employeur.</p>
+                        <p>Saisissez la mission, validez-la, puis envoyez la fiche mission au responsable de formation (RAF) en utilisant le lien situé sur cette page</p>
+                        <p>Nous vous rappelons que <b>votre dossier ne pourra être pris en compte qu'une fois qu'il aura été validé par le RAF</b>.
+                            Vous serez averti par mail de cette validation.</p>
+                        <p>Dans le cas où le RAF émettrait une réserve sur votre dossier,
+                            il vous faudra redéfinir une mission avec votre employeur, la saisir et la soumettre de nouveau au RAF.</p>
+                        </h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-1 col-externe">
                 <div class="col-md-12">
                     <h5><b>Mission</b></h5>
                 </div>
             </div>
-            <div class="col-md-10 col-externe">
+            <div class="col-md-11 col-externe">
                 <div class="col-md-12">
                       {{  form.mission }}
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-2 col-externe">
-                <div class="col-md-12">
-                    <input type="submit" value="Valider" />
+
+        {% if contrat.avis_raf == 0 or contrat.avis_raf == 3 %}
+            <div class="row">
+                <div class="col-md-2 col-externe">
+                    <div class="col-md-12">
+                        <input type="submit" value="Valider" />
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-md-2 col-externe">
-                <div class="col-md-12">
-                    <h5><a href="{% url 'creerCERFA' %}">Créer CERFA</a></h5>
+        {% endif %}
+
+
+        {% if contrat.mission %}
+            <div class="row">
+                <div class="col-md-2 col-externe">
+                    <div class="col-md-12">
+                        <h5><b>Etat de la mission</b></h5>
+                    </div>
+                </div>
+                <div class="col-md-10 col-externe">
+                    <div class="col-md-12">
+                        <h5>{{  libelle_avis_raf }}</h5>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            {% if contrat.motif %}
+                <div class="row">
+                    <div class="col-md-2 col-externe">
+                        <div class="col-md-12">
+                            <h5><b>Motif</b></h5>
+                        </div>
+                    </div>
+                    <div class="col-md-10 col-externe">
+                        <div class="col-md-12">
+                            <h5>{{  contrat.motif }}</h5>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-12 col-externe">
+                    <div class="col-md-12">
+                        <h5><a href="{% url 'creerfichemission' %}">Envoyer la fiche mission au responsable de formation</a></h5>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
 
         <div class="row">
             <div class="col-md-2 col-externe">
                 <div class="col-md-12">
-                    <h5><a href="{% url 'creerfichemission' %}">Créer fiche mission</a></h5>
+                    <h5><a href="{% url 'creerCERFA' %}">Télécharger le CERFA</a></h5>
                 </div>
             </div>
         </div>
 
     </fieldset>
-
-  {% if error %}
-  <p class="error">{{ error }}</p>
-  {% endif %}
 
 </form>
 {% endblock %}

@@ -4,6 +4,11 @@
 {% block content %}
     <form action="." method="POST">
         {% csrf_token %}
+
+        {% if form.errors %}
+        <p class="error">{{ form.errors }}</p>
+        {% endif %}
+
         <fieldset>
             <div class="row">
                 <div class="col-md-2 col-externe">
@@ -35,18 +40,12 @@
                         {{  form.date_fin_contrat }}
                     </div>
                 </div>
-                <div  class="col-md-6 col-externe">
-                    <div class="col-md-3">
+                <div  class="col-md-3 col-externe">
+                    <div class="col-md-7">
                         <h5 align="center">Date d'embauche</h5>
                     </div>
-                    <div class="col-md-2">
-                        {{  form.date_embauche }}
-                    </div>
-                    <div class="col-md-1">
-                    </div>
                     <div class="col-md-4">
-                    </div>
-                    <div class="col-md-2">
+                        {{  form.date_embauche }}
                     </div>
                 </div>
             </div>
@@ -354,11 +353,32 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-md-2 col-externe">
+                    <div class="col-md-12">
+                        <h5 align="">Durée hebdo. du travail</h5>
+                    </div>
+                </div>
+                <div class="col-md-6 col-externe">
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            {{  form.duree_hebdomadaire_travail_heures }}
+                            <span class="input-group-addon">h</span>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            {{  form.duree_hebdomadaire_travail_minutes }}
+                            <span class="input-group-addon">mn</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <p>
                 <input type="submit" value="Valider" />
             </p>
         </fieldset>
-
 
     </form>
 
