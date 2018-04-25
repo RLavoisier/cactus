@@ -234,11 +234,11 @@ class Alternant(models.Model):
 class Entreprise(models.Model):
 
     TYPE_EMPLOYEUR = (
-        (11, "Entreprise inscrite au répertoire des métiers ou au registre des entreprises pour l’Alsace-Moselle"),
         (12, "Entreprise inscrite uniquement au registre du commerce et des sociétés"),
         (13, "Entreprises dont les salariés relèvent de la mutualité sociale agricole"),
         (14, "Profession libérale"),
         (15, "Association"),
+        (11, "Entreprise inscrite au répertoire des métiers ou au registre des entreprises pour l’Alsace-Moselle"),
         (16, "Autre employeur privé"),
         (21, "Service de l’Etat (administrations centrales et leurs services déconcentrés de la fonction publique d’Etat)"),
         (22, "Commune"),
@@ -364,7 +364,7 @@ class Formation(models.Model):
         (4, "Autre"),
     )
 
-    code_formation = models.AutoField(max_length=14, primary_key=True)
+    code_formation = models.CharField(max_length=14, primary_key=True)
     cfa = models.ForeignKey(CFA, on_delete=models.CASCADE)
     intitule_formation = models.CharField(max_length=150,blank=True, null=True)
     ville = models.CharField(max_length=35,blank=True, null=True)
@@ -385,6 +385,7 @@ class Formation(models.Model):
     nombre_annees = models.PositiveSmallIntegerField(blank=True, null=True)
     annee_remuneration_annee_diplome = models.PositiveSmallIntegerField(blank=True, null=True)
     inspection_pedagogique_competente = models.PositiveSmallIntegerField(choices=INSPECTION_PEDAGOGIQUE, blank=True, null=True)
+    courriel_raf = models.CharField(max_length=40, blank=True, null=True)
 
 
     def __str__(self):
@@ -431,11 +432,11 @@ class Contrat(models.Model):
     )
 
     AVIS_RAF = (
-        (0, "Non envoyée"),
-        (1, "En attente de validation"),
-        (2, "Mission valide"),
-        (3, "Réserve"),
-        (4, "Rejet"),
+        (0, "Fiche mission non envoyée au responsable de formation"),
+        (1, "Mission en attente de validation par le responsable de formation "),
+        (2, "Mission validée par le responsable de formation"),
+        (3, "Le responsable de formation a émis des réserves sur la mission"),
+        (4, "Le responsable a rejeté cette mission"),
     )
 
     id = models.AutoField(primary_key=True)
@@ -452,7 +453,8 @@ class Contrat(models.Model):
     date_debut_contrat = models.DateField(verbose_name="Date de début du contrat", blank=True, null=True)
     date_effet_avenant = models.DateField(verbose_name="Date d'effet de l'avenant", blank=True, null=True,help_text="S'il s'agit d'un avenant à un contrat existant, vous devez en indiquer la date d'entrée en vigueur.")
     date_fin_contrat = models.DateField(blank=True, null=True)
-    duree_hebdomadaire_travail = models.DurationField(blank=True, null=True, help_text="Entrez la durée hebdomadaire du travail sous le format hh:mm (par exemple 35:45 pour 35 heures 30 minutes.")
+    duree_hebdomadaire_travail_heures = models.PositiveSmallIntegerField(blank=True, null=True, help_text="Entrez le nombre d'heures de travail hbdomadaire.")
+    duree_hebdomadaire_travail_minutes = models.PositiveSmallIntegerField(default=0, blank=True, null=True, help_text="Entrez les minutes du temps de travail hebodmadaire")
     risques_particuliers = models.BooleanField(default=False)
     salaire_minimum_conventionnel = models.FloatField(blank=True, null=True)
     salaire_brut_mensuel = models.FloatField(blank=True, null=True)

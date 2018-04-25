@@ -29,5 +29,5 @@ class CactusUserCreationForm(UserCreationForm):
 
     def clean_code_formation(self):
         if self.cleaned_data["code_formation"] != "cfa":
-            raise forms.ValidationError("Code formation inconnus.")
+            raise forms.ValidationError("Code formation inconnu.")
         return self.cleaned_data["code_formation"]

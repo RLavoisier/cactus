@@ -116,11 +116,14 @@ def create_entreprise(request):
         # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
         return redirect("comptes:login")
 
+    context = {}
+
     if len(request.POST) > 0:
 
         # On créé le formulaire en lui passant le contenu du post
         # Comme c'est un formulaire modèle, cela prépare également un objet de base de donnée
         form = CreationEntrepriseForm(request.POST)
+
 
         if form.is_valid():
 
@@ -225,9 +228,13 @@ def create_entreprise(request):
                     personnel.courriel_contact = request.POST.get("courriel_contact")
                     personnel.save()
 
-            return render(request, "entreprise_form.html", {"form": form})
+            context["form"] = form
+            context["contrat"] = contrat
+            return render(request, "entreprise_form.html", context)
         else:
-            return render(request, "entreprise_form.html", {"form": form})
+            context["form"] = form
+            context["contrat"] = contrat
+            return render(request, "entreprise_form.html", context)
     else:
         alternant = request.user.alternant
         contrat= Contrat.objects.get(alternant=alternant, contrat_courant=True)
@@ -258,8 +265,6 @@ def create_entreprise(request):
         except ObjectDoesNotExist:
             personnel = None
 
-        form = CreationEntrepriseForm(instance=entreprise)
-
         if personnel is not None:
             form.fields["civilite_ma_2"].initial = personnel.civilite
             form.fields["nom_ma_2"].initial = personnel.nom
@@ -271,8 +276,6 @@ def create_entreprise(request):
         except ObjectDoesNotExist:
             personnel = None
 
-        form = CreationEntrepriseForm(instance=entreprise)
-
         if personnel is not None:
             form.fields["civilite_contact"].initial = personnel.civilite
             form.fields["nom_contact"].initial = personnel.nom
@@ -280,7 +283,11 @@ def create_entreprise(request):
             form.fields["courriel_contact"].initial = personnel.courriel
 
 
-        return render(request, "entreprise_form.html", {"form": form})
+        context["form"] = form
+        context["contrat"] = contrat
+        return render(request, "entreprise_form.html", context)
+
+        #return render(request, "entreprise_form.html", {"form": form})
 
 def create_alternant(request):
 
@@ -288,14 +295,19 @@ def create_alternant(request):
         # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
         return redirect("comptes:login")
 
+    context={}
+
     if len(request.POST) > 0:
         # On créé le formulaire en lui passant le contenu du post
         # Comme c'est un formulaire modèle, cela prépare également un objet de base de donnée
+
         form = CreationAlternantForm(request.POST)
-        print(form.is_valid())
+
         if form.is_valid():
 
             alternant = Alternant(user=request.user)
+            contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+
             alternant.nom = form.cleaned_data["nom"]
             alternant.prenom = form.cleaned_data["prenom"]
             alternant.date_naissance = form.cleaned_data["date_naissance"]
@@ -306,7 +318,6 @@ def create_alternant(request):
             alternant.code_postal = form.cleaned_data["code_postal"]
             alternant.ville = form.cleaned_data["ville"]
             alternant.telephone = form.cleaned_data["telephone"]
-            # a utiliser les données issues de form_cleaned data
             alternant.handicape = form.cleaned_data["handicape"]
             alternant.nationalite = form.cleaned_data["nationalite"]
             alternant.regime_social = form.cleaned_data["regime_social"]
@@ -341,18 +352,37 @@ def create_alternant(request):
 
             #return redirect("creationalternant")
 
-            return render(request, "alternant_form.html", {"form": form})
+            context["form"] = form
+            context["contrat"] = contrat
+
+            return render(request, "alternant_form.html", context)
         else:
-            return render(request, "alternant_form.html", {"form": form})
+
+            alternant = Alternant(user=request.user)
+            contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+
+            context["form"] = form
+            context["contrat"] = contrat
+
+            return render(request, "alternant_form.html", context)
+
     else:
+
         form = CreationAlternantForm(instance=request.user.alternant)
-        return render(request, "alternant_form.html", {"form": form})
+
+        context["form"] = form
+        contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
+        context["contrat"]=contrat
+
+        return render(request, "alternant_form.html", context)
 
 def inform_contrat(request):
 
     if not request.user.is_authenticated:
         # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
         return redirect("comptes:login")
+
+    context = {}
 
     if len(request.POST) > 0:
 
@@ -367,7 +397,8 @@ def inform_contrat(request):
             contrat.date_debut_contrat = form.cleaned_data["date_debut_contrat"]
             contrat.date_effet_avenant = form.cleaned_data["date_effet_avenant"]
             contrat.date_fin_contrat = form.cleaned_data["date_fin_contrat"]
-            contrat.duree_hebdomadaire_travail = form.cleaned_data["duree_hebdomadaire_travail"]
+            contrat.duree_hebdomadaire_travail_heures = form.cleaned_data["duree_hebdomadaire_travail_heures"]
+            contrat.duree_hebdomadaire_travail_minutes = form.cleaned_data["duree_hebdomadaire_travail_minutes"]
             contrat.risques_particuliers = form.cleaned_data["risques_particuliers"]
             contrat.caisse_retraite_complementaire = form.cleaned_data["caisse_retraite_complementaire"]
             contrat.salaire_brut_mensuel = form.cleaned_data["salaire_brut_mensuel"]
@@ -417,7 +448,17 @@ def inform_contrat(request):
 
             contrat.save()
 
-        return render(request, "contrat_form.html", {"form": form})
+            context["form"] = form
+            context["contrat"]=contrat
+
+            return render(request, "contrat_form.html", context)
+        else:
+            context["form"] = form
+            contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
+            context["contrat"]=contrat
+
+            return render(request, "contrat_form.html", context)
+
     else:
 
         contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
@@ -425,7 +466,10 @@ def inform_contrat(request):
         # dans le formulaire on utilise l'objet user de la request qui n'existe pas dans le formulaire
         form = InformationContratForm(instance=contrat, request=request)
 
-        return render(request, "contrat_form.html", {"form": form})
+        context["form"] = form
+        context["contrat"]=contrat
+
+        return render(request, "contrat_form.html", context)
 
 
 def inform_mission(request):
@@ -433,6 +477,8 @@ def inform_mission(request):
     if not request.user.is_authenticated:
         # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
         return redirect("comptes:login")
+
+    context={}
 
     contrat = request.user.alternant.get_contrat_courant()
 
@@ -453,17 +499,21 @@ def inform_mission(request):
                 contrat.date_maj_mission=datetime.now()
                 contrat.date_maj=datetime.now()
                 contrat.save()
-
-                return render(request, "mission_form.html", {"form": form})
-            else:
-                return render(request, "mission_form.html", {"form": form})
-        else:
-            return render(request, "mission_form.html", {"form": form})
     else:
         contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
 
         form = InformationMissionForm(instance=contrat)
-        return render(request, "mission_form.html", {"form": form})
+
+    context["form"] = form
+    context["contrat"]=contrat
+
+    i=0
+    while contrat.avis_raf != Contrat.AVIS_RAF[i][0]:
+        i += 1
+
+    context["libelle_avis_raf"] = Contrat.AVIS_RAF[i][1]
+
+    return render(request, "mission_form.html", context)
 
 
 class liste_formation(LoginRequiredMixin, ListView):
@@ -484,6 +534,10 @@ class liste_formation(LoginRequiredMixin, ListView):
         context["villes"] = ["Toutes"] + list(villes)
         context["diplomes"] = ((0, "Tous"),) + diplomes
         context["request"] = self.request
+
+        alternant = Alternant(user=self.request.user)
+        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        context["contrat"] = contrat
 
         return context
 
@@ -532,6 +586,7 @@ class detail_formation(LoginRequiredMixin, DetailView):
             context["nombre_annees"] = context.get("formation").nombre_annees
         else:
             context["nombre_annees"] = self.contrat.nombre_annees
+
         context["nom_cfa"] = self.object.cfa.nom
         context["numeroUAI"] = self.object.cfa.numeroUAI
         context["adresse_numero"] = self.object.cfa.adresse_numero
@@ -541,18 +596,22 @@ class detail_formation(LoginRequiredMixin, DetailView):
         context["ville"] = self.object.cfa.ville
 
         i=0
-
         if context.get("formation").diplome is not None:
             while context.get("formation").diplome != Formation.DIPLOME[i][0]:
                 i+=1
 
         context["libelle_diplome"] = Formation.DIPLOME[i][1]
 
-        #if context.get("formation").inspection_pedagogique_competente is not None:
-        #    while context.get("formation").inspection_pedagogique_competente != Formation.INSPECTION_PEDAGOGIQUE[i][0]:
-        #        i+=1
+        i=0
+        if context.get("formation").inspection_pedagogique_competente is not None:
+            while context.get("formation").inspection_pedagogique_competente != Formation.INSPECTION_PEDAGOGIQUE[i][0]:
+                i+=1
 
-        #context["libelle_inspection_pedagogique_competente"] = Formation.INSPECTION_PEDAGOGIQUE[i][1]
+        context["libelle_inspection_pedagogique_competente"] = Formation.INSPECTION_PEDAGOGIQUE[i][1]
+
+        alternant = Alternant(user=request.user)
+        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        context["contrat"] = contrat
 
         return self.render_to_response(context)
 
@@ -564,6 +623,7 @@ class detail_formation(LoginRequiredMixin, DetailView):
         contrat.save()
 
         return redirect("detail_formation")
+
 
 class appliquer_formation(LoginRequiredMixin, DetailView):
     model = Formation
@@ -706,78 +766,114 @@ class creerCERFA(LoginRequiredMixin, DetailView):
         data["execution_fin_mois"] = str(contrat.date_debut_contrat.month).zfill(2)
         data["execution_fin_jour"] = str(contrat.date_debut_contrat.day).zfill(2)
 
-        data["contrat_duree_hebdo_heures"] = str(contrat.duree_hebdomadaire_travail).split(":")[1]
-        data["contrat_duree_hebdo_minutes"] = str(contrat.duree_hebdomadaire_travail).split(":")[2]
+        data["contrat_duree_hebdo_heures"] = str(contrat.duree_hebdomadaire_travail_heures)
+        data["contrat_duree_hebdo_minutes"] = str(contrat.duree_hebdomadaire_travail_minutes)
 
         if contrat.risques_particuliers:
             data["contrat_risques_oui"] = 1
         else:
             data["contrat_risques_non"] = 1
 
-        data["contrat_remu_annee1_taux1"] = str(contrat.an_1_per_1_taux)
-        data["contrat_remu_annee2_taux1"] = str(contrat.an_2_per_1_taux)
-        data["contrat_remu_annee3_taux1"] = str(contrat.an_3_per_1_taux)
-        data["contrat_remu_annee4_taux1"] = str(contrat.an_4_per_1_taux)
-        data["contrat_remu_annee1_du1_jour"] = str(contrat.an_1_per_1_du.day).zfill(2)
-        data["contrat_remu_annee1_du1_mois"] = str(contrat.an_1_per_1_du.month).zfill(2)
-        data["contrat_remu_annee1_du1_annee"] = contrat.an_1_per_1_du.year
-        data["contrat_remu_annee2_du1_jour"] = str(contrat.an_2_per_1_du.day).zfill(2)
-        data["contrat_remu_annee2_du1_mois"] = str(contrat.an_2_per_1_du.month).zfill(2)
-        data["contrat_remu_annee2_du1_annee"] = contrat.an_2_per_1_du.year
-        data["contrat_remu_annee3_du1_jour"] = str(contrat.an_3_per_1_du.day).zfill(2)
-        data["contrat_remu_annee3_du1_mois"] = str(contrat.an_3_per_1_du.month).zfill(2)
-        data["contrat_remu_annee3_du1_annee"] = contrat.an_3_per_1_du.year
-        data["contrat_remu_annee4_du1_jour"] = str(contrat.an_4_per_1_du.day).zfill(2)
-        data["contrat_remu_annee4_du1_mois"] = str(contrat.an_4_per_1_du.month).zfill(2)
-        data["contrat_remu_annee4_du1_annee"] = contrat.an_4_per_1_du.year
-        data["contrat_remu_annee1_au1_jour"] = str(contrat.an_1_per_1_au.day).zfill(2)
-        data["contrat_remu_annee1_au1_mois"] = str(contrat.an_1_per_1_au.month).zfill(2)
-        data["contrat_remu_annee1_au1_annee"] = contrat.an_1_per_1_au.year
-        data["contrat_remu_annee2_au1_jour"] = str(contrat.an_2_per_1_au.day).zfill(2)
-        data["contrat_remu_annee2_au1_mois"] = str(contrat.an_2_per_1_au.month).zfill(2)
-        data["contrat_remu_annee2_au1_annee"] = contrat.an_2_per_1_au.year
-        data["contrat_remu_annee3_au1_jour"] = str(contrat.an_3_per_1_au.day).zfill(2)
-        data["contrat_remu_annee3_au1_mois"] = str(contrat.an_3_per_1_au.month).zfill(2)
-        data["contrat_remu_annee3_au1_annee"] = contrat.an_3_per_1_au.year
-        data["contrat_remu_annee4_au1_jour"] = str(contrat.an_4_per_1_au.day).zfill(2)
-        data["contrat_remu_annee4_au1_mois"] = str(contrat.an_4_per_1_au.month).zfill(2)
-        data["contrat_remu_annee4_au1_annee"] = contrat.an_4_per_1_au.year
-        data["contrat_remu_annee1_ref1"] = Contrat.BASE[contrat.an_1_per_1_base - 1][1]
-        data["contrat_remu_annee2_ref1"] = Contrat.BASE[contrat.an_2_per_1_base - 1][1]
-        data["contrat_remu_annee3_ref1"] = Contrat.BASE[contrat.an_3_per_1_base - 1][1]
-        data["contrat_remu_annee4_ref1"] = Contrat.BASE[contrat.an_4_per_1_base - 1][1]
-        data["contrat_remu_annee1_taux2"] = str(contrat.an_1_per_2_taux)
-        data["contrat_remu_annee2_taux2"] = str(contrat.an_2_per_2_taux)
-        data["contrat_remu_annee3_taux2"] = str(contrat.an_3_per_2_taux)
-        data["contrat_remu_annee4_taux2"] = str(contrat.an_4_per_2_taux)
-        data["contrat_remu_annee1_du2_jour"] = str(contrat.an_1_per_2_du.day).zfill(2)
-        data["contrat_remu_annee1_du2_mois"] = str(contrat.an_1_per_2_du.month).zfill(2)
-        data["contrat_remu_annee1_du2_annee"] = contrat.an_1_per_2_du.year
-        data["contrat_remu_annee2_du2_jour"] = str(contrat.an_2_per_2_du.day).zfill(2)
-        data["contrat_remu_annee2_du2_mois"] = str(contrat.an_2_per_2_du.month).zfill(2)
-        data["contrat_remu_annee2_du2_annee"] = contrat.an_2_per_2_du.year
-        data["contrat_remu_annee3_du2_jour"] = str(contrat.an_3_per_2_du.day).zfill(2)
-        data["contrat_remu_annee3_du2_mois"] = str(contrat.an_3_per_2_du.month).zfill(2)
-        data["contrat_remu_annee3_du2_annee"] = contrat.an_3_per_2_du.year
-        data["contrat_remu_annee4_du2_jour"] = str(contrat.an_4_per_2_du.day).zfill(2)
-        data["contrat_remu_annee4_du2_mois"] = str(contrat.an_4_per_2_du.month).zfill(2)
-        data["contrat_remu_annee4_du2_annee"] = contrat.an_4_per_2_du.year
-        data["contrat_remu_annee1_au2_jour"] = str(contrat.an_1_per_2_au.day).zfill(2)
-        data["contrat_remu_annee1_au2_mois"] = str(contrat.an_1_per_2_au.month).zfill(2)
-        data["contrat_remu_annee1_au2_annee"] = contrat.an_1_per_2_au.year
-        data["contrat_remu_annee2_au2_jour"] = str(contrat.an_2_per_2_au.day).zfill(2)
-        data["contrat_remu_annee2_au2_mois"] = str(contrat.an_2_per_2_au.month).zfill(2)
-        data["contrat_remu_annee2_au2_annee"] = contrat.an_2_per_2_au.year
-        data["contrat_remu_annee3_au2_jour"] = str(contrat.an_3_per_2_au.day).zfill(2)
-        data["contrat_remu_annee3_au2_mois"] = str(contrat.an_3_per_2_au.month).zfill(2)
-        data["contrat_remu_annee3_au2_annee"] = contrat.an_3_per_2_au.year
-        data["contrat_remu_annee4_au2_jour"] = str(contrat.an_4_per_2_au.day).zfill(2)
-        data["contrat_remu_annee4_au2_mois"] = str(contrat.an_4_per_2_au.month).zfill(2)
-        data["contrat_remu_annee4_au2_annee"] = contrat.an_4_per_2_au.year
-        data["contrat_remu_annee1_ref2"] = Contrat.BASE[contrat.an_1_per_2_base - 1][1]
-        data["contrat_remu_annee2_ref2"] = Contrat.BASE[contrat.an_2_per_2_base - 1][1]
-        data["contrat_remu_annee3_ref2"] = Contrat.BASE[contrat.an_3_per_2_base - 1][1]
-        data["contrat_remu_annee4_ref2"] = Contrat.BASE[contrat.an_4_per_2_base - 1][1]
+        if contrat.an_1_per_1_taux is not None:
+            data["contrat_remu_annee1_taux1"] = str(contrat.an_1_per_1_taux)
+        if contrat.an_2_per_1_taux is not None:
+            data["contrat_remu_annee2_taux1"] = str(contrat.an_2_per_1_taux)
+        if contrat.an_3_per_1_taux is not None:
+            data["contrat_remu_annee3_taux1"] = str(contrat.an_3_per_1_taux)
+        if contrat.an_4_per_1_taux is not None:
+            data["contrat_remu_annee4_taux1"] = str(contrat.an_4_per_1_taux)
+
+        if contrat.an_1_per_1_du is not None:
+            data["contrat_remu_annee1_du1_jour"] = str(contrat.an_1_per_1_du.day).zfill(2)
+            data["contrat_remu_annee1_du1_mois"] = str(contrat.an_1_per_1_du.month).zfill(2)
+            data["contrat_remu_annee1_du1_annee"] = contrat.an_1_per_1_du.year
+        if contrat.an_2_per_1_du is not None:
+            data["contrat_remu_annee2_du1_jour"] = str(contrat.an_2_per_1_du.day).zfill(2)
+            data["contrat_remu_annee2_du1_mois"] = str(contrat.an_2_per_1_du.month).zfill(2)
+            data["contrat_remu_annee2_du1_annee"] = contrat.an_2_per_1_du.year
+        if contrat.an_3_per_1_du is not None:
+            data["contrat_remu_annee3_du1_jour"] = str(contrat.an_3_per_1_du.day).zfill(2)
+            data["contrat_remu_annee3_du1_mois"] = str(contrat.an_3_per_1_du.month).zfill(2)
+            data["contrat_remu_annee3_du1_annee"] = contrat.an_3_per_1_du.year
+        if contrat.an_4_per_1_du is not None:
+            data["contrat_remu_annee4_du1_jour"] = str(contrat.an_4_per_1_du.day).zfill(2)
+            data["contrat_remu_annee4_du1_mois"] = str(contrat.an_4_per_1_du.month).zfill(2)
+            data["contrat_remu_annee4_du1_annee"] = contrat.an_4_per_1_du.year
+        if contrat.an_1_per_1_au is not None:
+            data["contrat_remu_annee1_au1_jour"] = str(contrat.an_1_per_1_au.day).zfill(2)
+            data["contrat_remu_annee1_au1_mois"] = str(contrat.an_1_per_1_au.month).zfill(2)
+            data["contrat_remu_annee1_au1_annee"] = contrat.an_1_per_1_au.year
+        if contrat.an_2_per_1_au is not None:
+            data["contrat_remu_annee2_au1_jour"] = str(contrat.an_2_per_1_au.day).zfill(2)
+            data["contrat_remu_annee2_au1_mois"] = str(contrat.an_2_per_1_au.month).zfill(2)
+            data["contrat_remu_annee2_au1_annee"] = contrat.an_2_per_1_au.year
+        if contrat.an_3_per_1_au is not None:
+            data["contrat_remu_annee3_au1_jour"] = str(contrat.an_3_per_1_au.day).zfill(2)
+            data["contrat_remu_annee3_au1_mois"] = str(contrat.an_3_per_1_au.month).zfill(2)
+            data["contrat_remu_annee3_au1_annee"] = contrat.an_3_per_1_au.year
+        if contrat.an_4_per_1_au is not None:
+            data["contrat_remu_annee4_au1_jour"] = str(contrat.an_4_per_1_au.day).zfill(2)
+            data["contrat_remu_annee4_au1_mois"] = str(contrat.an_4_per_1_au.month).zfill(2)
+            data["contrat_remu_annee4_au1_annee"] = contrat.an_4_per_1_au.year
+
+        if contrat.an_1_per_1_base is not None:
+            data["contrat_remu_annee1_ref1"] = Contrat.BASE[contrat.an_1_per_1_base - 1][1]
+        if contrat.an_2_per_1_base is not None:
+            data["contrat_remu_annee2_ref1"] = Contrat.BASE[contrat.an_2_per_1_base - 1][1]
+        if contrat.an_3_per_1_base is not None:
+            data["contrat_remu_annee3_ref1"] = Contrat.BASE[contrat.an_3_per_1_base - 1][1]
+        if contrat.an_4_per_1_base is not None:
+            data["contrat_remu_annee4_ref1"] = Contrat.BASE[contrat.an_4_per_1_base - 1][1]
+
+        if contrat.an_1_per_2_taux is not None:
+            data["contrat_remu_annee1_taux2"] = str(contrat.an_1_per_2_taux)
+        if contrat.an_2_per_2_taux is not None:
+            data["contrat_remu_annee2_taux2"] = str(contrat.an_2_per_2_taux)
+        if contrat.an_3_per_2_taux is not None:
+            data["contrat_remu_annee3_taux2"] = str(contrat.an_3_per_2_taux)
+        if contrat.an_4_per_2_taux is not None:
+            data["contrat_remu_annee4_taux2"] = str(contrat.an_4_per_2_taux)
+
+        if contrat.an_1_per_1_du is not None:
+            data["contrat_remu_annee1_du2_jour"] = str(contrat.an_1_per_2_du.day).zfill(2)
+            data["contrat_remu_annee1_du2_mois"] = str(contrat.an_1_per_2_du.month).zfill(2)
+            data["contrat_remu_annee1_du2_annee"] = contrat.an_1_per_2_du.year
+        if contrat.an_2_per_2_du is not None:
+            data["contrat_remu_annee2_du2_jour"] = str(contrat.an_2_per_2_du.day).zfill(2)
+            data["contrat_remu_annee2_du2_mois"] = str(contrat.an_2_per_2_du.month).zfill(2)
+            data["contrat_remu_annee2_du2_annee"] = contrat.an_2_per_2_du.year
+        if contrat.an_3_per_2_du is not None:
+            data["contrat_remu_annee3_du2_jour"] = str(contrat.an_3_per_2_du.day).zfill(2)
+            data["contrat_remu_annee3_du2_mois"] = str(contrat.an_3_per_2_du.month).zfill(2)
+            data["contrat_remu_annee3_du2_annee"] = contrat.an_3_per_2_du.year
+        if contrat.an_4_per_2_du is not None:
+            data["contrat_remu_annee4_du2_jour"] = str(contrat.an_4_per_2_du.day).zfill(2)
+            data["contrat_remu_annee4_du2_mois"] = str(contrat.an_4_per_2_du.month).zfill(2)
+            data["contrat_remu_annee4_du2_annee"] = contrat.an_4_per_2_du.year
+        if contrat.an_1_per_2_au is not None:
+            data["contrat_remu_annee1_au2_jour"] = str(contrat.an_1_per_2_au.day).zfill(2)
+            data["contrat_remu_annee1_au2_mois"] = str(contrat.an_1_per_2_au.month).zfill(2)
+            data["contrat_remu_annee1_au2_annee"] = contrat.an_1_per_2_au.year
+        if contrat.an_2_per_2_au is not None:
+            data["contrat_remu_annee2_au2_jour"] = str(contrat.an_2_per_2_au.day).zfill(2)
+            data["contrat_remu_annee2_au2_mois"] = str(contrat.an_2_per_2_au.month).zfill(2)
+            data["contrat_remu_annee2_au2_annee"] = contrat.an_2_per_2_au.year
+        if contrat.an_3_per_2_au is not None:
+            data["contrat_remu_annee3_au2_jour"] = str(contrat.an_3_per_2_au.day).zfill(2)
+            data["contrat_remu_annee3_au2_mois"] = str(contrat.an_3_per_2_au.month).zfill(2)
+            data["contrat_remu_annee3_au2_annee"] = contrat.an_3_per_2_au.year
+        if contrat.an_4_per_2_au is not None:
+            data["contrat_remu_annee4_au2_jour"] = str(contrat.an_4_per_2_au.day).zfill(2)
+            data["contrat_remu_annee4_au2_mois"] = str(contrat.an_4_per_2_au.month).zfill(2)
+            data["contrat_remu_annee4_au2_annee"] = contrat.an_4_per_2_au.year
+        if contrat.an_1_per_2_base is not None:
+            data["contrat_remu_annee1_ref2"] = Contrat.BASE[contrat.an_1_per_2_base - 1][1]
+        if contrat.an_2_per_2_base is not None:
+            data["contrat_remu_annee2_ref2"] = Contrat.BASE[contrat.an_2_per_2_base - 1][1]
+        if contrat.an_3_per_2_base is not None:
+            data["contrat_remu_annee3_ref2"] = Contrat.BASE[contrat.an_3_per_2_base - 1][1]
+        if contrat.an_4_per_2_base is not None:
+            data["contrat_remu_annee4_ref2"] = Contrat.BASE[contrat.an_4_per_2_base - 1][1]
 
         entier = int(contrat.salaire_brut_mensuel)
         decimal = contrat.salaire_brut_mensuel - entier
@@ -824,12 +920,16 @@ class creerCERFA(LoginRequiredMixin, DetailView):
         data["formation_adr_cp"] = cfa.code_postal
         data["formation_adr_ville"] = cfa.ville
         data["formation_inspect_pedag"] = formation.inspection_pedagogique_competente
-        data["signature_date_annee"] = contrat.fait_le.year
-        data["signature_date_mois"] = str(contrat.fait_le.month).zfill(2)
-        data["signature_date_jour"] = str(contrat.fait_le.day).zfill(2)
+
+        if contrat.fait_le is not None:
+            data["signature_date_annee"] = contrat.fait_le.year
+            data["signature_date_mois"] = str(contrat.fait_le.month).zfill(2)
+            data["signature_date_jour"] = str(contrat.fait_le.day).zfill(2)
+
         data["signature_lieu"] = contrat.fait_a
         if contrat.attestation_pieces:
             data["signature_emp_attestation"] = 1
+
         data["formation_intitule"] = formation.intitule_diplome
         data["formation_diplome"] = formation.diplome
         data["formation_diplome_code"] = formation.code_diplome_apprentissage
@@ -872,20 +972,20 @@ class creerCERFA(LoginRequiredMixin, DetailView):
             data["formation_annee3_au_mois"] = str(formation.an_3_au.month).zfill(2)
             data["formation_annee3_au_annee"] = formation.an_3_au.year
 
-        nomfichier = PDFGenerator.generate_pdf_with_datas(data, nom_template="cerfa_10103.pdf", flatten=False, cerfa_pdf=True)
+        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(data, flatten=False)
 
         return redirect("informationmission")
 
 class creerfichemission(LoginRequiredMixin, DetailView):
+
     model = Contrat
 
     def get(self, request, *args, **kwargs):
 
         alternant = Alternant.objects.get(user=request.user)
-        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        contrat = alternant.get_contrat_courant()
         entreprise = contrat.entreprise
         formation = contrat.formation
-        cfa = formation.cfa
 
         try:
             ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
@@ -893,19 +993,22 @@ class creerfichemission(LoginRequiredMixin, DetailView):
             ma_1 = None
 
         data = {}
-        data["numero"] = alternant.adresse_numero
+        if alternant.adresse_numero is not None:
+            data["numero"] = alternant.adresse_numero
         data["voie"] = alternant.adresse_voie
         data["codepostal"] = alternant.code_postal
         data["ville"] = alternant.ville
-        data["neele"] = alternant.date_naissance
+        data["neele"] = alternant.date_naissance.strftime('%d/%m/%Y')
         data["mail"] = request.user.email
         data["telephone"] = alternant.telephone
         data["nomprenom"] = "%s %s" % (alternant.nom, alternant.prenom)
 
         data["raisonsociale"] = entreprise.raison_sociale
-        data["numero2"] = entreprise.adresse_numero
+        if entreprise.adresse_numero is not None:
+            data["numero2"] = entreprise.adresse_numero
         data["voie2"] = entreprise.adresse_voie
-        data["complement2"] = entreprise.adresse_complement
+        if entreprise.adresse_complement is not None:
+            data["complement2"] = entreprise.adresse_complement
         data["codepostal2"] = entreprise.code_postal
         data["ville2"] = entreprise.ville
         data["telephone2"] = entreprise.telephone
@@ -918,6 +1021,11 @@ class creerfichemission(LoginRequiredMixin, DetailView):
 
         data["mission"] = contrat.mission
 
-        nomfichier = PDFGenerator.generate_mission_pdf_with_datas(data, flatten=False)
+        nomfichier = PDFGenerator.generate_mission_pdf_with_datas(data, flatten=True)
+
+        contrat.avis_raf = 1
+        contrat.motif = None
+        contrat.date_envoi_raf = datetime.now()
+        contrat.save
 
         return redirect("informationmission")
