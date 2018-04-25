@@ -23,6 +23,18 @@ class AnneeFormation(object):
         self.periode1 = periode1
         self.periode2 = periode2
 
+    def to_dict(self):
+        ret_dict = {}
+        for i, p in enumerate(self.periode1, self.periode2):
+            period = "periode%d" % (i + 1)
+            ret_dict[period] = {
+                "du": p.du,
+                "au": p.au,
+                "base": p.base,
+                "taux": p.taux
+            }
+        return ret_dict
+
 
 class PeriodesFormationManager(object):
     """
@@ -42,12 +54,19 @@ class PeriodesFormationManager(object):
     :type date_debut_formation: datetime
     """
     def __init__(self, date_naissance_alternant, date_debut_contrat,
-                 duree_formation, date_debut_formation):
+                 duree_formation, date_debut_formation,
+                 annee_remuneration):
         self.date_naissance_alternant = date_naissance_alternant
         self.date_debut_contrat = date_debut_contrat
         self.duree_formation = duree_formation
         self.date_debut_formation = date_debut_formation
-        self.annees = list()
+        self.premiere_annee_remuneration = annee_remuneration - duree_formation + 1
+        self.annees = {
+            "annee1": None,
+            "annee2": None,
+            "annee3": None,
+            "annee4": None,
+        }
 
     def calculer_annees(self, annee_formation=0):
         """
@@ -87,7 +106,8 @@ class PeriodesFormationManager(object):
 
         annee = AnneeFormation(periode1, periode2)
 
-        self.annees.append(annee)
+        annee_en_cours = self.premiere_annee_remuneration + annee_formation
+        self.annees["annee%d" % annee_en_cours] = annee
 
         return self.calculer_annees(annee_formation+1)
 

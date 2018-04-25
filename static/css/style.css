@@ -103,3 +103,15 @@ ul.errorlist {
     margin: 0
 
 }
+
+.popover-content {
+    min-width: 250px;
+}
+
+.ui-datepicker-calendar {
+    z-index: 1;
+}
+
+.input-group .form-control{
+    z-index: 0;
+}

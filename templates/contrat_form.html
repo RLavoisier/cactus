@@ -26,7 +26,9 @@
                         <h5>Date de début de contrat</h5>
                     </div>
                     <div class="col-md-2">
-                        {{  form.date_debut_contrat }}
+                        <div data-toggle="popover" data-trigger="manual" data-placement="bottom"
+                             data-content="Sauf dérogation la date de début de contrat doit être comprise dans la période suivante :
+                                            date de formation moins 3 mois – date de début de formation + 3 mois" id="div_date_debut_contrat">{{  form.date_debut_contrat }}</div>
                     </div>
                     <div class="col-md-4">
                         <h5 align="center">Date de fin de contrat</h5>
@@ -96,7 +98,7 @@
         </fieldset>
 
         <fieldset>
-            <div class="row">
+            <div class="row" id="annee1">
                 <div class="col-md-6 col-externe">
                     <div class="col-md-3">
                         <h5>Première année</h5>
@@ -143,7 +145,7 @@
 
             </div>
 
-            <div class="row">
+            <div class="row" id="annee2">
                 <div class="col-md-6 col-externe">
                     <div class="col-md-3">
                         <h5>Deuxième année</h5>
@@ -189,7 +191,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row" id="annee3">
                 <div class="col-md-6 col-externe">
                     <div class="col-md-3">
                         <h5>Troisième année</h5>
@@ -235,7 +237,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row" id="annee4">
                 <div class="col-md-6 col-externe">
                     <div class="col-md-3">
                         <h5>Quatrième année</h5>
@@ -364,18 +366,32 @@
 
     <script type="text/javascript">
 
-    $("#id_date_debut_contrat").change(function(){
-        $.post(
-            'http://127.0.0.1:8000/api/valider_date_debut_contrat/',
-            {
-                date_saisie: $("#id_date_debut_contrat").val()
-            },
-            function(response){
-                if(!response.success){
-                    alert(response.success);
+    var DOMAIN = "http://127.0.0.1:8001/";
+
+    $(document).ready(function() {
+        // Message d'alerte pour la saisie erronnée d'une date de début de contrat
+
+        $(document).on("click", ".popover-content", function(){
+            $("#div_date_debut_contrat").popover("hide");
+        });
+
+        $("#id_date_debut_contrat").change(function(){
+            $.post(
+                DOMAIN + "api/valider_date_debut_contrat/",
+                {
+                    "date_saisie": $("#id_date_debut_contrat").val()
+                },
+                function(response){
+                    if(!response.success){
+                        $("#div_date_debut_contrat").popover("show");
+                        $("#div_date_debut_contrat").closest("div").addClass("has-error");
+                    } else {
+                        $("#div_date_debut_contrat").popover("hide");
+                        $("#div_date_debut_contrat").closest("div").removeClass("has-error");
+                    }
                 }
-            }
-        );
+            );
+        });
     });
 
     </script>

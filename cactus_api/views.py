@@ -1,15 +1,14 @@
 from datetime import datetime
 
 from django.http import JsonResponse
-from django.shortcuts import render
 from collections import namedtuple
 
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
-from saisiecontrat.models import Alternant, Formation
 from saisiecontrat.utils.fonctions_metier import PeriodesFormationManager
+
 
 ApiResponse = namedtuple("ApiReponse", ("success", "response", "data"))
 
@@ -28,6 +27,7 @@ class ValiderDateDebutContrat(View):
             return JsonResponse(response._asdict())
 
         date_saisie_str = request.POST["date_saisie"]
+        print(date_saisie_str)
 
         # conversion de la date saisie en datetime
         try:
@@ -41,7 +41,9 @@ class ValiderDateDebutContrat(View):
             return JsonResponse(response._asdict())
 
         # récupération de la formation
-        formation = Formation.objects.get(code_formation="1351140684007")
+        # formation = Formation.objects.get(code_formation="1351140684007")
+        contrat = request.user.alternant.get_contrat_courant()
+        formation = contrat.formation
 
         try:
             debut_contrat_valide = PeriodesFormationManager.controle_debut_contrat(date_saisie,
@@ -60,4 +62,11 @@ class ValiderDateDebutContrat(View):
             )
 
         return JsonResponse(response._asdict())
-        
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class RecupererAnneesFormations(View):
+    """
+    Cette vue permet de récupérer les différentes années de formations ainsi que les valeurs associées
+    """
+    pass
