@@ -9,7 +9,7 @@ class Periode(object):
     """
     Cette class represente une période de formation
     """
-    def __init__(self, du, au, base=0, taux=0):
+    def __init__(self, du=None, au=None, base=0, taux=0):
         self.du = du
         self.au = au
         self.base = base
@@ -25,11 +25,13 @@ class AnneeFormation(object):
 
     def to_dict(self):
         ret_dict = {}
-        for i, p in enumerate(self.periode1, self.periode2):
+        for i, p in enumerate([self.periode1, self.periode2]):
             period = "periode%d" % (i + 1)
+            if not p:
+                continue
             ret_dict[period] = {
-                "du": p.du,
-                "au": p.au,
+                "du": p.du.strftime("%d/%m/%y"),
+                "au": p.au.strftime("%d/%m/%y"),
                 "base": p.base,
                 "taux": p.taux
             }
@@ -47,20 +49,24 @@ class PeriodesFormationManager(object):
     :param date_debut_contrat: la date de début du contrat
     :type date_debut_contrat: datetime
 
+    param date_fin_contrat: la date de fin du contrat
+    :type date_fin_contrat: datetime
+
     :param duree_formation: La durée de la formation
     :type duree_formation: int
 
-    :param date_debut_formation: la date de début de la formation
-    :type date_debut_formation: datetime
+    :param formation: l'objet formation
+    :type formation: Formation
     """
     def __init__(self, date_naissance_alternant, date_debut_contrat,
-                 duree_formation, date_debut_formation,
-                 annee_remuneration):
+                 date_fin_contrat, duree_formation, formation):
         self.date_naissance_alternant = date_naissance_alternant
         self.date_debut_contrat = date_debut_contrat
+        self.date_fin_contrat = date_fin_contrat
         self.duree_formation = duree_formation
-        self.date_debut_formation = date_debut_formation
-        self.premiere_annee_remuneration = annee_remuneration - duree_formation + 1
+        self.formation = formation
+        self.date_fin_formation = formation.an_3_du or formation.an_2_du or formation.an_1_du
+        self.premiere_annee_remuneration = self.formation.annee_remuneration_annee_diplome - duree_formation + 1
         self.annees = {
             "annee1": None,
             "annee2": None,
@@ -72,11 +78,23 @@ class PeriodesFormationManager(object):
         """
         Cette méthode calcul l'ensemble des années de formation
         """
-        # Si annee est égale à l'annee de dilome, on sort
-        if annee_formation == self.duree_formation:
-            return
 
         date_debut_annee = self.date_debut_contrat + relativedelta(years=annee_formation)
+
+        date_fin_annee = date_debut_annee + relativedelta(years=1)
+
+        annee_en_cours = self.premiere_annee_remuneration + annee_formation
+
+        # Si annee est égale à l'annee de diplome, on sort
+        if (annee_formation == self.duree_formation) and \
+                (self.date_fin_contrat.date() > self.date_fin_formation):
+            # On ajoute juste un année avec une seule période jusqu'à la fin du contrat
+            age_alternant = self.__age_alternant_a_date(date_debut_annee)
+            taux = self.__get_minima_taux(age_alternant, annee_en_cours)
+            periode1 = Periode(date_debut_annee, self.date_fin_contrat, taux=taux)
+            annee = AnneeFormation(periode1, None)
+            self.annees["annee%d" % annee_en_cours] = annee.to_dict()
+            return
 
         date_fin_annee = date_debut_annee + relativedelta(years=1)
 
@@ -97,22 +115,53 @@ class PeriodesFormationManager(object):
                                              month=3,
                                              year=date_debut_annee.year) - timedelta(days=1)
 
-        periode1 = Periode(date_debut_annee, date_fin_periode1)
 
+        # Calcul de l'âge de l'aternant
+        age_alternant = self.__age_alternant_a_date(date_debut_annee)
+
+        # On récupère l'object minima concerné
+        taux_minimum = self.__get_minima_taux(age_alternant,
+                                              annee_en_cours)
+
+        # Création de la période
+        periode1 = Periode(date_debut_annee, date_fin_periode1,
+                           taux=taux_minimum)
 
         # Calcul de la seconde période
-        periode2 = Periode(date_fin_periode1 + timedelta(days=1),
-                           date_fin_annee - timedelta(days=1))
+        taux_minimum = self.__get_minima_taux(age_alternant+1,
+                                              annee_en_cours)
 
+        periode2 = Periode(date_fin_periode1 + timedelta(days=1),
+                           date_fin_annee - timedelta(days=1),
+                           taux=taux_minimum)
+
+        # Création de la période
         annee = AnneeFormation(periode1, periode2)
 
-        annee_en_cours = self.premiere_annee_remuneration + annee_formation
-        self.annees["annee%d" % annee_en_cours] = annee
+        self.annees["annee%d" % annee_en_cours] = annee.to_dict()
 
         return self.calculer_annees(annee_formation+1)
 
-        #age_alternant = self.__age_alternant_a_date(self.date_debut_contrat)
-        #minima = Minima.objects.get()
+    @staticmethod
+    def __get_minima_taux(age, annee):
+        """
+        Cette méthode récupère le minima correspondant à l'age et l'année passée en argument
+        :param age:
+        :param annee:
+        :return:
+        """
+        try:
+            minima = Minima.objects.filter(age__lte=age,
+                                           annee__lte=annee).order_by("-annee", "-age")[0]
+
+            print("Taux Minima pour annee %d - age %d : %s (id: %s)" % (annee,
+                                                                        age,
+                                                                        minima.taux_minimum,
+                                                                        minima.id))
+
+            return minima.taux_minimum
+        except:
+            return 0
 
     def __age_alternant_a_date(self, date_base):
         """
@@ -151,4 +200,26 @@ class PeriodesFormationManager(object):
         min_debut_contrat = date_debut_formation - relativedelta(months=3)
         max_debut_contrat = date_debut_formation + relativedelta(months=3)
 
-        return (min_debut_contrat < date_debut_contrat) & (date_debut_contrat < max_debut_contrat)
+        return (min_debut_contrat <= date_debut_contrat) & (date_debut_contrat <= max_debut_contrat)
+
+
+    @classmethod
+    def controle_fin_contrat(self, date_fin_contrat, date_fin_formation):
+        """
+        Cette méthode vérifie si la date de fin de contrat est valide selon la règle :
+
+        date_fin_formation < contrat.date_fin_contrat <= date_fin_formation + 2 mois
+
+        :param date_fin_contrat: la date de fin de contrat
+        :type date_fin_contrat; datetime
+
+        :param date_fin_formation: la date de fin de formation
+        :type date_fin_formation: datetime
+
+        :return: Valid
+        :type: bool
+        """
+        min_fin_contrat = date_fin_formation + relativedelta(days=1)
+        max_fin_contrat = date_fin_formation + relativedelta(months=2)
+
+        return (min_fin_contrat <= date_fin_contrat) & (date_fin_contrat <= max_fin_contrat)
