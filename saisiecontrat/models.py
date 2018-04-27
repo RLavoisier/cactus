@@ -436,7 +436,7 @@ class Contrat(models.Model):
         (1, "Mission en attente de validation par le responsable de formation "),
         (2, "Mission validée par le responsable de formation"),
         (3, "Le responsable de formation a émis des réserves sur la mission"),
-        (4, "Le responsable a rejeté cette mission"),
+        (4, "Le responsable de formation a rejeté cette mission"),
     )
 
     id = models.AutoField(primary_key=True)
@@ -508,6 +508,7 @@ class Contrat(models.Model):
     contrat_courant = models.BooleanField(default=True)
     avis_raf = models.PositiveSmallIntegerField(choices=AVIS_RAF, default=0)
     motif = models.TextField(blank=True, null=True)
+    date_validation_raf = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return "Contrat %i" % self.id

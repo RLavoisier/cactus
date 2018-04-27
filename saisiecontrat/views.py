@@ -9,10 +9,13 @@ from django.db.models import Min, Max
 from django.shortcuts import render, redirect
 from datetime import datetime
 
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView
 
-from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm, CreationAlternantForm, InformationContratForm, InformationMissionForm
+from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm, CreationAlternantForm, InformationContratForm, InformationMissionForm, ValidationMissionForm
 from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel, Formation, CFA
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -176,14 +179,14 @@ def create_entreprise(request):
                                       civilite=request.POST.get("civilite_ma_1"),
                                       nom=request.POST.get("nom_ma_1"),
                                       prenom=request.POST.get("prenom_ma_1"),
-                                      date_naissance=request.POST.get("date_naissance_ma_1"),
+                                      date_naissance=form.cleaned_data["date_naissance_ma_1"],
                                       role=2)
                 personnel.save()
             else:
                 personnel.civilite = request.POST.get("civilite_ma_1")
                 personnel.nom = request.POST.get("nom_ma_1")
                 personnel.prenom = request.POST.get("prenom_ma_1")
-                personnel.date_naissance = request.POST.get("date_naissance_ma_1")
+                personnel.date_naissance = form.cleaned_data["date_naissance_ma_1"]
                 personnel.save()
 
             if request.POST.get("nom_ma_2") is None:
@@ -197,14 +200,14 @@ def create_entreprise(request):
                                           civilite=request.POST.get("civilite_ma_2"),
                                           nom=request.POST.get("nom_ma_2"),
                                           prenom=request.POST.get("prenom_ma_2"),
-                                          date_naissance=request.POST.get("date_naissance_ma_2"),
+                                          date_naissance=form.cleaned_data["date_naissance_ma_2"],
                                           role=3)
                     personnel.save()
                 else:
                     personnel.civilite = request.POST.get("civilite_ma_2")
                     personnel.nom = request.POST.get("nom_ma_2")
                     personnel.prenom = request.POST.get("prenom_ma_2")
-                    personnel.date_naissance = request.POST.get("date_naissance_ma_2")
+                    personnel.date_naissance = form.cleaned_data["date_naissance_ma_2"]
                     personnel.save()
 
             if request.POST.get("nom_contact") is None:
@@ -336,24 +339,9 @@ def create_alternant(request):
             alternant.date_maj = datetime.now()
             alternant.save()
 
-            #alternant.secteur_employeur = int(form.data.get("type_employeur")[1])
-            #alternant.save()
-
-            # Pour l'exemple, lorsque nous gererons les sessions et le contrat en cours
-            # Nous pourrons venir rattacher la societé au contrat de cette manière :
-            #id_contrat = request.session.get("id_contrat")
-            #if id_contrat:
-            #    # Récupération du contrat en base de donnée
-            #    contrat = Contrat.objects.get(id=id_contrat)
-            #    # Rattachement de l'entreprise
-            #    contrat.entreprise = entreprise
-            #    # Sauvegarde du contrat
-            #    contrat.save()
-
-            #return redirect("creationalternant")
-
             context["form"] = form
             context["contrat"] = contrat
+            context["nationalite"] = alternant.nationalite
 
             return render(request, "alternant_form.html", context)
         else:
@@ -470,6 +458,20 @@ def inform_contrat(request):
         context["contrat"]=contrat
 
         return render(request, "contrat_form.html", context)
+
+def cerfa(request):
+
+    if not request.user.is_authenticated:
+        # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
+        return redirect("comptes:login")
+
+    context={}
+
+    contrat = request.user.alternant.get_contrat_courant()
+
+    context["contrat"] = contrat
+
+    return render(request, "cerfa_form.html", context)
 
 
 def inform_mission(request):
@@ -974,7 +976,7 @@ class creerCERFA(LoginRequiredMixin, DetailView):
 
         nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(data, flatten=False)
 
-        return redirect("informationmission")
+        return redirect("cerfa")
 
 class creerfichemission(LoginRequiredMixin, DetailView):
 
@@ -1020,12 +1022,184 @@ class creerfichemission(LoginRequiredMixin, DetailView):
             data["maitredapprentissage"] = "%s %s" % (ma_1.nom, ma_1.prenom)
 
         data["mission"] = contrat.mission
+        filename = "Fiche mission%s%s.pdf" % (alternant.nom, alternant.prenom)
+        filename = filename.replace(' ', '')
 
-        nomfichier = PDFGenerator.generate_mission_pdf_with_datas(data, flatten=True)
+        nomfichier = PDFGenerator.generate_mission_pdf_with_datas(filename, data, flatten=True)
+
+        context={}
+        context["alternant"]=alternant
+
+        msg_plain = render_to_string('information_raf.html', context)
+        msg_html = render_to_string('information_raf.html', context)
+
+        print(formation.courriel_raf)
+        send_mail(
+            filename,
+            msg_plain,
+            'cactus.test.tg@gmail.com',
+            [formation.courriel_raf],
+            msg_html
+        )
 
         contrat.avis_raf = 1
         contrat.motif = None
         contrat.date_envoi_raf = datetime.now()
-        contrat.save
+        contrat.save()
 
         return redirect("informationmission")
+
+def validationmission(request):
+
+    context={}
+    message = ''
+
+    if len(request.POST) > 0:
+
+        # On créé le formulaire en lui passant le contenu du post
+        # Comme c'est un formulaire modèle, cela prépare également un objet de base de donnée
+
+        form = ValidationMissionForm(request.POST)
+
+        if form.is_valid():
+
+            contrat = Contrat.objects.get(contrat_courant=True)
+
+            if contrat.avis_raf == 2 or contrat.avis_raf == 3 or contrat.avis_raf == 4:
+                message = "Un avis a déjà été enregistré sur cette mission."
+            else:
+                contrat.motif = form.cleaned_data["motif"]
+                contrat.avis_raf = form.cleaned_data["validation"]
+                contrat.date_validation_raf=datetime.now()
+                contrat.save()
+                message = "Votre avis a bien été pris en compte. Un mail est en cours d'achemenement vers le(la) candidat(e)."
+    else:
+        contrat = Contrat.objects.get(contrat_courant=True)
+        form = ValidationMissionForm(instance=contrat)
+
+    context["form"] = form
+    context["contrat"] = contrat
+    context["nom_alternant"]=contrat.alternant.nom
+    context["prenom_alternant"]=contrat.alternant.prenom
+    if message is not None:
+        context["message"]=message
+
+    return render(request, "validation_mission_form.html", context)
+
+
+class envoifichemission(LoginRequiredMixin, DetailView):
+
+    model = Contrat
+
+    def get(self, request, *args, **kwargs):
+
+        alternant = Alternant.objects.get(user=request.user)
+        contrat = alternant.get_contrat_courant()
+        entreprise = contrat.entreprise
+        formation = contrat.formation
+
+        try:
+            ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
+        except ObjectDoesNotExist:
+            ma_1 = None
+
+        data = {}
+
+        # PRODUIRE LA FICHE MISSION -------------------------------------------------------------------------------
+
+        context={}
+        context["alternant"]=alternant
+
+        msg_plain = render_to_string('information_raf.html', context)
+        msg_html = render_to_string('information_raf.html', context)
+
+        send_mail(
+            filename,
+            msg_plain,
+            cactus.test.tg@gmail.com,
+            [formation.courriel_raf],
+            html_message=msg_html,
+        )
+
+        contrat.avis_raf = 1
+        contrat.motif = None
+        contrat.date_envoi_raf = datetime.now()
+        contrat.save()
+
+class recapinscriptions(LoginRequiredMixin, DetailView):
+
+    model = Contrat
+
+    def get(self, request, *args, **kwargs):
+
+        alternant = Alternant.objects.get(user=request.user)
+        contrat = alternant.get_contrat_courant()
+        entreprise = contrat.entreprise
+        formation = contrat.formation
+
+        try:
+            ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
+        except ObjectDoesNotExist:
+            ma_1 = None
+
+        data = {}
+
+        # PRODUIRE LA FICHE MISSION -------------------------------------------------------------------------------
+
+        context={}
+        context["alternant"]=alternant
+
+        msg_plain = render_to_string('information_raf.html', context)
+        msg_html = render_to_string('information_raf.html', context)
+
+        send_mail(
+            filename,
+            msg_plain,
+            cactus.test.tg@gmail.com,
+            [formation.courriel_raf],
+            html_message=msg_html,
+        )
+
+        contrat.avis_raf = 1
+        contrat.motif = None
+        contrat.date_envoi_raf = datetime.now()
+        contrat.save()
+
+class fichierinscriptions(LoginRequiredMixin, DetailView):
+
+    model = Contrat
+
+    def get(self, request, *args, **kwargs):
+
+        alternant = Alternant.objects.get(user=request.user)
+        contrat = alternant.get_contrat_courant()
+        entreprise = contrat.entreprise
+        formation = contrat.formation
+
+        try:
+            ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
+        except ObjectDoesNotExist:
+            ma_1 = None
+
+        data = {}
+
+        # PRODUIRE LA FICHE MISSION -------------------------------------------------------------------------------
+
+        context={}
+        context["alternant"]=alternant
+
+        msg_plain = render_to_string('information_raf.html', context)
+        msg_html = render_to_string('information_raf.html', context)
+
+        send_mail(
+            filename,
+            msg_plain,
+            cactus.test.tg@gmail.com,
+            [formation.courriel_raf],
+            html_message=msg_html,
+        )
+
+        contrat.avis_raf = 1
+        contrat.motif = None
+        contrat.date_envoi_raf = datetime.now()
+        contrat.save()

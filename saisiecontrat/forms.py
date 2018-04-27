@@ -67,13 +67,13 @@ class CreationEntrepriseForm(forms.ModelForm):
     civilite_ma_1 = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE, attrs={"class": "form-control"}))
     nom_ma_1 = forms.CharField(max_length=40, widget=forms.TextInput(attrs={"class": "form-control"}))
     prenom_ma_1 = forms.CharField(max_length=40, widget=forms.TextInput(attrs={"class": "form-control"}))
-    date_naissance_ma_1 = forms.DateField(widget=forms.DateInput(attrs={"class": "datepicker form-control"},
-                                                                format="%d/%m/%y"))
+    date_naissance_ma_1 = forms.DateField(widget=forms.DateInput(attrs={"class": "datepickeryyyy form-control"},
+                                                                format="%d/%m/%Y"))
     civilite_ma_2 = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE, attrs={"class": "form-control"}))
     nom_ma_2= forms.CharField(max_length=40, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
     prenom_ma_2 = forms.CharField(max_length=40, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
-    date_naissance_ma_2 = forms.DateField(required=False, widget=forms.DateInput(attrs={"class": "datepicker form-control"},
-                                                                format="%d/%m/%y"))
+    date_naissance_ma_2 = forms.DateField(required=False, widget=forms.DateInput(attrs={"class": "datepickeryyyy form-control"},
+                                                                format="%d/%m/%Y"))
     civilite_contact = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE, attrs={"class": "form-control"}))
     nom_contact = forms.CharField(max_length=40, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
     prenom_contact = forms.CharField(max_length=40, required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
@@ -315,7 +315,7 @@ class CreationAlternantForm(forms.ModelForm):
             "handicape": forms.CheckboxInput(),
             "numero_departement_naissance": forms.Select(attrs={"class": "form-control"}),
             "sexe": forms.Select(attrs={"class": "form-control"}),
-            "date_naissance": forms.DateInput(attrs={"class": "form-control datepicker"}, format="%d/%m/%y"),
+            "date_naissance": forms.DateInput(attrs={"class": "form-control datepickeryyyy"}, format="%d/%m/%Y"),
             "commune_naissance": forms.TextInput(attrs={"class": "form-control"}),
             "nationalite": forms.Select(attrs={"class": "form-control"}),
             "regime_social": forms.Select(attrs={"class": "form-control"}),
@@ -621,4 +621,45 @@ class InformationMissionForm(forms.ModelForm):
             raise forms.ValidationError("Vous devez saisir une mission.")
         else:
             return mission
+
+class ValidationMissionForm(forms.ModelForm):
+
+    CHOIX = [
+        (2, "Mission validée"),
+        (3, "Réserve"),
+        (4, "Rejet")
+    ]
+
+    validation = forms.ChoiceField(choices=CHOIX, widget=forms.RadioSelect())
+
+    class Meta:
+        """
+        Cette classe est propre au form de type "Model Form"
+        On y paramètre toutes les informations du modèle lié ainsi que la définition des champs
+        """
+        model = Contrat
+        fields = ['motif']
+
+        widgets = {
+            "motif": forms.Textarea(attrs={"class": "form-control"}),
+        }
+
+    def clean_validation(self):
+
+        validation = self.cleaned_data.get("validation")
+
+        if validation is None:
+            raise forms.ValidationError("Vous n'avez pas coché d'avis")
+        else:
+            return validation
+
+    def clean_motif(self):
+
+        validation = self.cleaned_data.get("validation")
+        motif = self.cleaned_data.get("motif")
+
+        if (validation == 3 or validation == 4) and len(motif) == 0:
+            raise forms.ValidationError("Vous devez saisir un motif en cas de réserve ou de rejet.")
+        else:
+            return motif
 

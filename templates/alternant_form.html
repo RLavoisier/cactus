@@ -4,8 +4,7 @@
     <form action="{% url 'creationalternant' %}" method="post">
     {% csrf_token %}
 
-    {% if form.nationalite == "3" %}
-        <br />
+    {% if nationalite == 3 %}
         <h5>
         Attention : si vous êtes ressortissants hors UE, pour conclure un contrat d’apprentissage, vous devez avoir l’autorisation pour travailler à temps complet.<br />
         Cette autorisation est déjà valable pour les détenteurs des titres de séjour suivants :<br />
@@ -49,7 +48,7 @@
                     <div class="col-md-4">
                         <h5>Date de naissance</h5>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         {{ form.date_naissance }}
                     </div>
                     <div class="col-md-2">
@@ -289,7 +288,7 @@
         </fieldset>
 
     <p>
-        <input type="submit" value="Valider" />
+        <input type="submit" class="btn btn-success" value="Valider" />
     </p>
 
 </form>

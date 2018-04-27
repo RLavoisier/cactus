@@ -33,7 +33,7 @@ class PDFGenerator:
 
 
     @classmethod
-    def generate_mission_pdf_with_datas(cls, input_datas, flatten=True):
+    def generate_mission_pdf_with_datas(cls, filename, input_datas, flatten=True):
         """
         Cette méthode génère un pdf avec les données passées en argument
 
@@ -44,10 +44,10 @@ class PDFGenerator:
         :rtype: str
         """
         template_pdf = os.path.join(settings.TEMPLATE_DIR, "pdf", "fiche_mission.pdf")
-        return cls.__fill_pdf(template_pdf, input_datas, flatten)
+        return cls.__fill_pdf(filename, template_pdf, input_datas, flatten)
 
     @classmethod
-    def __fill_pdf(cls, template, datas, flatten=True):
+    def __fill_pdf(cls, filename, template, datas, flatten=True):
         """
         Cette méthode injecte les données dans le template pdf passé en argument
 
@@ -57,7 +57,7 @@ class PDFGenerator:
         :return:
         """
         # génération du nom de fichier
-        filename = "%s.pdf" % str(uuid.uuid4())
+        #filename = "%s.pdf" % str(uuid.uuid4())
 
         # génération du chemin complet vers le fichier
         output_file_path = os.path.join(cls.OUTPUT_DIR, filename)
