@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.contrib.auth.models import User
@@ -185,6 +187,7 @@ class Alternant(models.Model):
 
     # Le related name permet de renvoyer l'alternant depuis le user avec la syntaxe user.alternant
     user = models.OneToOneField(User,on_delete=models.CASCADE, primary_key=True, related_name="alternant")
+    hash = models.CharField(default=str(uuid4()), max_length=50)
     nom = models.CharField(max_length=70, blank=True, null=True)
     prenom = models.CharField(verbose_name="Prénom", max_length=35, blank=True, null=True)
     sexe = models.CharField(max_length=1, choices=SEXE, default='M')
@@ -217,6 +220,10 @@ class Alternant(models.Model):
     code_postal_representant = models.CharField(verbose_name="Code postal", max_length=5, blank=True, null=True)
     ville_representant = models.CharField(max_length=60, blank=True, null=True)
     date_maj = models.DateTimeField(default=datetime.datetime.now())
+
+    @property
+    def contrat_courant(self):
+        return self.get_contrat_courant()
 
     def get_contrat_courant(self):
         """
@@ -365,6 +372,7 @@ class Formation(models.Model):
     )
 
     code_formation = models.CharField(max_length=14, primary_key=True)
+    hash = models.CharField(default=str(uuid4()), max_length=50)
     cfa = models.ForeignKey(CFA, on_delete=models.CASCADE)
     intitule_formation = models.CharField(max_length=150,blank=True, null=True)
     ville = models.CharField(max_length=35,blank=True, null=True)

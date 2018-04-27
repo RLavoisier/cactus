@@ -11,6 +11,7 @@ from datetime import datetime
 
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.urls import reverse
 
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView
@@ -19,6 +20,7 @@ from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm, Cre
 from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel, Formation, CFA
 from django.core.exceptions import ObjectDoesNotExist
 
+from saisiecontrat.utils.helper import generer_data_pour_pdf_mission
 from saisiecontrat.utils.pdf_generator import PDFGenerator
 
 
@@ -978,81 +980,63 @@ class creerCERFA(LoginRequiredMixin, DetailView):
 
         return redirect("cerfa")
 
-class creerfichemission(LoginRequiredMixin, DetailView):
 
-    model = Contrat
+def envoyervalidationraf(request):
 
-    def get(self, request, *args, **kwargs):
+    alternant = request.user.alternant
+    contrat = alternant.get_contrat_courant()
 
-        alternant = Alternant.objects.get(user=request.user)
-        contrat = alternant.get_contrat_courant()
-        entreprise = contrat.entreprise
-        formation = contrat.formation
+    creerfichemission(request, alternant.hash)
 
-        try:
-            ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
-        except ObjectDoesNotExist:
-            ma_1 = None
+    contrat.avis_raf = 1
+    contrat.motif = None
+    contrat.date_envoi_raf = datetime.now()
+    contrat.save()
 
-        data = {}
-        if alternant.adresse_numero is not None:
-            data["numero"] = alternant.adresse_numero
-        data["voie"] = alternant.adresse_voie
-        data["codepostal"] = alternant.code_postal
-        data["ville"] = alternant.ville
-        data["neele"] = alternant.date_naissance.strftime('%d/%m/%Y')
-        data["mail"] = request.user.email
-        data["telephone"] = alternant.telephone
-        data["nomprenom"] = "%s %s" % (alternant.nom, alternant.prenom)
+    return redirect("informationmission")
 
-        data["raisonsociale"] = entreprise.raison_sociale
-        if entreprise.adresse_numero is not None:
-            data["numero2"] = entreprise.adresse_numero
-        data["voie2"] = entreprise.adresse_voie
-        if entreprise.adresse_complement is not None:
-            data["complement2"] = entreprise.adresse_complement
-        data["codepostal2"] = entreprise.code_postal
-        data["ville2"] = entreprise.ville
-        data["telephone2"] = entreprise.telephone
-        data["mail2"] = entreprise.courriel
-        data["siret"] = entreprise.numero_SIRET
-        data["codeape"] = entreprise.code_APE
+def creerfichemission(request, alternant_hash):
 
-        if ma_1 is not None:
-            data["maitredapprentissage"] = "%s %s" % (ma_1.nom, ma_1.prenom)
+    alternant = Alternant.objects.get(hash=alternant_hash)
+    contrat = alternant.get_contrat_courant()
+    entreprise = contrat.entreprise
+    formation = contrat.formation
 
-        data["mission"] = contrat.mission
-        filename = "Fiche mission%s%s.pdf" % (alternant.nom, alternant.prenom)
-        filename = filename.replace(' ', '')
+    try:
+        ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
+    except ObjectDoesNotExist:
+        ma_1 = None
 
-        nomfichier = PDFGenerator.generate_mission_pdf_with_datas(filename, data, flatten=True)
+    data = generer_data_pour_pdf_mission(alternant, alternant.user.email, entreprise, ma_1, contrat)
 
-        context={}
-        context["alternant"]=alternant
+    filename = "Fiche mission %s %s.pdf" % (alternant.nom, alternant.prenom)
+    filename = filename.replace(' ', '_')
 
-        msg_plain = render_to_string('information_raf.html', context)
-        msg_html = render_to_string('information_raf.html', context)
+    nomfichier = PDFGenerator.generate_mission_pdf_with_datas(filename, data, flatten=True)
 
-        print(formation.courriel_raf)
-        send_mail(
-            filename,
-            msg_plain,
-            'cactus.test.tg@gmail.com',
-            [formation.courriel_raf],
-            msg_html
-        )
+    context={}
+    context["alternant"]=alternant
 
-        contrat.avis_raf = 1
-        contrat.motif = None
-        contrat.date_envoi_raf = datetime.now()
-        contrat.save()
+    msg_plain = render_to_string('information_raf.html', context)
+    msg_html = render_to_string('information_raf.html', context)
 
-        return redirect("informationmission")
+    print(formation.courriel_raf)
+    send_mail(
+        'TOTO',
+        msg_plain,
+        'cactus.test.tg@gmail.com',
+        [formation.courriel_raf],
+        html_message=msg_html
+    )
 
-def validationmission(request):
+
+
+def validationmission(request, alternant_hash):
 
     context={}
     message = ''
+
+    print(request.build_absolute_uri(reverse("validationmission", kwargs={"alternant_hash": alternant_hash})))
 
     if len(request.POST) > 0:
 

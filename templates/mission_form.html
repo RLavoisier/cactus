@@ -89,7 +89,7 @@
             <div class="row">
                 <div class="col-md-12 col-externe">
                     <div class="col-md-12">
-                        <h5><a class="btn btn-primary" href="{% url 'validationmission' %}">Validation mission SUPPRIMER</a></h5>
+                        <h5><a class="btn btn-primary" href="{{ request.build_absolute_uri }}{% url 'validationmission' alternant.hash %}">Validation mission SUPPRIMER</a></h5>
                     </div>
                 </div>
             </div>
