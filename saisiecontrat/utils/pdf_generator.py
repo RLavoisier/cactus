@@ -12,7 +12,7 @@ class PDFGenerator:
     OUTPUT_DIR = os.path.join(settings.BASE_DIR, "pdf_outputs")
 
     @classmethod
-    def generate_cerfa_pdf_with_datas(cls, input_datas, flatten=True):
+    def generate_cerfa_pdf_with_datas(cls, filename, input_datas, flatten=True):
         """
         Cette méthode prends en argument un dictionnaire contenant les nom des champs
         du pdf et les valeurs à injecter
@@ -29,7 +29,7 @@ class PDFGenerator:
         # Transformation des nom de champ du dictionnaire
         formatted_datas = cls.__format_input_datas_dict(input_datas)
 
-        return cls.__fill_pdf(cerfa_pdf, formatted_datas, flatten)
+        return cls.__fill_pdf(filename, cerfa_pdf, formatted_datas, flatten)
 
 
     @classmethod

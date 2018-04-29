@@ -21,7 +21,7 @@
       <ul>
       {% for a in alternants %}
           <li>
-             <a href="{{ request.scheme }}://{{ request.get_host }}/{% url 'validationmission' a.hash %}">{{ a.prenom }} {{ a.nom }}</a> <a href="{% url 'envoyerficheraf' a.hash %}">Fiche de mission</a>
+             <a href="{{ request.scheme }}://{{ request.get_host }}/validationmission/{{ a.hash }}">{{ a.prenom }} {{ a.nom }}</a> <a href="{{ request.scheme }}://{{ request.get_host }}/{% url 'envoyerficheraf' a.hash %}">Fiche de mission</a>
           </li>
       {% endfor %}
       </ul>

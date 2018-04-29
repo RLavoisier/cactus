@@ -1,5 +1,7 @@
+import os
 
-from django.core.mail import send_mail
+from django.conf import settings
+from django.core.mail import send_mail, EmailMessage
 from django.template.loader import render_to_string
 from saisiecontrat.models import  Alternant,  Personnel, Contrat
 from django.core.exceptions import ObjectDoesNotExist
@@ -74,14 +76,21 @@ def creerfichemission(request,alternant_hash):
     msg_plain = render_to_string('information_raf.html', context)
     msg_html = render_to_string('information_raf.html', context)
 
-    send_mail(
+    email = EmailMessage(
         "Fiche mission de %s %s.pdf" % (alternant.nom, alternant.prenom),
-        msg_plain,
+        msg_html,
         'cactus.test.tg@gmail.com',
         [formation.courriel_raf],
-        html_message=msg_html
     )
 
+    email.attach(nomfichier, os.path.join(settings.PDF_OUTPUT_DIR, nomfichier), "application/pdf")
+
+    email.send(fail_silently=True)
+
+    try:
+        os.remove(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
+    except:
+        pass
 
 def creerrecapinscriptions(formation_hash):
 

@@ -1,11 +1,13 @@
 # coding: utf-8
-
+import os
 import re
 from copy import deepcopy
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Min, Max
+from django.http import HttpResponse
 
 from django.shortcuts import render, redirect
 from datetime import datetime
@@ -13,6 +15,7 @@ from datetime import datetime
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.encoding import smart_str
 
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView
@@ -559,9 +562,6 @@ class liste_formation(LoginRequiredMixin, ListView):
         contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
         context["contrat"] = contrat
 
-        messages.add_message(self.request, messages.SUCCESS, "Coucou")
-        messages.add_message(self.request, messages.ERROR, "Coucou")
-
         return context
 
     def get_queryset(self):
@@ -995,9 +995,13 @@ class creerCERFA(LoginRequiredMixin, DetailView):
             data["formation_annee3_au_mois"] = str(formation.an_3_au.month).zfill(2)
             data["formation_annee3_au_annee"] = formation.an_3_au.year
 
-        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(data, flatten=False)
+        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas("test.pdf", data, flatten=False)
 
-        return redirect("cerfa")
+        response = HttpResponse(
+            content_type='application/force-download')
+        response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(nomfichier)
+        response['X-Sendfile'] = smart_str(os.path.join(settings.BASE_DIR, "pdf_outputs", nomfichier))
+        return response
 
 
 def envoyermailvalidationraf(request):
@@ -1007,12 +1011,14 @@ def envoyermailvalidationraf(request):
     alternant = request.user.alternant
     contrat = alternant.get_contrat_courant()
 
-    creerfichemission(creerfichemission, alternant.hash)
+    creerfichemission(request, alternant.hash)
 
     contrat.avis_raf = 1
     contrat.motif = None
     contrat.date_envoi_raf = datetime.now()
     contrat.save()
+
+    messages.add_message(request, messages.SUCCESS, "Message de validation envoyé.")
 
     return redirect("informationmission")
 
@@ -1030,7 +1036,6 @@ def envoyerficheraf(request, alternant_hash):
 def validationmission(request, alternant_hash):
 
     context={}
-    message = ''
 
     print(request.build_absolute_uri(reverse("validationmission", kwargs={"alternant_hash": alternant_hash})))
 
@@ -1052,7 +1057,9 @@ def validationmission(request, alternant_hash):
                 contrat.avis_raf = form.cleaned_data["validation"]
                 contrat.date_validation_raf=datetime.now()
                 contrat.save()
-                message = "Votre avis a bien été pris en compte. Un mail est en cours d'achemenement vers le(la) candidat(e)."
+
+                messages.add_message(request, messages.SUCCESS, "Mission validée")
+
     else:
         contrat = Contrat.objects.get(contrat_courant=True)
         form = ValidationMissionForm(instance=contrat)
@@ -1061,8 +1068,6 @@ def validationmission(request, alternant_hash):
     context["contrat"] = contrat
     context["nom_alternant"]=contrat.alternant.nom
     context["prenom_alternant"]=contrat.alternant.prenom
-    if message is not None:
-        context["message"]=message
 
     return render(request, "validation_mission_form.html", context)
 
