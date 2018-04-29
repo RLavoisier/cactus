@@ -1,30 +1,26 @@
 # coding: utf-8
-import os
-import re
 from copy import deepcopy
 
-from django.conf import settings
+import os
+from wsgiref.util import FileWrapper
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Min, Max
 from django.http import HttpResponse
 
 from django.shortcuts import render, redirect
 from datetime import datetime
 
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.encoding import smart_str
 
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, DetailView
 
+from django.conf import settings
 from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm, CreationAlternantForm, InformationContratForm, InformationMissionForm, ValidationMissionForm
 from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel, Formation, CFA
 from django.core.exceptions import ObjectDoesNotExist
 
-from saisiecontrat.utils.helper import generer_data_pour_pdf_mission,creerfichemission
+from saisiecontrat.utils.helper import creerfichemission
 from saisiecontrat.utils.pdf_generator import PDFGenerator
 
 
@@ -138,15 +134,15 @@ def create_entreprise(request):
         # Comme c'est un formulaire modèle, cela prépare également un objet de base de donnée
         form = CreationEntrepriseForm(request.POST)
 
+        alternant = Alternant(user=request.user)
+        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        entreprise = contrat.entreprise
 
         if form.is_valid():
 
             # Ici, on sauvegarde le formulaire, ce qui nous renvoie automatiquement
             # un nouvel objet entreprise
 
-            alternant = Alternant(user=request.user)
-            contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
-            entreprise = contrat.entreprise
 
             entreprise.raison_sociale = form.cleaned_data["raison_sociale"]
             entreprise.numero_SIRET = form.cleaned_data["numero_SIRET"]
@@ -997,11 +993,11 @@ class creerCERFA(LoginRequiredMixin, DetailView):
 
         nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas("test.pdf", data, flatten=False)
 
-        response = HttpResponse(
-            content_type='application/force-download')
-        response['Content-Disposition'] = 'attachment; filename=%s' % smart_str(nomfichier)
-        response['X-Sendfile'] = smart_str(os.path.join(settings.BASE_DIR, "pdf_outputs", nomfichier))
-        return response
+
+        with open(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier), "rb") as file:
+            response = HttpResponse(FileWrapper(file), content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename=%s' % nomfichier
+            return response
 
 
 def envoyermailvalidationraf(request):
