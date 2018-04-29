@@ -1,7 +1,7 @@
 import os
 
 from django.conf import settings
-from django.core.mail import send_mail, EmailMessage
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from saisiecontrat.models import  Alternant,  Personnel, Contrat
 from django.core.exceptions import ObjectDoesNotExist
@@ -76,14 +76,18 @@ def creerfichemission(request,alternant_hash):
     msg_plain = render_to_string('information_raf.html', context)
     msg_html = render_to_string('information_raf.html', context)
 
-    email = EmailMessage(
+    # Création du mail
+    email = EmailMultiAlternatives(
         "Fiche mission de %s %s.pdf" % (alternant.nom, alternant.prenom),
-        msg_html,
+        msg_plain,
         'cactus.test.tg@gmail.com',
         [formation.courriel_raf],
     )
 
-    email.attach(nomfichier, os.path.join(settings.PDF_OUTPUT_DIR, nomfichier), "application/pdf")
+    # Ajout du format html (https://docs.djangoproject.com/fr/2.0/topics/email/#sending-alternative-content-types)
+    email.attach_alternative(msg_html, "text/html")
+
+    email.attach_file(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
 
     email.send(fail_silently=True)
 
