@@ -43,7 +43,7 @@ class UserSignupView(CreateView):
             return super().get(request, *args, **kwargs)
 
 
-class UserSignupOrLoginView(TemplateView):
+class UserSignupOrLoginView(LoginView):
     template_name = "registration/signup_login.html"
 
     def get_context_data(self, **kwargs):
