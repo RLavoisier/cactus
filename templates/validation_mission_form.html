@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- SI c'est la même form qui est appelée on peut mettre un point -->
+<form action="." method="post">
+    {% csrf_token %}
+
+    {% if form.errors %}
+    <p class="error">{{ form.errors }}</p>
+    {% endif %}
+
+    <!-- {{ form.as_p }} permet d'afficher tous les champs -->
+    <fieldset>
+
+        <div class="row">
+            <div class="col-md-12 col-externe">
+                <div class="col-md-12">
+                    Veuillez cocher la case correspondant à votre évaluation de la mission de ce candidat.<br />
+                    <ul>
+                        <li>La validation permet au traitement du contrat d'apprentissage de poursuivre son cours.</li>
+                        <li>La réserve oblige le candidat et son employeur à modifier la mission afin de vous la soumettre de nouveau.</li>
+                        <li>Le rejet est définitif. Il interdit toute modification et réenvoi de la mission. A utiliser donc seulement dans les cas extrêmes.</li>
+                    </ul>
+                    Réserves et rejets doivent être motivés.
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-1 col-externe">
+                <div class="col-md-12">
+                    <h5><b>Candidat</b></h5>
+                </div>
+            </div>
+            <div class="col-md-11 col-externe">
+                <div class="col-md-12">
+                    <div class="btn-group" data-toggle="buttons" >
+                        <h5>{{  nom_alternant }} {{  prenom_alternant }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-1 col-externe">
+                <div class="col-md-12">
+                    <h5><b>Mission</b></h5>
+                </div>
+            </div>
+            <div class="col-md-11 col-externe">
+                <div class="col-md-12">
+                    <div class="btn-group" data-toggle="buttons" >
+                        <h5>{{  mission }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-1 col-externe">
+                <div class="col-md-12">
+                    <h5><b>Votre avis</b></h5>
+                </div>
+            </div>
+            <div class="col-md-2 col-externe">
+                <div class="col-md-12">
+                    <div class="btn-group" data-toggle="buttons" >
+                        {{ form.validation }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1 col-externe">
+
+            </div>
+
+            <div class="col-md-1 col-externe">
+                <div class="col-md-1">
+                    <h5><b>Motif</b></h5>
+                </div>
+            </div>
+            <div class="col-md-7 col-externe">
+                <div class="col-md-12">
+                    <h5>{{ form.motif }}</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 col-externe">
+                <div class="col-md-12">
+                    <h5>A moins que vous ne le jugiez nécessaire, il est inutile d'avertir le(la) candidat(e) de votre décision, un mail lui sera envoyé dès votre validation.</h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 col-externe">
+                <div class="col-md-1">
+                    <input type="submit" class="btn btn-success" value="Valider" />
+                </div>
+                <div class="col-md-11">
+                    <h5>{{ message }}</h5>
+                </div>
+            </div>
+        </div>
+
+    </fieldset>
+</form>
+{% endblock %}

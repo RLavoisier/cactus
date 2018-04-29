@@ -20,7 +20,7 @@ from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm, Cre
 from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel, Formation, CFA
 from django.core.exceptions import ObjectDoesNotExist
 
-from saisiecontrat.utils.helper import generer_data_pour_pdf_mission
+from saisiecontrat.utils.helper import generer_data_pour_pdf_mission,creerfichemission
 from saisiecontrat.utils.pdf_generator import PDFGenerator
 
 
@@ -981,12 +981,14 @@ class creerCERFA(LoginRequiredMixin, DetailView):
         return redirect("cerfa")
 
 
-def envoyervalidationraf(request):
+def envoyermailvalidationraf(request):
+
+# Cette vue est appelée depuis l'écran mission
 
     alternant = request.user.alternant
     contrat = alternant.get_contrat_courant()
 
-    creerfichemission(request, alternant.hash)
+    creerfichemission(creerfichemission, alternant.hash)
 
     contrat.avis_raf = 1
     contrat.motif = None
@@ -995,41 +997,16 @@ def envoyervalidationraf(request):
 
     return redirect("informationmission")
 
-def creerfichemission(request, alternant_hash):
 
-    alternant = Alternant.objects.get(hash=alternant_hash)
-    contrat = alternant.get_contrat_courant()
-    entreprise = contrat.entreprise
-    formation = contrat.formation
+def envoyerficheraf(request, alternant_hash):
 
-    try:
-        ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
-    except ObjectDoesNotExist:
-        ma_1 = None
-
-    data = generer_data_pour_pdf_mission(alternant, alternant.user.email, entreprise, ma_1, contrat)
-
-    filename = "Fiche mission %s %s.pdf" % (alternant.nom, alternant.prenom)
-    filename = filename.replace(' ', '_')
-
-    nomfichier = PDFGenerator.generate_mission_pdf_with_datas(filename, data, flatten=True)
+    creerfichemission(creerfichemission,alternant_hash)
 
     context={}
-    context["alternant"]=alternant
 
-    msg_plain = render_to_string('information_raf.html', context)
-    msg_html = render_to_string('information_raf.html', context)
+    context["message"] = "Un mail a été généré avec la fiche mission demandée. S'il n'apparaît pas dans votre boîte de réception, vérifiez le dossier des éléments indésirables."
 
-    print(formation.courriel_raf)
-    send_mail(
-        'TOTO',
-        msg_plain,
-        'cactus.test.tg@gmail.com',
-        [formation.courriel_raf],
-        html_message=msg_html
-    )
-
-
+    return render(request, "message.html", context)
 
 def validationmission(request, alternant_hash):
 
@@ -1071,119 +1048,13 @@ def validationmission(request, alternant_hash):
     return render(request, "validation_mission_form.html", context)
 
 
-class envoifichemission(LoginRequiredMixin, DetailView):
+def recapinscriptions(request, formation_hash):
 
-    model = Contrat
+    creerrecapinscriptions(formation_hash)
 
-    def get(self, request, *args, **kwargs):
+    context={}
 
-        alternant = Alternant.objects.get(user=request.user)
-        contrat = alternant.get_contrat_courant()
-        entreprise = contrat.entreprise
-        formation = contrat.formation
+    context["message"] = "Un mail a étéé généré avec la liste actualisée des inscriptions. S'il n'apparaît pas dans votre boîte de réception, vérifiez le dossier des éléments indésirables."
 
-        try:
-            ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
-        except ObjectDoesNotExist:
-            ma_1 = None
+    return render(request, "message.html", context)
 
-        data = {}
-
-        # PRODUIRE LA FICHE MISSION -------------------------------------------------------------------------------
-
-        context={}
-        context["alternant"]=alternant
-
-        msg_plain = render_to_string('information_raf.html', context)
-        msg_html = render_to_string('information_raf.html', context)
-
-        send_mail(
-            filename,
-            msg_plain,
-            cactus.test.tg@gmail.com,
-            [formation.courriel_raf],
-            html_message=msg_html,
-        )
-
-        contrat.avis_raf = 1
-        contrat.motif = None
-        contrat.date_envoi_raf = datetime.now()
-        contrat.save()
-
-class recapinscriptions(LoginRequiredMixin, DetailView):
-
-    model = Contrat
-
-    def get(self, request, *args, **kwargs):
-
-        alternant = Alternant.objects.get(user=request.user)
-        contrat = alternant.get_contrat_courant()
-        entreprise = contrat.entreprise
-        formation = contrat.formation
-
-        try:
-            ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
-        except ObjectDoesNotExist:
-            ma_1 = None
-
-        data = {}
-
-        # PRODUIRE LA FICHE MISSION -------------------------------------------------------------------------------
-
-        context={}
-        context["alternant"]=alternant
-
-        msg_plain = render_to_string('information_raf.html', context)
-        msg_html = render_to_string('information_raf.html', context)
-
-        send_mail(
-            filename,
-            msg_plain,
-            cactus.test.tg@gmail.com,
-            [formation.courriel_raf],
-            html_message=msg_html,
-        )
-
-        contrat.avis_raf = 1
-        contrat.motif = None
-        contrat.date_envoi_raf = datetime.now()
-        contrat.save()
-
-class fichierinscriptions(LoginRequiredMixin, DetailView):
-
-    model = Contrat
-
-    def get(self, request, *args, **kwargs):
-
-        alternant = Alternant.objects.get(user=request.user)
-        contrat = alternant.get_contrat_courant()
-        entreprise = contrat.entreprise
-        formation = contrat.formation
-
-        try:
-            ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
-        except ObjectDoesNotExist:
-            ma_1 = None
-
-        data = {}
-
-        # PRODUIRE LA FICHE MISSION -------------------------------------------------------------------------------
-
-        context={}
-        context["alternant"]=alternant
-
-        msg_plain = render_to_string('information_raf.html', context)
-        msg_html = render_to_string('information_raf.html', context)
-
-        send_mail(
-            filename,
-            msg_plain,
-            cactus.test.tg@gmail.com,
-            [formation.courriel_raf],
-            html_message=msg_html,
-        )
-
-        contrat.avis_raf = 1
-        contrat.motif = None
-        contrat.date_envoi_raf = datetime.now()
-        contrat.save()

@@ -19,7 +19,7 @@ from saisiecontrat.views import create_alternant, inform_contrat, inform_mission
 from django.urls import path, include
 
 from cactus.views import accueil
-from saisiecontrat.views import creationcontrat, create_entreprise, creerCERFA, creerfichemission,cerfa,validationmission,envoifichemission,recapinscriptions,fichierinscriptions
+from saisiecontrat.views import creationcontrat, create_entreprise, creerCERFA, cerfa, envoyermailvalidationraf, recapinscriptions, envoyerficheraf,validationmission
 
 urlpatterns = [
     path('comptes/', include("comptes.urls"), name="comptes"),
@@ -37,9 +37,8 @@ urlpatterns = [
     path('detail_formation/', detail_formation.as_view(), name='detail_formation'),
     path('cerfa/', cerfa, name='cerfa'),
     path('creerCERFA/', creerCERFA.as_view(), name='creerCERFA'),
-    path('creerfichemission/<str:alternant_hash>/', creerfichemission, name='creerfichemission'),
+    path('envoyerficheraf/<str:alternant_hash>/', envoyerficheraf, name='envoyerficheraf'),
     path('validationmission/<str:alternant_hash>/', validationmission, name='validationmission'),
-    path('envoifichemission/', envoifichemission, name='envoifichemission'),
-    path('recapinscriptions/', recapinscriptions, name='recapinscriptions'),
-    path('fichierinscriptions/', fichierinscriptions, name='fichierinscriptions')
+    path('envoyermailvalidationraf/', envoyermailvalidationraf, name='envoyermailvalidationraf'),
+    path('recapinscriptions/<str:formation_hash>/', recapinscriptions, name='recapinscriptions'),
 ]
