@@ -3,6 +3,7 @@
 import re
 from copy import deepcopy
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Min, Max
 
@@ -57,6 +58,9 @@ def creationcontrat(request):
                                 date_effet_avenant=form.cleaned_data['date_effet_avenant'],
                                 )
                 contrat.save()
+
+                contrat_a_afficher = contrat
+
                 context["message"] = "Le contrat a bien été créé vous pouvez maintenant le compléter dans les onglets suivants."
             else:
                 # copy ll'objet (si on écrit nouveaucontrat=contrat on crée juste un pointeur sur contrat)
@@ -75,13 +79,15 @@ def creationcontrat(request):
                 contrat.contrat_courant = False
                 contrat.save()
 
+                contrat_a_afficher = nouveaucontrat
+
                 context["message"] = "Un contrat a bien été créé. Les données du contrat précédent on été reprises vous pouver modifier les données dans les onglets suivants."
 
             form = CreationContratForm(initial={
-                "type_contrat_avenant": nouveaucontrat.type_contrat_avenant,
-                "mode_contractuel": nouveaucontrat.mode_contractuel,
-                "numero_contrat_anterieur": nouveaucontrat.numero_contrat_anterieur,
-                "date_effet_avenant": nouveaucontrat.date_effet_avenant,
+                "type_contrat_avenant": contrat_a_afficher.type_contrat_avenant,
+                "mode_contractuel": contrat_a_afficher.mode_contractuel,
+                "numero_contrat_anterieur": contrat_a_afficher.numero_contrat_anterieur,
+                "date_effet_avenant": contrat_a_afficher.date_effet_avenant,
             })
 
             context["form"] = form
@@ -527,12 +533,22 @@ class liste_formation(LoginRequiredMixin, ListView):
     # variable contenant les objets pour les passer au template
     context_object_name = "formations"
 
+    def get(self, request, *args, **kwargs):
+        # Si une formation est déjà choisie on redirige l'utilisateur
+        if request.user.alternant.contrat_courant.formation:
+            return redirect("detail_formation")
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, *, object_list=None, **kwargs):
         # super fait référence à la classe mère ListView
         context = super().get_context_data(object_list=None, **kwargs)
         specialites = Formation.objects.order_by("specialite").values_list("specialite", flat=True).distinct()
         villes = Formation.objects.order_by("ville").values_list("ville", flat=True).distinct()
-        diplomes = Formation.DIPLOME
+
+        # Selection des diplômes dispo en base
+        diplomes_base = Formation.objects.order_by("diplome").values_list("diplome", flat=True).distinct()
+        diplomes = tuple(t for t in Formation.DIPLOME
+                    if t[0] in diplomes_base)
 
         context["specialites"] = ["Toutes"] + list(specialites)
         context["villes"] = ["Toutes"] + list(villes)
@@ -542,6 +558,9 @@ class liste_formation(LoginRequiredMixin, ListView):
         alternant = Alternant(user=self.request.user)
         contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
         context["contrat"] = contrat
+
+        messages.add_message(self.request, messages.SUCCESS, "Coucou")
+        messages.add_message(self.request, messages.ERROR, "Coucou")
 
         return context
 

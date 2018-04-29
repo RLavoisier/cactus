@@ -2,7 +2,8 @@
 {% load humanize %}
 
 {% block content %}
-    <form action="." method="POST">
+
+    <form id="contrat_form" action="." method="POST">
         {% csrf_token %}
 
         {% if form.errors %}
@@ -391,12 +392,41 @@
     var DOMAIN = "http://127.0.0.1:8000/";
 
     $(document).ready(function() {
-        // Message d'alerte pour la saisie erronnée d'une date de début de contrat
 
+        $('#contrat_form').data('serialize',$('#contrat_form').serialize());
+          // On load save form current state
+
+        $(window).bind('beforeunload', function(e){
+            if($('#contrat_form').serialize()!=$('#contrat_form').data('serialize'))return true;
+            else alert("hey !");
+        });
+
+        // Message d'alerte pour la saisie erronnée d'une date de début de contrat
         $(document).on("click", ".popover-content", function(){
             $("#div_date_debut_contrat").popover("hide");
             $("#div_date_fin_contrat").popover("hide");
         });
+
+        // Affichage des zone d'année si besoin
+        if($("#id_an_1_per_1_du").val() || $("#id_an_2_per_1_du").val() ||
+            $("#id_an_3_per_1_du").val() || $("#id_an_4_per_1_du").val()){
+
+            if(!$("#id_an_1_per_1_du").val()){
+                $("#annee1").hide();
+            }
+
+            if(!$("#id_an_2_per_1_du").val()){
+                $("#annee2").hide();
+            }
+
+            if(!$("#id_an_3_per_1_du").val()){
+                $("#annee3").hide();
+            }
+
+            if(!$("#id_an_4_per_1_du").val()){
+                $("#annee4").hide();
+            }
+        }
 
         $("#id_date_debut_contrat").change(function(){
             $.post(
@@ -466,6 +496,14 @@
                         for(i=0; i < annees.length; i++){
                             index = i + 1;
                             annee = annees[i];
+
+                            // Vidage des champs
+                            $("#id_an_" + index + "_per_1_du").val(null);
+                            $("#id_an_" + index + "_per_1_au").val(null);
+                            $("#id_an_" + index + "_per_1_taux").val(null);
+                            $("#id_an_" + index + "_per_2_du").val(null);
+                            $("#id_an_" + index + "_per_2_au").val(null);
+                            $("#id_an_" + index + "_per_2_taux").val(null);
 
                             //on masque la ligne si l'année est null
                             if (!annee){

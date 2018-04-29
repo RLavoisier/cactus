@@ -18,6 +18,8 @@ $(document).ready(
             dayNamesMin: ['D', 'L', 'M', 'M', 'J', 'V', 'S'],
             weekHeader: 'Sem.',
             dateFormat: 'dd/mm/y',
+            yearRange: "1950:2100",
+            defaultDate: new Date(),
             shortYearCutoff: 99
         });
         $(".datepickeryyyy").datepicker(
@@ -35,7 +37,9 @@ $(document).ready(
             dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
             dayNamesMin: ['D', 'L', 'M', 'M', 'J', 'V', 'S'],
             weekHeader: 'Sem.',
-            dateFormat: 'dd/mm/yy'
+            dateFormat: 'dd/mm/yy',
+            yearRange: "1950:2100",
+            defaultDate: new Date()
         });
     }
 
