@@ -1,0 +1,18 @@
+Bonjour,
+
+{% if alternant %}
+Veuillez trouver ci-joint la fiche mission de : {{ alternant.prenom }} {{ alternant.nom }}
+{% endif %}
+Les dossiers ci-dessous sont en attente de validation.
+
+Pour valider une mission, collez l'URL écrite après le nom du candidat dans votre navigateur.
+
+Si vous souhaitez obtenir de nouveau la fiche mission d’un candidat, utilisez l'URL écrite entre parenthèses.
+{% for a in alternants %}
+    - {{ a.prenom }} {{ a.nom }} : {{ request.scheme }}://{{ request.get_host }}/validationmission/{{ a.hash }} ({{ request.scheme }}://{{ request.get_host }}/envoyerficheraf/{{ a.hash }})
+
+{% endfor %}
+Pour obtenir la liste complète des dossiers d'inscription, collez l'URL ci-dessous dans votre navigateur
+{{ request.scheme }}://{{ request.get_host }}/recapinscriptions/{{ formation.hash }}"
+
+Le CFA Epure Méditerranée

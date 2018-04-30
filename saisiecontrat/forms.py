@@ -301,7 +301,7 @@ class CreationAlternantForm(forms.ModelForm):
         model = Alternant
         fields = ("__all__")
 
-        exclude = ["date_maj", "user", "courriel"]
+        exclude = ["date_maj", "user", "courriel","code_acces"]
 
         # Si vous souhaitez éditez les widgets des champs (si ceux par défaut ne vous conviennent pas
         widgets = {
@@ -620,7 +620,10 @@ class InformationMissionForm(forms.ModelForm):
         if mission is None:
             raise forms.ValidationError("Vous devez saisir une mission.")
         else:
-            return mission
+            if len(mission) < 100:
+                raise forms.ValidationError("La mission doit comporter au minimum 100 caractères.")
+            else:
+                return mission
 
 class ValidationMissionForm(forms.ModelForm):
 
@@ -658,7 +661,10 @@ class ValidationMissionForm(forms.ModelForm):
         validation = self.cleaned_data.get("validation")
         motif = self.cleaned_data.get("motif")
 
-        if (validation == 3 or validation == 4) and len(motif) == 0:
+        print(type(validation))
+        print(self.request.POST)
+
+        if validation in ["3", "4"] and len(motif) < 100:
             raise forms.ValidationError("Vous devez saisir un motif en cas de réserve ou de rejet.")
         else:
             return motif

@@ -1,6 +1,9 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+
+from saisiecontrat.models import Formation
 
 
 class CactusUserCreationForm(UserCreationForm):
@@ -17,10 +20,10 @@ class CactusUserCreationForm(UserCreationForm):
     )
 
     code_formation = forms.CharField(
-        label="Code formation",
+        label="Code d'accès",
         widget=forms.TextInput,
         strip=False,
-        help_text="Entrez le code fourni par le responsable de la formation."
+        help_text="Entrez le code d'accès fourni par le(la) responsable de la formation."
     )
 
     class Meta:
@@ -28,6 +31,12 @@ class CactusUserCreationForm(UserCreationForm):
         fields = ("email",)
 
     def clean_code_formation(self):
-        if self.cleaned_data["code_formation"] != "cfa":
-            raise forms.ValidationError("Code formation inconnu.")
+
+        try:
+            Formation.objects.get(code_acces=self.cleaned_data["code_formation"])
+        except ObjectDoesNotExist:
+            raise forms.ValidationError("Code d'accès inconnu.")
+        except MultipleObjectsReturned:
+            return None
+
         return self.cleaned_data["code_formation"]

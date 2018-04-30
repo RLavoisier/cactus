@@ -31,6 +31,10 @@ class UserSignupView(CreateView):
 
         alternant = Alternant()
         alternant.user = user
+
+        if form.cleaned_data["code_formation"]:
+            alternant.code_access = form.cleaned_data["code_formation"]
+
         alternant.save()
 
         return is_valid

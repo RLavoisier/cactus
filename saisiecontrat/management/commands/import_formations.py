@@ -33,6 +33,10 @@ class Command(BaseCommand):
                 niveau=row[17],
                 nombre_annees=row[18],
                 annee_remuneration_annee_diplome=row[19],
+                inspection_pedagogique_competente=row[20],
+                raf=row[21],
+                courriel_raf=row[22],
+                code_acces=row[23]
             )
             print(row[2])
 

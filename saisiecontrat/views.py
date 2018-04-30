@@ -6,11 +6,13 @@ from wsgiref.util import FileWrapper
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponse
 
 from django.shortcuts import render, redirect
 from datetime import datetime
 
+from django.template.loader import render_to_string
 from django.urls import reverse
 
 from django.views.generic import ListView, DetailView
@@ -20,7 +22,7 @@ from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm, Cre
 from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel, Formation, CFA
 from django.core.exceptions import ObjectDoesNotExist
 
-from saisiecontrat.utils.helper import creerfichemission
+from saisiecontrat.utils.helper import creerfichemission, creerrecapinscriptions
 from saisiecontrat.utils.pdf_generator import PDFGenerator
 
 
@@ -499,19 +501,24 @@ def inform_mission(request):
         form = InformationMissionForm(request.POST)
 
         if contrat.mission != request.POST.get("mission"):
-
             if form.is_valid():
-
                 alternant = Alternant(user=request.user)
                 contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
                 contrat.mission = request.POST.get("mission")
+                contrat.avis_raf=0
                 contrat.date_maj_mission=datetime.now()
                 contrat.date_maj=datetime.now()
                 contrat.save()
+                context["boutonenvoiactif"] = (len(contrat.mission) >= 100)
+            else:
+                context["boutonenvoiactf"] = False
+        else:
+            context["boutonenvoiactif"] = (len(contrat.mission) >= 100)
+
     else:
         contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
-
         form = InformationMissionForm(instance=contrat)
+        context["boutonenvoiactif"] = (len(contrat.mission) >= 100)
 
     context["form"] = form
     context["contrat"]=contrat
@@ -1007,14 +1014,18 @@ def envoyermailvalidationraf(request):
     alternant = request.user.alternant
     contrat = alternant.get_contrat_courant()
 
-    creerfichemission(request, alternant.hash)
+    if len(contrat.mission) > 100:
+        contrat.avis_raf = 1
+        contrat.motif = None
+        contrat.date_envoi_raf = datetime.now()
+        contrat.save()
 
-    contrat.avis_raf = 1
-    contrat.motif = None
-    contrat.date_envoi_raf = datetime.now()
-    contrat.save()
+        creerfichemission(request, alternant.hash)
 
-    messages.add_message(request, messages.SUCCESS, "Message de validation envoyé.")
+        messages.add_message(request, messages.SUCCESS, "Un mail a été envoyé au responsable de formation pour qu'il valide votre mission.")
+    else:
+
+        messages.add_message(request, messages.INFO, "La mission doit être renseignée et comporter au moins 100 caractères.")
 
     return redirect("informationmission")
 
@@ -1023,17 +1034,12 @@ def envoyerficheraf(request, alternant_hash):
 
     creerfichemission(creerfichemission,alternant_hash)
 
-    context={}
+    messages.add_message(request, messages.SUCCESS, "Un mail a été généré avec la fiche mission demandée. S'il n'apparaît pas dans votre boîte de réception, vérifiez le dossier des éléments indésirables.")
 
-    context["message"] = "Un mail a été généré avec la fiche mission demandée. S'il n'apparaît pas dans votre boîte de réception, vérifiez le dossier des éléments indésirables."
-
-    return render(request, "message.html", context)
+    return render(request, "message.html")
 
 def validationmission(request, alternant_hash):
 
-    context={}
-
-    print(request.build_absolute_uri(reverse("validationmission", kwargs={"alternant_hash": alternant_hash})))
 
     if len(request.POST) > 0:
 
@@ -1047,19 +1053,51 @@ def validationmission(request, alternant_hash):
             contrat = Contrat.objects.get(contrat_courant=True)
 
             if contrat.avis_raf == 2 or contrat.avis_raf == 3 or contrat.avis_raf == 4:
-                message = "Un avis a déjà été enregistré sur cette mission."
+                messages.add_message(request, messages.INFO, "Un avis a déjà été enregistré sur cette mission.")
             else:
                 contrat.motif = form.cleaned_data["motif"]
                 contrat.avis_raf = form.cleaned_data["validation"]
                 contrat.date_validation_raf=datetime.now()
                 contrat.save()
 
-                messages.add_message(request, messages.SUCCESS, "Mission validée")
+                i = 0
+                while str(contrat.avis_raf) != str(Contrat.AVIS_RAF[i][0]):
+                    i += 1
+
+                libelle_avis_raf = Contrat.AVIS_RAF[i][1]
+
+                alternant=Alternant.objects.get(hash=alternant_hash)
+
+                context = {}
+                context["libelle_avis_raf"] = libelle_avis_raf
+                context["contrat"] = contrat
+                formation = contrat.formation
+                context["formation"] = formation
+                context["request"] = request
+
+                msg_plain = render_to_string('informationmission_alternant.txt', context)
+                msg_html = render_to_string('informationmission_alternant.html', context)
+
+                # Création du mail
+                email = EmailMultiAlternatives(
+                    libelle_avis_raf,
+                    msg_plain,
+                    'cactus.test.tg@gmail.com',
+                    [alternant.user.email],
+                )
+
+                # Ajout du format html (https://docs.djangoproject.com/fr/2.0/topics/email/#sending-alternative-content-types)
+                email.attach_alternative(msg_html, "text/html")
+
+                email.send(fail_silently=True)
+
+                messages.add_message(request, messages.SUCCESS, "Votre avis a bien été enregistré.")
 
     else:
         contrat = Contrat.objects.get(contrat_courant=True)
         form = ValidationMissionForm(instance=contrat)
 
+    context={}
     context["form"] = form
     context["contrat"] = contrat
     context["nom_alternant"]=contrat.alternant.nom
@@ -1070,11 +1108,9 @@ def validationmission(request, alternant_hash):
 
 def recapinscriptions(request, formation_hash):
 
-    creerrecapinscriptions(formation_hash)
+    creerrecapinscriptions(request,formation_hash)
 
-    context={}
+    messages.add_message(request, messages.SUCCESS, "Un mail a été généré avec la liste actualisée des inscriptions. S'il n'apparaît pas dans votre boîte de réception, vérifiez le dossier des éléments indésirables.")
 
-    context["message"] = "Un mail a étéé généré avec la liste actualisée des inscriptions. S'il n'apparaît pas dans votre boîte de réception, vérifiez le dossier des éléments indésirables."
-
-    return render(request, "message.html", context)
+    return render(request, "message.html")
 

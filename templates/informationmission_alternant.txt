@@ -1,0 +1,16 @@
+
+Bonjour,
+
+Le responsable de la formation {{formation.intitule_formation }} a examiné votre mission.
+
+{{ libelle_avis_raf }}
+
+{{ contrat.motif }}</p>
+
+Nous vous rappelons les points suivants :
+
+    - La validation de la mission permet la transmission de votre dossier à nos services.
+    - Une réserve implique que vous revoyiez avec votre employeur le contenu de la mission.
+    - Le rejet est définitif.
+
+Le CFA Epure Méditerranée

@@ -77,13 +77,17 @@
                 </div>
             {% endif %}
 
-            <div class="row">
-                <div class="col-md-12 col-externe">
-                    <div class="col-md-12">
-                        <h5><a class="btn btn-primary" href="{% url 'envoyermailvalidationraf' %}">Envoyer la fiche mission au responsable de formation</a></h5>
+            {% if contrat.avis_raf == 0 or contrat.avis_raf == 3 %}
+                {% if boutonenvoiactif %}
+                    <div class="row">
+                        <div class="col-md-12 col-externe">
+                            <div class="col-md-12">
+                                <h5><a class="btn btn-primary" href="{% url 'envoyermailvalidationraf' %}">Envoyer la fiche mission au responsable de formation</a></h5>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                {% endif %}
+            {% endif %}
         {% endif %}
 
     </fieldset>

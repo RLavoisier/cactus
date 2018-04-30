@@ -1,0 +1,30 @@
+{% load static %}
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+  </head>
+  <body>
+    <header>
+    </header>
+
+      Bonjour,
+
+      <p>
+      Le responsable de la formation {{formation.intitule_formation }} a examiné votre mission.
+      </p>
+
+      <p>
+      {{ libelle_avis_raf }}
+      </p>
+
+      <p>{{ contrat.motif }}</p>
+
+      <p>Nous vous rappelons les points suivants :<br />
+        - La validation de la mission permet la transmission de votre dossier à nos services.<br />
+        - Une réserve implique que vous revoyiez avec votre employeur le contenu de la mission.<br />
+        - Le rejet est définitif. </p>
+
+    <p>Le CFA Epure Méditerranée</p>
+  </body>
+</html>

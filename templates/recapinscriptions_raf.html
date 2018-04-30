@@ -1,0 +1,54 @@
+{% load static %}
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+  </head>
+  <body>
+    <header>
+    </header>
+
+      Bonjour,
+
+      <p>
+      Veuillez trouver ci-joint la liste récapitulative des inscriptions en cours.
+      </p>
+      <p>
+      Pour les dossiers en attente de validation les nom et prénom des candidats apparaissent soulignés. Cliquez sur le lien pour accéder à la validation.
+      </p>
+
+      <p>
+      Si vous souhaitez obtenir de nouveau la fiche mission d’un candidat, cliquez sur le lien fiche de mission situé en vis à vis de son nom.
+      </p>
+      <ul>
+      {% for a in alternants %}
+          {% ifequal a.avis_raf 0 %}
+            <li>
+                {{ a.prenom }} {{ a.nom }} (En cours de saisie)
+            </li>
+          {% endifequal %}
+          {% ifequal a.avis_raf 1 %}
+            <li>
+                <a href="{{ request.scheme }}://{{ request.get_host }}/validationmission/{{ a.hash }}">{{ a.prenom }} {{ a.nom }}</a> <a href="{{ request.scheme }}://{{ request.get_host }}/envoyerficheraf/{{ a.hash }}">(Fiche de mission)</a>
+            </li>
+          {% endifequal %}
+          {% ifequal a.avis_raf 2 %}
+            <li>
+                {{ a.prenom }} {{ a.nom }} (Déjà validé)
+            </li>
+          {% endifequal %}
+          {% ifequal a.avis_raf 3 %}
+            <li>
+                {{ a.prenom }} {{ a.nom }} (Validé avec réserve)
+            </li>
+          {% endifequal %}
+      {% endfor %}
+      </ul>
+
+      <p>
+          <a href="{{ request.scheme }}://{{ request.get_host }}/recapinscriptions/{{ formation.hash }}">Cliquez sur ce lien pour obtenir un mail contenant une liste actualisée des dossiers d'inscription.</a>
+      </p>
+
+    <p>Le CFA Epure Méditerranée</p>
+  </body>
+</html>

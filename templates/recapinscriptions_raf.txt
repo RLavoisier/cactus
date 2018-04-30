@@ -1,0 +1,28 @@
+Bonjour,
+
+
+Veuillez trouver ci-joint la liste récapitulative des inscriptions en cours.
+
+Pour les dossiers en attente de validation les nom et prénom sont suivis de l'URL de validation, recopiez-la dans votre navigateur.
+
+Si vous souhaitez obtenir de nouveau la fiche mission d’un candidat, collez l'URL écrite entre parenthèse dans votre navigateur.
+
+{% for a in alternants %}
+{% ifequal a.avis_raf 0 %}
+    {{ a.prenom }} {{ a.nom }} (En cours de saisie)
+{% endifequal %}
+{% ifequal a.avis_raf 1 %}
+    {{ a.prenom }} {{ a.nom }} {{ request.scheme }}://{{ request.get_host }}/validationmission/{{ a.hash }} ({{ request.scheme }}://{{ request.get_host }}/envoyerficheraf/{{ a.hash }})
+{% endifequal %}
+{% ifequal a.avis_raf 2 %}
+    {{ a.prenom }} {{ a.nom }} (Déjà validé)
+{% endifequal %}
+{% ifequal a.avis_raf 3 %}
+    {{ a.prenom }} {{ a.nom }} (Validé avec réserve)
+{% endifequal %}
+{% endfor %}
+
+
+Collez cette URL dans votre navigateur pour obtenir une liste actualisée des dossiers d'inscription : request.scheme }}://{{ request.get_host }}/recapinscriptions/{{ formation.hash }}
+
+Le CFA Epure Méditerranée

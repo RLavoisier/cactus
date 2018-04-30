@@ -5,6 +5,11 @@
 {% block bodyId %}loginPage{% endblock %}
 
 {% block content %}
+
+{% if login_form.errors %}
+<p class="error">{{ login_form.errors }}</p>
+{% endif %}
+
 <h3>Vous avez un compte. Identifiez-vous.</h3>
 <form action="{% url 'comptes:login' %}" method="POST">
     {{ login_form.as_p }}

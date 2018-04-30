@@ -1,3 +1,4 @@
+import uuid
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
@@ -7,6 +8,10 @@ import datetime
 
 
 User = get_user_model()
+
+def generer_uuid4():
+    uid = uuid4()
+    return str(uid)
 
 
 class Alternant(models.Model):
@@ -187,7 +192,7 @@ class Alternant(models.Model):
 
     # Le related name permet de renvoyer l'alternant depuis le user avec la syntaxe user.alternant
     user = models.OneToOneField(User,on_delete=models.CASCADE, primary_key=True, related_name="alternant")
-    hash = models.CharField(default=str(uuid4()), max_length=50, null=True, blank=True)
+    hash = models.CharField(default=generer_uuid4, max_length=50, null=True, blank=True)
     nom = models.CharField(max_length=70, blank=True, null=True)
     prenom = models.CharField(verbose_name="Prénom", max_length=35, blank=True, null=True)
     sexe = models.CharField(max_length=1, choices=SEXE, default='M')
@@ -220,6 +225,7 @@ class Alternant(models.Model):
     code_postal_representant = models.CharField(verbose_name="Code postal", max_length=5, blank=True, null=True)
     ville_representant = models.CharField(max_length=60, blank=True, null=True)
     date_maj = models.DateTimeField(default=datetime.datetime.now())
+    code_acces = models.CharField(max_length=15, blank=True, null=True)
 
     @property
     def contrat_courant(self):
@@ -288,8 +294,10 @@ class Entreprise(models.Model):
     telecopie = models.CharField(verbose_name="Télécopie", max_length=18, blank=True, null=True)
     courriel = models.CharField(max_length=40, blank=True, null=True)
     code_convention_collective = models.CharField(verbose_name="Code de la convention collective", max_length=4, blank=True, null=True, help_text="Saisissez le code de la convention collective (4 chiffres). Si la convention collective n'est pas encore entrée en vigueur saisissez 9998. S'il n'y a aucune convention collective, saisissez 9999.")
-    libelle_convention_collective = models.CharField(verbose_name="Libellé de la convention collective", max_length=200, blank=True, null=True, help_text="Cette donnée est obligatoire. Si le code de convention existe, elle sera renseignée automatiquement.")
-    adhesion_regime_assurance_chomage = models.BooleanField(default=False, help_text="Cochez cette case si l'employeur appartient au secteur public et si l'apprenti(e) adhère au régime spécifique d'assurance chômage.")
+    libelle_convention_collective = models.CharField(verbose_name="Libellé de la convention collective", max_length=200, blank=True, null=True,
+                                                     help_text="Cette donnée est obligatoire. Si le code de convention existe, elle sera renseignée automatiquement.")
+    adhesion_regime_assurance_chomage = models.BooleanField(default=False,
+                                                            help_text="Cochez cette case si l'employeur appartient au secteur public et si l'apprenti(e) adhère au régime spécifique d'assurance chômage.")
     date_maj = models.DateTimeField(default=datetime.datetime.now())
     date_maj_contacts = models.DateTimeField(default=datetime.datetime.now())
 
@@ -327,6 +335,7 @@ class Personnel(models.Model):
 
 class CFA(models.Model):
     numeroUAI = models.CharField(max_length=8,primary_key=True)
+    hash = models.CharField(default=generer_uuid4, max_length=50, null=True, blank=True)
     nom = models.CharField(max_length=70)
     adresse_numero = models.CharField(max_length=10, blank=True)
     adresse_voie = models.CharField(max_length=100)
@@ -372,7 +381,7 @@ class Formation(models.Model):
     )
 
     code_formation = models.CharField(max_length=14, primary_key=True)
-    hash = models.CharField(default=str(uuid4()), max_length=50, null=True, blank=True)
+    hash = models.CharField(default=generer_uuid4, max_length=50, null=True, blank=True)
     cfa = models.ForeignKey(CFA, on_delete=models.CASCADE)
     intitule_formation = models.CharField(max_length=150,blank=True, null=True)
     ville = models.CharField(max_length=35,blank=True, null=True)
@@ -393,8 +402,9 @@ class Formation(models.Model):
     nombre_annees = models.PositiveSmallIntegerField(blank=True, null=True)
     annee_remuneration_annee_diplome = models.PositiveSmallIntegerField(blank=True, null=True)
     inspection_pedagogique_competente = models.PositiveSmallIntegerField(choices=INSPECTION_PEDAGOGIQUE, blank=True, null=True)
+    raf = models.CharField(max_length=60, blank=True, null=True)
     courriel_raf = models.CharField(max_length=40, blank=True, null=True)
-
+    code_acces = models.CharField(max_length=15, blank=True, null=True)
 
     def __str__(self):
         return self.intitule_formation
@@ -440,9 +450,9 @@ class Contrat(models.Model):
     )
 
     AVIS_RAF = (
-        (0, "Fiche mission non envoyée au responsable de formation"),
-        (1, "Mission en attente de validation par le responsable de formation "),
-        (2, "Mission validée par le responsable de formation"),
+        (0, "La fiche mission n'a pas été envoyée au responsable de formation"),
+        (1, "La mission est en attente de validation par le responsable de formation"),
+        (2, "La mission a été validée par le responsable de formation"),
         (3, "Le responsable de formation a émis des réserves sur la mission"),
         (4, "Le responsable de formation a rejeté cette mission"),
     )
@@ -452,7 +462,7 @@ class Contrat(models.Model):
     mode_contractuel = models.PositiveSmallIntegerField(choices=MODE_CONTRACTUEL)
     entreprise = models.ForeignKey(Entreprise, on_delete=models.CASCADE, blank=True, null=True)
     formation = models.ForeignKey(Formation, on_delete=models.CASCADE, blank=True, null=True)
-    mission = models.TextField(blank=True, null=True)
+    mission = models.TextField(blank=True, null=True, default='')
     type_contrat_avenant = models.PositiveSmallIntegerField(choices=TYPE_CONTRAT_AVENANT, blank=True, null=True)
     date_inscription = models.DateField(verbose_name="Date d'inscription", blank=True, null=True)
     type_derogation = models.PositiveSmallIntegerField(verbose_name="Type de dérogation", choices=TYPE_DEROGATION, blank=True, null=True)

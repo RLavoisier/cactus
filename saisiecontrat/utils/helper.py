@@ -3,7 +3,7 @@ import os
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from saisiecontrat.models import  Alternant,  Personnel, Contrat
+from saisiecontrat.models import  Alternant,  Personnel, Contrat, Formation
 from django.core.exceptions import ObjectDoesNotExist
 
 from saisiecontrat.utils.pdf_generator import PDFGenerator
@@ -72,8 +72,7 @@ def creerfichemission(request,alternant_hash):
     context["alternants"] = alternants
     context["request"] = request
 
-
-    msg_plain = render_to_string('information_raf.html', context)
+    msg_plain = render_to_string('information_raf.txt', context)
     msg_html = render_to_string('information_raf.html', context)
 
     # Création du mail
@@ -96,6 +95,31 @@ def creerfichemission(request,alternant_hash):
     except:
         pass
 
-def creerrecapinscriptions(formation_hash):
+def creerrecapinscriptions(request,formation_hash):
 
-    pass
+    formation = Formation.objects.get(hash=formation_hash)
+    contrats = Contrat.objects.filter(formation=formation)
+    alternants = [{"nom": c.alternant.nom, "prenom": c.alternant.prenom, "hash": c.alternant.hash, "avis_raf": c.avis_raf} for c in contrats]
+
+    context={}
+
+    context["formation"] = formation
+    context["alternants"] = alternants
+    context["request"] = request
+
+
+    msg_plain = render_to_string('recapinscriptions_raf.txt', context)
+    msg_html = render_to_string('recapinscriptions_raf.html', context)
+
+    # Création du mail
+    email = EmailMultiAlternatives(
+        "Récapitulatif des dossiers d'inscription",
+        msg_plain,
+        'cactus.test.tg@gmail.com',
+        [formation.courriel_raf],
+    )
+
+    # Ajout du format html (https://docs.djangoproject.com/fr/2.0/topics/email/#sending-alternative-content-types)
+    email.attach_alternative(msg_html, "text/html")
+
+    email.send(fail_silently=True)
