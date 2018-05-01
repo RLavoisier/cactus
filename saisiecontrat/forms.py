@@ -30,7 +30,7 @@ class LocalizedModelForm(forms.ModelForm):
                 self.fields[field].widget.attrs.update({
                     "class": cls,
                     "data-content": help_text,
-                    "data-placement": "right",
+                    "data-placement": "bottom",
                     "data-container": "body"
                 })
 
@@ -90,7 +90,7 @@ class CreationContratForm(forms.Form):
         return cleaned_data
 
 
-class CreationEntrepriseForm(forms.ModelForm):
+class CreationEntrepriseForm(LocalizedModelForm):
 
     civilite_ma_1 = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE, attrs={"class": "form-control"}))
     nom_ma_1 = forms.CharField(max_length=40, widget=forms.TextInput(attrs={"class": "form-control"}))
@@ -625,7 +625,7 @@ class InformationContratForm(LocalizedModelForm):
             return duree_hebdomadaire_travail_heures
 
 
-class InformationMissionForm(forms.ModelForm):
+class InformationMissionForm(LocalizedModelForm):
 
     class Meta:
         """
@@ -651,7 +651,7 @@ class InformationMissionForm(forms.ModelForm):
             else:
                 return mission
 
-class ValidationMissionForm(forms.ModelForm):
+class ValidationMissionForm(LocalizedModelForm):
 
     CHOIX = [
         (2, "Mission validée"),
