@@ -131,8 +131,16 @@ class PeriodesFormationManager(object):
         taux_minimum = self.__get_minima_taux(age_alternant+1,
                                               annee_en_cours)
 
+        fin_periode_2 = date_fin_annee - timedelta(days=1)
+
+        # Gestion de la fin de période supérieur à la date de fin de contrat
+        derniere_periode = False
+        if fin_periode_2 > self.date_fin_contrat:
+            fin_periode_2 = self.date_fin_contrat
+            derniere_periode = True
+
         periode2 = Periode(date_fin_periode1 + timedelta(days=1),
-                           date_fin_annee - timedelta(days=1),
+                           fin_periode_2,
                            taux=taux_minimum)
 
         # Création de la période
@@ -140,7 +148,8 @@ class PeriodesFormationManager(object):
 
         self.annees["annee%d" % annee_en_cours] = annee.to_dict()
 
-        return self.calculer_annees(annee_formation+1)
+        if not derniere_periode:
+            return self.calculer_annees(annee_formation+1)
 
     @staticmethod
     def __get_minima_taux(age, annee):
