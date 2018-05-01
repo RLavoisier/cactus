@@ -1,17 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+{% extends "base.html" %}
 
+{% block title %}Connexion{% endblock %}
+
+{% block bodyId %}loginPage{% endblock %}
+
+{% block content %}
+<h3>Vous avez un compte. Identifiez-vous.</h3>
+<form action="{% url 'comptes:login' %}" method="POST">
+    {{ login_form.as_p }}
+    {% csrf_token %}
+    <p><a href="{% url 'comptes:password_reset' %}">Mot de passe oublié</a></p>
+    <input type="submit" value="Envoyer">
+</form>
+
+<h3>Vous n'avez pas encore de compte</h3>
+<p>Pour votre inscription, utilisez une adresse mail que vous pensez conserver. N'utilisez pas d'adresse fournie par un lycée ou votre organisme de formation actuel.</p>
 <form action="{% url 'comptes:signup' %}" method="POST">
-    {{ form.as_p }}
+    {{ signup_form.as_p }}
     {% csrf_token %}
     <input type="submit" value="Envoyer">
 </form>
 
-
-</body>
-</html>
+{% endblock %}

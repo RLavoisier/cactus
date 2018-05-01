@@ -39,6 +39,14 @@ class UserSignupView(CreateView):
 
         return is_valid
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["signup_form"] = CactusUserCreationForm()
+        context["login_form"] = AuthenticationForm()
+
+        return context
+
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
@@ -46,9 +54,18 @@ class UserSignupView(CreateView):
         else:
             return super().get(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        if request.POST.get("login"):
+            self.form_class = AuthenticationForm
+        elif request.POST.get("signup"):
+            self.form_class = CactusUserCreationForm
+
+        return super().post(request, *args, **kwargs)
+
 
 class UserSignupOrLoginView(LoginView):
     template_name = "registration/signup_login.html"
+    form_class = AuthenticationForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -64,3 +81,11 @@ class UserSignupOrLoginView(LoginView):
             return redirect(reverse("creationcontrat"))
         else:
             return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get("login"):
+            self.form_class = AuthenticationForm
+        elif request.POST.get("signup"):
+            self.form_class = CactusUserCreationForm
+
+        return super().post(request, *args, **kwargs)

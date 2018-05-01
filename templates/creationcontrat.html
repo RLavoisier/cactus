@@ -34,9 +34,6 @@
 
 <form action="{% url 'creationcontrat' %}" method="post">
     {% csrf_token %}
-    {% if error %}
-    <p class="error">{{ error }}</p>
-    {% endif %}
     <fieldset>
         <div class="row">
             <div class="col-md-3">

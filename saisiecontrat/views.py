@@ -1047,11 +1047,9 @@ def validationmission(request, alternant_hash):
         # Comme c'est un formulaire modèle, cela prépare également un objet de base de donnée
 
         form = ValidationMissionForm(request.POST)
+        contrat = Contrat.objects.get(contrat_courant=True)
 
         if form.is_valid():
-
-            contrat = Contrat.objects.get(contrat_courant=True)
-
             if contrat.avis_raf == 2 or contrat.avis_raf == 3 or contrat.avis_raf == 4:
                 messages.add_message(request, messages.INFO, "Un avis a déjà été enregistré sur cette mission.")
             else:

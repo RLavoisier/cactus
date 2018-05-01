@@ -4,10 +4,6 @@
 <form action="{% url 'informationmission' %}" method="post">
     {% csrf_token %}
 
-    {% if form.errors %}
-    <p class="error">{{ form.errors }}</p>
-    {% endif %}
-
     <fieldset>
 
         <div class="row">

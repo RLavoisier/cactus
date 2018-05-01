@@ -398,6 +398,12 @@
 
         $(window).bind('beforeunload', function(e){
             if($('#contrat_form').serialize()!=$('#contrat_form').data('serialize'))return true;
+            else return False;
+        });
+
+        $("#contrat_form").on("submit", function(e){
+           $(window).off("beforeunload");
+           return true;
         });
 
         // Message d'alerte pour la saisie erronnée d'une date de début de contrat

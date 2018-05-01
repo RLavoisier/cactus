@@ -5,10 +5,6 @@
 <form action="." method="post">
     {% csrf_token %}
 
-    {% if form.errors %}
-    <p class="error">{{ form.errors }}</p>
-    {% endif %}
-
     <!-- {{ form.as_p }} permet d'afficher tous les champs -->
     <fieldset>
 
