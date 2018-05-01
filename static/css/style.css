@@ -42,6 +42,10 @@ body#loginPage section#rightside {
   border-left: 1px solid #133783;
 }
 
+ul {
+    list-style-type: None;
+}
+
 .container {
     width: 85%;
 }
