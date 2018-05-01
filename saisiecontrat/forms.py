@@ -17,6 +17,7 @@ class LocalizedModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.base_fields.values():
+            # Code de correction des virgules
             if type(field) in (forms.FloatField, forms.DecimalField):
                 field.localize = True
                 field.widget.is_localized = True
@@ -687,9 +688,7 @@ class ValidationMissionForm(LocalizedModelForm):
         validation = self.cleaned_data.get("validation")
         motif = self.cleaned_data.get("motif")
 
-        print(type(validation))
-
-        if validation in ["3", "4"] and len(motif) < 100:
+        if validation in ["3", "4"] and len(motif) == 0:
             raise forms.ValidationError("Vous devez saisir un motif en cas de réserve ou de rejet.")
 
         return self.cleaned_data

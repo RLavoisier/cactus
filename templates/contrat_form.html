@@ -6,10 +6,6 @@
     <form id="contrat_form" action="." method="POST">
         {% csrf_token %}
 
-        {% if form.errors %}
-        <p class="error">{{ form.errors }}</p>
-        {% endif %}
-
         <fieldset>
             <div class="row">
                 <div class="col-md-2 col-externe">
