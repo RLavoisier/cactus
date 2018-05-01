@@ -25,28 +25,49 @@
             <ul class="nav navbar-nav">
 
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'accueil' %}">Accueil</a>
+                <a class="nav-link" href="{% url 'accueil' %}">
+                  {% ifequal nomonglet "Accueil" %}<strong>{% endifequal %}Accueil{% ifequal nomonglet "Accueil" %}</strong>{% endifequal %}
+                </a>
               </li>
 
               {% if contrat %}
+
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'creationalternant' %}">Vous</a>
+                <a class="nav-link" href="{% url 'creationalternant' %}">
+                  {% ifequal nomonglet "Vous" %}<strong>{% endifequal %}Vous{% ifequal nomonglet "Vous" %}</strong>{% endifequal %}
+                </a>
               </li>
+
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'creationentreprise' %}">Votre employeur</a>
+                <a class="nav-link" href="{% url 'creationentreprise' %}">
+                  {% ifequal nomonglet "Votre employeur" %}<strong>{% endifequal %}Votre employeur{% ifequal nomonglet "Votre employeur" %}</strong>{% endifequal %}
+                </a>
               </li>
+
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'detail_formation' %}">Votre formation</a>
+                <a class="nav-link" href="{% url 'detail_formation' %}">
+                  {% ifequal nomonglet "Votre formation" %}<strong>{% endifequal %}Votre formation{% ifequal nomonglet "Votre formation" %}</strong>{% endifequal %}
+                </a>
               </li>
+
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'informationcontrat' %}">Les données de votre contrat</a>
+                <a class="nav-link" href="{% url 'informationcontrat' %}">
+                  {% ifequal nomonglet "Les données de votre contrat" %}<strong>{% endifequal %}Les données de votre contrat{% ifequal nomonglet "Les données de votre contrat" %}</strong>{% endifequal %}
+                </a>
               </li>
+
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'informationmission' %}">Votre mission</a>
+                <a class="nav-link" href="{% url 'informationmission' %}">
+                  {% ifequal nomonglet "Votre mission" %}<strong>{% endifequal %}Votre mission{% ifequal nomonglet "Votre mission" %}</strong>{% endifequal %}
+                </a>
               </li>
+
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'cerfa' %}">Votre CERFA</a>
+                <a class="nav-link" href="{% url 'cerfa' %}">
+                  {% ifequal nomonglet "Votre CERFA" %}<strong>{% endifequal %}Votre CERFA{% ifequal nomonglet "Votre CERFA" %}</strong>{% endifequal %}
+                </a>
               </li>
+
               {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">

@@ -14,8 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from saisiecontrat.views import create_alternant, inform_contrat, inform_mission, \
-    liste_formation, detail_formation, appliquer_formation
+from saisiecontrat.views import create_alternant, inform_contrat, inform_mission, liste_formation, detail_formation, \
+    appliquer_formation, exportypareo
 from django.urls import path, include
 
 from cactus.views import accueil
@@ -41,4 +41,5 @@ urlpatterns = [
     path('validationmission/<str:alternant_hash>/', validationmission, name='validationmission'),
     path('envoyermailvalidationraf/', envoyermailvalidationraf, name='envoyermailvalidationraf'),
     path('recapinscriptions/<str:formation_hash>/', recapinscriptions, name='recapinscriptions'),
+    path('exportypareo/<str:cfa_hash>/<str:email_livraison>/', exportypareo, name='exportypareo'),
 ]

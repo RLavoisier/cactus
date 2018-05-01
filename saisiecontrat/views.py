@@ -22,7 +22,7 @@ from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm, Cre
 from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel, Formation, CFA
 from django.core.exceptions import ObjectDoesNotExist
 
-from saisiecontrat.utils.helper import creerfichemission, creerrecapinscriptions
+from saisiecontrat.utils.helper import creerfichemission, creerrecapinscriptions, creerexportypareo
 from saisiecontrat.utils.pdf_generator import PDFGenerator
 
 
@@ -34,6 +34,9 @@ def creationcontrat(request):
         return redirect("comptes:login")
 
     # EXEMPLE DE FORMULAIRE GERE SANS RECOURS AUX MODELSFORMS
+
+    context = {}
+    context["nomonglet"] = "Accueil"
 
     if len(request.POST) > 0:
 
@@ -47,7 +50,7 @@ def creationcontrat(request):
             except ObjectDoesNotExist:
                 contrat = None
 
-            context = {}
+
 
             # Si aucun contrat n'existe on crée un nouveau contrat
             if contrat is None:
@@ -82,7 +85,8 @@ def creationcontrat(request):
 
                 contrat_a_afficher = nouveaucontrat
 
-                context["message"] = "Un contrat a bien été créé. Les données du contrat précédent on été reprises vous pouver modifier les données dans les onglets suivants."
+                messages.add_message(request, messages.SUCCESS,
+                                     "Un contrat a bien été créé. Les données du contrat précédent on été reprises vous pouver modifier les données dans les onglets suivants.")
 
             form = CreationContratForm(initial={
                 "type_contrat_avenant": contrat_a_afficher.type_contrat_avenant,
@@ -99,7 +103,6 @@ def creationcontrat(request):
         else:
             return render(request, 'creationcontrat.html', {'form': form})
     else:
-        context = {}
         try:
             contrat=Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
         except ObjectDoesNotExist:
@@ -129,6 +132,7 @@ def create_entreprise(request):
         return redirect("comptes:login")
 
     context = {}
+    context["nomonglet"] = "Votre employeur"
 
     if len(request.POST) > 0:
 
@@ -160,6 +164,7 @@ def create_entreprise(request):
             entreprise.telephone = form.cleaned_data["telephone"]
             entreprise.telecopie = form.cleaned_data["telecopie"]
             entreprise.courriel = form.cleaned_data["courriel"]
+            entreprise.libelle_convention_collective = form.cleaned_data["libelle_convention_collective"]
             entreprise.code_convention_collective = form.cleaned_data["code_convention_collective"]
             entreprise.adhesion_regime_assurance_chomage = form.cleaned_data["adhesion_regime_assurance_chomage"]
             if form.cleaned_data["type_employeur"] in (11, 12, 13, 14, 15, 16):
@@ -167,14 +172,16 @@ def create_entreprise(request):
             else:
                 entreprise.secteur_employeur = 2
 
-            if len(entreprise.code_convention_collective) > 0:
-                try:
-                    conventioncollective = ConventionCollective.objects.get(code=entreprise.code_convention_collective)
-                except ObjectDoesNotExist:
-                    conventioncollective = None
+            if not entreprise.libelle_convention_collective:
+                if entreprise.code_convention_collective:
+                    try:
+                        conventioncollective = ConventionCollective.objects.get(code=entreprise.code_convention_collective)
+                    except ObjectDoesNotExist:
+                        conventioncollective = None
 
-                if not conventioncollective is None:
-                    entreprise.libelle_convention_collective = conventioncollective.libelle
+                    if conventioncollective:
+                        entreprise.libelle_convention_collective = conventioncollective.libelle
+
 
             entreprise.save()
 
@@ -242,6 +249,9 @@ def create_entreprise(request):
 
             context["form"] = form
             context["contrat"] = contrat
+
+            messages.add_message(request, messages.SUCCESS, "Les données de l'employeur ont été enregistrées.")
+
             return render(request, "entreprise_form.html", context)
         else:
             context["form"] = form
@@ -308,6 +318,7 @@ def create_alternant(request):
         return redirect("comptes:login")
 
     context={}
+    context["nomonglet"] = "Vous"
 
     if len(request.POST) > 0:
         # On créé le formulaire en lui passant le contenu du post
@@ -352,6 +363,8 @@ def create_alternant(request):
             context["contrat"] = contrat
             context["nationalite"] = alternant.nationalite
 
+            messages.add_message(request, messages.SUCCESS, "Vos données ont bien été enregistrées.")
+
             return render(request, "alternant_form.html", context)
         else:
 
@@ -380,6 +393,7 @@ def inform_contrat(request):
         return redirect("comptes:login")
 
     context = {}
+    context["nomonglet"] = "Les données de votre contrat"
 
     if len(request.POST) > 0:
 
@@ -448,6 +462,8 @@ def inform_contrat(request):
             context["form"] = form
             context["contrat"]=contrat
 
+            messages.add_message(request, messages.SUCCESS, "Les données de votre contrat ont bien été enregistrées.")
+
             return render(request, "contrat_form.html", context)
         else:
             context["form"] = form
@@ -455,7 +471,6 @@ def inform_contrat(request):
             context["contrat"]=contrat
 
             return render(request, "contrat_form.html", context)
-
     else:
 
         contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
@@ -468,13 +483,16 @@ def inform_contrat(request):
 
         return render(request, "contrat_form.html", context)
 
+
 def cerfa(request):
 
     if not request.user.is_authenticated:
         # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
         return redirect("comptes:login")
 
-    context={}
+    context = {}
+    context["nomonglet"] = "Votre CERFA"
+
 
     contrat = request.user.alternant.get_contrat_courant()
 
@@ -490,6 +508,7 @@ def inform_mission(request):
         return redirect("comptes:login")
 
     context={}
+    context["nomonglet"] = "Votre mission"
 
     contrat = request.user.alternant.get_contrat_courant()
 
@@ -514,6 +533,8 @@ def inform_mission(request):
                 context["boutonenvoiactf"] = False
         else:
             context["boutonenvoiactif"] = (len(contrat.mission) >= 100)
+
+        messages.add_message(request, messages.SUCCESS, "La mission a bien été enregistrée.")
 
     else:
         contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
@@ -564,6 +585,7 @@ class liste_formation(LoginRequiredMixin, ListView):
         alternant = Alternant(user=self.request.user)
         contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
         context["contrat"] = contrat
+        context["nomonglet"] = "Votre formation"
 
         return context
 
@@ -638,6 +660,7 @@ class detail_formation(LoginRequiredMixin, DetailView):
         alternant = Alternant(user=request.user)
         contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
         context["contrat"] = contrat
+        context["nomonglet"] = "Votre formation"
 
         return self.render_to_response(context)
 
@@ -648,10 +671,13 @@ class detail_formation(LoginRequiredMixin, DetailView):
         contrat.nombre_annees = nombre_annee
         contrat.save()
 
+        messages.add_message(request, messages.SUCCESS, "Vos données ont bien été enregistrées.")
+
         return redirect("detail_formation")
 
 
 class appliquer_formation(LoginRequiredMixin, DetailView):
+
     model = Formation
 
     def get(self, request, *args, **kwargs):
@@ -698,7 +724,7 @@ class creerCERFA(LoginRequiredMixin, DetailView):
         else:
             data["emp_public"] = 1
 
-        if contrat.type_contrat_avenant in (31,32,33,34,35,36):
+        if contrat.type_contrat_avenant in (31, 32, 33, 34, 35, 36):
             data["avenant"] = 1
         else:
             data["contrat"] = 1
@@ -998,7 +1024,7 @@ class creerCERFA(LoginRequiredMixin, DetailView):
             data["formation_annee3_au_mois"] = str(formation.an_3_au.month).zfill(2)
             data["formation_annee3_au_annee"] = formation.an_3_au.year
 
-        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas("test.pdf", data, flatten=False)
+        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas("CERFA.pdf", data, flatten=False)
 
 
         with open(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier), "rb") as file:
@@ -1114,3 +1140,16 @@ def recapinscriptions(request, formation_hash):
 
     return render(request, "message.html")
 
+def exportypareo(request, cfa_hash,email_livraison):
+
+    try:
+        CFA.objects.get(hash=cfa_hash)
+    except ObjectDoesNotExist:
+        messages.add_message(request, messages.ERROR,"L'URL est erronée.")
+        return render(request, "message.html")
+
+    creerexportypareo(request,email_livraison)
+
+    messages.add_message(request, messages.SUCCESS, "Un mail a été généré avec le fichier csv joint. S'il n'apparaît pas dans votre boîte de réception, vérifiez le dossier des éléments indésirables.")
+
+    return render(request, "message.html")
