@@ -182,7 +182,6 @@ def create_entreprise(request):
                     if conventioncollective:
                         entreprise.libelle_convention_collective = conventioncollective.libelle
 
-
             entreprise.save()
 
             try:
@@ -247,12 +246,11 @@ def create_entreprise(request):
                     personnel.courriel_contact = request.POST.get("courriel_contact")
                     personnel.save()
 
-            context["form"] = form
-            context["contrat"] = contrat
-
             messages.add_message(request, messages.SUCCESS, "Les données de l'employeur ont été enregistrées.")
 
-            return render(request, "entreprise_form.html", context)
+            # le redirect affiche la page comme sur un GET celà revient à envoyer l'exécution à la ligne du else:*
+            # diu test if len(request.POST) > 0: (comme si on demandait l'affichait l'affichage
+            return redirect(reverse("creationentreprise"))
         else:
             context["form"] = form
             context["contrat"] = contrat
