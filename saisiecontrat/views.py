@@ -1066,6 +1066,8 @@ def envoyerficheraf(request, alternant_hash):
 
 def validationmission(request, alternant_hash):
 
+    alternant=Alternant.objects.get(hash=alternant_hash)
+    contrat = alternant.contrat_courant
 
     if len(request.POST) > 0:
 
@@ -1075,9 +1077,6 @@ def validationmission(request, alternant_hash):
         form = ValidationMissionForm(request.POST)
 
         if form.is_valid():
-
-            contrat = Contrat.objects.get(contrat_courant=True)
-
             if contrat.avis_raf == 2 or contrat.avis_raf == 3 or contrat.avis_raf == 4:
                 messages.add_message(request, messages.INFO, "Un avis a déjà été enregistré sur cette mission.")
             else:
@@ -1091,8 +1090,6 @@ def validationmission(request, alternant_hash):
                     i += 1
 
                 libelle_avis_raf = Contrat.AVIS_RAF[i][1]
-
-                alternant=Alternant.objects.get(hash=alternant_hash)
 
                 context = {}
                 context["libelle_avis_raf"] = libelle_avis_raf
@@ -1120,7 +1117,6 @@ def validationmission(request, alternant_hash):
                 messages.add_message(request, messages.SUCCESS, "Votre avis a bien été enregistré.")
 
     else:
-        contrat = Contrat.objects.get(contrat_courant=True)
         form = ValidationMissionForm(instance=contrat)
 
     context={}

@@ -5,9 +5,8 @@
 {% block bodyId %}loginPage{% endblock %}
 
 {% block content %}
+{% if form.errors %}
 
-{% if login_form.errors %}
-<p class="error">{{ login_form.errors }}</p>
 {% endif %}
 
 <h3>Vous avez un compte. Identifiez-vous.</h3>
@@ -15,7 +14,7 @@
     {{ login_form.as_p }}
     {% csrf_token %}
     <p><a href="{% url 'comptes:password_reset' %}">Mot de passe oublié</a></p>
-    <input type="submit" value="Envoyer">
+    <input type="submit" name="login" value="Envoyer">
 </form>
 
 <h3>Vous n'avez pas encore de compte</h3>
@@ -23,7 +22,7 @@
 <form action="{% url 'comptes:signup' %}" method="POST">
     {{ signup_form.as_p }}
     {% csrf_token %}
-    <input type="submit" value="Envoyer">
+    <input type="submit" name="signup" value="Envoyer">
 </form>
 
 {% endblock %}

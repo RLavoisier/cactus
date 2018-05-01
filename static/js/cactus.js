@@ -1,7 +1,7 @@
-var DOMAIN = "http://127.0.0.1/";
+$(document).ready(function(){
 
-$(document).ready(
-    function(){
+        $(".has-popover").popover({'trigger':'hover'});
+
         $(".datepicker").datepicker(
             {
             changeMonth: true,

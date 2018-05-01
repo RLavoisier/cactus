@@ -3,11 +3,6 @@
 {% block content %}
 <form action="{% url 'creationentreprise' %}" method="post">
     {% csrf_token %}
-
-    {% if form.errors %}
-    <p class="error">{{ form.errors }}</p>
-    {% endif %}
-
         <fieldset>
             <div class="row">
                 <div class="col-md-8 col-externe">

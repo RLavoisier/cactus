@@ -17,10 +17,22 @@ class LocalizedModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.base_fields.values():
-            print(field)
             if type(field) in (forms.FloatField, forms.DecimalField):
                 field.localize = True
                 field.widget.is_localized = True
+        # Ajout des popover
+        for field in self.fields:
+            help_text = self.fields[field].help_text
+            print(help_text)
+            if help_text:
+                cls = self.fields[field].widget.attrs.get("class", "")
+                cls = "%s %s" % (cls, "has-popover")
+                self.fields[field].widget.attrs.update({
+                    "class": cls,
+                    "data-content": help_text,
+                    "data-placement": "bottom",
+                    "data-container": "body"
+                })
 
 class CreationContratForm(forms.Form):
 
@@ -39,6 +51,22 @@ class CreationContratForm(forms.Form):
                                                                 format="%d/%m/%y"))
 
     numero_contrat_anterieur = forms.CharField(required=False, widget=forms.TextInput(attrs={"class": "form-control"}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Ajout des popover
+        for field in self.fields:
+            help_text = self.fields[field].help_text
+            print(help_text)
+            if help_text:
+                cls = self.fields[field].widget.attrs.get("class", "")
+                cls = "%s %s" % (cls, "has-popover")
+                self.fields[field].widget.attrs.update({
+                    "class": cls,
+                    "data-content": help_text,
+                    "data-placement": "right",
+                    "data-container": "body"
+                })
 
     def clean(self):
 
@@ -62,7 +90,7 @@ class CreationContratForm(forms.Form):
         return cleaned_data
 
 
-class CreationEntrepriseForm(forms.ModelForm):
+class CreationEntrepriseForm(LocalizedModelForm):
 
     civilite_ma_1 = forms.IntegerField(widget=forms.Select(choices=Personnel.CIVILITE, attrs={"class": "form-control"}))
     nom_ma_1 = forms.CharField(max_length=40, widget=forms.TextInput(attrs={"class": "form-control"}))
@@ -158,7 +186,6 @@ class CreationEntrepriseForm(forms.ModelForm):
             raise forms.ValidationError("Le SIRET doit être renseigné.")
         else:
             S=0
-
             if len(siret) == 14:
                 for i in range(1, 14):
                     if divmod(i, 2)[1] == 1:
@@ -291,7 +318,7 @@ class CreationEntrepriseForm(forms.ModelForm):
         else:
             return False
 
-class CreationAlternantForm(forms.ModelForm):
+class CreationAlternantForm(LocalizedModelForm):
 
     class Meta:
         """
@@ -549,7 +576,6 @@ class InformationContratForm(LocalizedModelForm):
         self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
 
-
     def clean_date_embauche(self):
 
         date_embauche = self.cleaned_data.get("date_embauche")
@@ -599,7 +625,7 @@ class InformationContratForm(LocalizedModelForm):
             return duree_hebdomadaire_travail_heures
 
 
-class InformationMissionForm(forms.ModelForm):
+class InformationMissionForm(LocalizedModelForm):
 
     class Meta:
         """
@@ -625,7 +651,7 @@ class InformationMissionForm(forms.ModelForm):
             else:
                 return mission
 
-class ValidationMissionForm(forms.ModelForm):
+class ValidationMissionForm(LocalizedModelForm):
 
     CHOIX = [
         (2, "Mission validée"),
@@ -656,16 +682,16 @@ class ValidationMissionForm(forms.ModelForm):
         else:
             return validation
 
-    def clean_motif(self):
+    def clean(self):
 
         validation = self.cleaned_data.get("validation")
         motif = self.cleaned_data.get("motif")
 
         print(type(validation))
-        print(self.request.POST)
 
         if validation in ["3", "4"] and len(motif) < 100:
             raise forms.ValidationError("Vous devez saisir un motif en cas de réserve ou de rejet.")
-        else:
-            return motif
+
+        return self.cleaned_data
+
 

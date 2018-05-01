@@ -8,7 +8,7 @@ app_name = "comptes"
 
 urlpatterns = [
     path("", UserSignupOrLoginView.as_view(), name="signup_or_login"),
-    path("signup/", UserSignupOrLoginView.as_view(), name="signup"),
+    path("signup/", UserSignupView.as_view(), name="signup"),
     path("login/", UserSignupOrLoginView.as_view(), name="login"),
     path('password_reset/',
          PasswordResetView.as_view(success_url=reverse_lazy("comptes:password_reset_done")),
