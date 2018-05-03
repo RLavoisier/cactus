@@ -88,8 +88,6 @@ LOGOUT_REDIRECT_URL = LOGIN_URL
 #LOGIN_REDIRECT_URL = "accueil"
 LOGIN_REDIRECT_URL = "creationcontrat"
 
-CRISPY_TEMPLATE_PACK = 'bootstrap3'
-
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
