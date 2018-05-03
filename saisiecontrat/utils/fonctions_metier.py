@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
+from django.core.exceptions import ObjectDoesNotExist
 
-from saisiecontrat.models import Minima
+from saisiecontrat.models import Minima, SMIC
 
 
 class Periode(object):
@@ -73,6 +74,7 @@ class PeriodesFormationManager(object):
             "annee3": None,
             "annee4": None,
         }
+        self.salaire = 0
 
     def calculer_annees(self, annee_formation=0):
         """
@@ -80,8 +82,6 @@ class PeriodesFormationManager(object):
         """
 
         date_debut_annee = self.date_debut_contrat + relativedelta(years=annee_formation)
-
-        date_fin_annee = date_debut_annee + relativedelta(years=1)
 
         annee_en_cours = self.premiere_annee_remuneration + annee_formation
 
@@ -97,18 +97,19 @@ class PeriodesFormationManager(object):
             return
 
         date_fin_annee = date_debut_annee + relativedelta(years=1)
+        date_debut_mois_suivant_ann = self.__debut_mois_suivant_annversaire(self.date_naissance_alternant)
 
         # calcul de la première période
         if ((date_debut_annee.month, date_debut_annee.day) >
                 (self.date_naissance_alternant.month, self.date_naissance_alternant.day)):
-            date_fin_periode1 = datetime(day=self.date_naissance_alternant.day,
-                                         month=self.date_naissance_alternant.month,
-                                         year=date_debut_annee.year + 1) - timedelta(days=1)
+            date_fin_periode1 = datetime(day=date_debut_mois_suivant_ann.day,
+                                         month=date_debut_mois_suivant_ann.month,
+                                         year=date_debut_annee.year + 1) - relativedelta(days=1)
         else:
             try:
-                date_fin_periode1 = datetime(day=self.date_naissance_alternant.day,
-                                             month=self.date_naissance_alternant.month,
-                                             year=date_debut_annee.year) - timedelta(days=1)
+                date_fin_periode1 = datetime(day=date_debut_mois_suivant_ann.day,
+                                             month=date_debut_mois_suivant_ann.month,
+                                             year=date_debut_annee.year) - relativedelta(days=1)
             except ValueError:
                 # gestion des alternant nés le 29 fevrier...
                 date_fin_periode1 = datetime(day=1,
@@ -148,6 +149,14 @@ class PeriodesFormationManager(object):
 
         self.annees["annee%d" % annee_en_cours] = annee.to_dict()
 
+        # si c'est la première période on calcul la rémunération
+        if not self.salaire:
+            try:
+                smic = SMIC.objects.get(du__year=date_debut_annee.year)
+                self.salaire = float("{0:.2f}".format(smic.montant * (taux_minimum / 100)))
+            except ObjectDoesNotExist:
+                self.salaire = 0
+
         if not derniere_periode:
             return self.calculer_annees(annee_formation+1)
 
@@ -185,10 +194,24 @@ class PeriodesFormationManager(object):
         age = date_base.year - self.date_naissance_alternant.year
 
         # deduction par rapport aux jours
-        age = age - ((date_base.month, date_base.date()) <
+        age = age - ((date_base.month, date_base.day) <
                      (self.date_naissance_alternant.month, self.date_naissance_alternant.day))
 
         return age
+
+    def __debut_mois_suivant_annversaire(self, date_anniversaire):
+        """
+        Cette méthode retourne le debut du mois suivant l'anniversaire de l'alternant
+
+        :param date_anniversaire: la date d'anniversaire courant de l'alternant
+        :type date_anniversaire: datetime
+
+        :return: La date de début de mois suivant
+        :rtype: datetime
+        """
+        debut_mois_anniversaire = date_anniversaire.replace(day=1)
+        return debut_mois_anniversaire + relativedelta(months=1)
+
 
     @classmethod
     def controle_debut_contrat(self, date_debut_contrat, date_debut_formation, type_derogation):

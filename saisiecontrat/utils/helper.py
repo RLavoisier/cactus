@@ -596,7 +596,6 @@ def entreprise_complet(entreprise):
             if personnel.date_naissance:
                 i += 1
 
-        print(i)
         return i == 15
     else:
         return False

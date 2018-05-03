@@ -29,7 +29,7 @@
                         <h5>Date de début de contrat</h5>
                     </div>
                     <div class="col-md-2">
-                        <div data-toggle="popover" data-trigger="manual" data-placement="bottom"
+                        <div data-toggle="popover" data-trigger="manual" data-placement="top"
                              data-content="Sauf dérogation la date de début de contrat doit être comprise dans la période suivante :
                                             date de formation moins 3 mois – date de début de formation + 3 mois" id="div_date_debut_contrat">{{  form.date_debut_contrat }}</div>
                     </div>
@@ -37,7 +37,7 @@
                         <h5 align="center">Date de fin de contrat</h5>
                     </div>
                     <div class="col-md-2">
-                        <div data-toggle="popover" data-trigger="manual" data-placement="bottom"
+                        <div data-toggle="popover" data-trigger="manual" data-placement="top"
                              data-content="La date de fin de contrat doit être postérieure à la date de fin de formation (examens
                                            compris) et ne pas la dépasser de plus de deux mois." id="div_date_fin_contrat">{{  form.date_fin_contrat }}</div>
                     </div>
@@ -456,6 +456,14 @@
             );
         });
 
+        $("#id_type_derogation").change(function(){
+            // on Tente de récupérér les rémunération
+            if($("#id_date_fin_contrat").val() != "" && $("#id_date_debut_contrat").val() != ""){
+                get_remuneration();
+            }
+        });
+
+
         $("#id_date_fin_contrat").change(function(){
             $.post(
                 DOMAIN + "api/valider_date_fin_contrat/",
@@ -490,63 +498,13 @@
                 function(response){
                     if(response.success){
                         var annees = [
-                            response.data.annee1,
-                            response.data.annee2,
-                            response.data.annee3,
-                            response.data.annee4
+                            response.data.annees.annee1,
+                            response.data.annees.annee2,
+                            response.data.annees.annee3,
+                            response.data.annees.annee4
                         ];
 
-                        for(i=0; i < annees.length; i++){
-                            index = i + 1;
-                            annee = annees[i];
-
-                            // Vidage des champs
-                            $("#id_an_" + index + "_per_1_du").val(null);
-                            $("#id_an_" + index + "_per_1_au").val(null);
-                            $("#id_an_" + index + "_per_1_taux").val(null);
-                            $("#id_an_" + index + "_per_2_du").val(null);
-                            $("#id_an_" + index + "_per_2_au").val(null);
-                            $("#id_an_" + index + "_per_2_taux").val(null);
-
-                            //on masque la ligne si l'année est null
-                            if (!annee){
-                                $("#annee" + index).hide();
-                                continue;
-                            }
-
-                            //sinon on affiches les valeurs dans les champs
-                            $("#annee" + index).show();
-                            $("#id_an_" + index + "_per_1_du").val(annee.periode1.du);
-                            $("#id_an_" + index + "_per_1_au").val(annee.periode1.au);
-                            $("#id_an_" + index + "_per_1_taux").val(annee.periode1.taux);
-
-                            if(annee.periode2){
-                                $("#id_an_" + index + "_per_2_du").val(annee.periode2.du);
-                                $("#id_an_" + index + "_per_2_au").val(annee.periode2.au);
-                                $("#id_an_" + index + "_per_2_taux").val(annee.periode2.taux);
-                            }
-
-                        }
-                    }
-                }
-            )
-        }
-
-        function get_remuneration(){
-            $.post(
-                DOMAIN + "api/recuperer_remuneration/",
-                {
-                    "date_debut_contrat": $("#id_date_debut_contrat").val(),
-                    "date_fin_contrat": $("#id_date_fin_contrat").val()
-                },
-                function(response){
-                    if(response.success){
-                        var annees = [
-                            response.data.annee1,
-                            response.data.annee2,
-                            response.data.annee3,
-                            response.data.annee4
-                        ];
+                        $("#id_salaire_brut_mensuel").val(response.data.salaire);
 
                         for(i=0; i < annees.length; i++){
                             index = i + 1;
