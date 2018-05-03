@@ -69,7 +69,7 @@
                     <th scope="row">{{ formation.code_formation }}</th>
                     <td>{{ formation.intitule_formation }}</td>
                     <td>{{ formation.nombre_annees }} ans</td>
-                    <td><a href="{% url "appliquer_formation" pk=formation.pk %}">Sélectionner</a></td>
+                    <td><a  class="btn btn-success" href="{% url "appliquer_formation" pk=formation.pk%}">Sélectionner</a></td>
                 </tr>
             {% endfor %}
           </tbody>

@@ -163,10 +163,10 @@ class PeriodesFormationManager(object):
             minima = Minima.objects.filter(age__lte=age,
                                            annee__lte=annee).order_by("-annee", "-age")[0]
 
-            print("Taux Minima pour annee %d - age %d : %s (id: %s)" % (annee,
-                                                                        age,
-                                                                        minima.taux_minimum,
-                                                                        minima.id))
+            #print("Taux Minima pour annee %d - age %d : %s (id: %s)" % (annee,
+            #                                                            age,
+            #                                                            minima.taux_minimum,
+            #                                                            minima.id))
 
             return minima.taux_minimum
         except:
@@ -191,7 +191,7 @@ class PeriodesFormationManager(object):
         return age
 
     @classmethod
-    def controle_debut_contrat(self, date_debut_contrat, date_debut_formation):
+    def controle_debut_contrat(self, date_debut_contrat, date_debut_formation, type_derogation):
         """
         Cette méthode vérifie si la date de début de contrat est valide selon la règle :
 
@@ -206,10 +206,14 @@ class PeriodesFormationManager(object):
         :return: Valid
         :type: bool
         """
-        min_debut_contrat = date_debut_formation - relativedelta(months=3)
-        max_debut_contrat = date_debut_formation + relativedelta(months=3)
 
-        return (min_debut_contrat <= date_debut_contrat) & (date_debut_contrat <= max_debut_contrat)
+        if type_derogation in ["31", "50"]:
+            return True
+        else:
+            min_debut_contrat = date_debut_formation - relativedelta(months=3)
+            max_debut_contrat = date_debut_formation + relativedelta(months=3)
+
+            return (min_debut_contrat <= date_debut_contrat) & (date_debut_contrat <= max_debut_contrat)
 
 
     @classmethod
@@ -228,7 +232,7 @@ class PeriodesFormationManager(object):
         :return: Valid
         :type: bool
         """
-        min_fin_contrat = date_fin_formation + relativedelta(days=1)
+        min_fin_contrat = date_fin_formation
         max_fin_contrat = date_fin_formation + relativedelta(months=2)
 
         return (min_fin_contrat <= date_fin_contrat) & (date_fin_contrat <= max_fin_contrat)

@@ -14,9 +14,13 @@ from saisiecontrat.utils.pdf_generator import PDFGenerator
 def generer_data_pour_pdf_mission(alternant, email, entreprise, ma_1, contrat):
 
     data = {}
+
+    data["formation"] = contrat.formation.intitule_formation
+
     if alternant.adresse_numero is not None:
-        data["numero"] = alternant.adresse_numero
-    data["voie"] = alternant.adresse_voie
+        data["voie"] = "%s %s" % (alternant.adresse_numero,alternant.adresse_voie)
+    else:
+        data["voie"] = alternant.adresse_voie
     data["codepostal"] = alternant.code_postal
     data["ville"] = alternant.ville
     data["neele"] = alternant.date_naissance.strftime('%d/%m/%Y')
@@ -26,8 +30,9 @@ def generer_data_pour_pdf_mission(alternant, email, entreprise, ma_1, contrat):
 
     data["raisonsociale"] = entreprise.raison_sociale
     if entreprise.adresse_numero is not None:
-        data["numero2"] = entreprise.adresse_numero
-    data["voie2"] = entreprise.adresse_voie
+        data["voie2"] = "%s %s" % (entreprise.adresse_numero,entreprise.adresse_voie)
+    else:
+        data["voie2"] = entreprise.adresse_voie
     if entreprise.adresse_complement is not None:
         data["complement2"] = entreprise.adresse_complement
     data["codepostal2"] = entreprise.code_postal
@@ -591,6 +596,7 @@ def entreprise_complet(entreprise):
             if personnel.date_naissance:
                 i += 1
 
+        print(i)
         return i == 15
     else:
         return False
@@ -617,7 +623,9 @@ def mission_complet(contrat):
 
 def contrat_complet(contrat):
 
+
     if contrat:
+
 
         i = 0
 
@@ -639,6 +647,7 @@ def contrat_complet(contrat):
         else:
             if contrat.formation:
                 if contrat.nombre_annees:
+
                     nombre_annees = contrat.nombre_annees
                 else:
                     nombre_annees = contrat.formation.nombre_annees
@@ -691,12 +700,14 @@ def contrat_complet(contrat):
                 if not contrat.an_4_per_2_base:
                     return False
 
+            return True
     else:
         return False
 
-def saisie_complete(request):
+def informe_saisie_complete(request):
 
     alternant = request.user.alternant
+    request.session["alternantcomplet"] = alternant_complet(alternant)
 
     try:
         contrat = alternant.get_contrat_courant()
@@ -704,9 +715,18 @@ def saisie_complete(request):
         contrat = None
 
     if not contrat:
-        return False
+        request.session["contratcomplet"] = False
+        request.session["formationcomplet"] = False
+        request.session["missioncomplet"] = False
+        request.session["entreprisecomplet"] = False
     else:
-        if not contrat.entreprise:
-            return False
+        request.session["contratcomplet"] = contrat_complet(contrat)
+        request.session["formationcomplet"] = formation_complet(contrat)
+        request.session["missioncomplet"] = mission_complet(contrat)
 
-    return alternant_complet(alternant) and entreprise_complet(contrat.entreprise) and formation_complet(contrat) and mission_complet(contrat) and contrat_complet(contrat)
+        if not contrat.entreprise:
+            request.session["entreprisecomplet"] = False
+        else:
+            request.session["entreprisecomplet"] = entreprise_complet(contrat.entreprise)
+
+    return request

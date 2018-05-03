@@ -23,6 +23,7 @@
     <section id="content">
       <div class="container">
         {% if user.is_authenticated %}
+
         <nav class="navbar navbar-default">
             <ul class="nav navbar-nav">
 
@@ -33,43 +34,43 @@
               </li>
 
               {% if contrat %}
-
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'creationalternant' %}">
-                  {% ifequal nomonglet "Vous" %}<strong>{% endifequal %}Vous{% ifequal nomonglet "Vous" %}</strong>{% endifequal %}
+                  {% ifequal nomonglet "Vous" %}<strong>{% endifequal %}Vous{% ifequal nomonglet "Vous" %}</strong>{% endifequal %} {% if request.session.alternantcomplet %}<span class="glyphicon glyphicon-ok"></span>{% endif %}
                 </a>
               </li>
 
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'creationentreprise' %}">
-                  {% ifequal nomonglet "Votre employeur" %}<strong>{% endifequal %}Votre employeur{% ifequal nomonglet "Votre employeur" %}</strong>{% endifequal %}
+                  {% ifequal nomonglet "Votre employeur" %}<strong>{% endifequal %}Votre employeur{% ifequal nomonglet "Votre employeur" %}</strong>{% endifequal %} {% if request.session.entreprisecomplet %}<span class="glyphicon glyphicon-ok"></span>{% endif %}
                 </a>
               </li>
 
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'detail_formation' %}">
-                  {% ifequal nomonglet "Votre formation" %}<strong>{% endifequal %}Votre formation{% ifequal nomonglet "Votre formation" %}</strong>{% endifequal %}
+                  {% ifequal nomonglet "Votre formation" %}<strong>{% endifequal %}Votre formation{% ifequal nomonglet "Votre formation" %}</strong>{% endifequal %} {% if request.session.formationcomplet %}<span class="glyphicon glyphicon-ok"></span>{% endif %}
                 </a>
               </li>
-
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'informationcontrat' %}">
-                  {% ifequal nomonglet "Les données de votre contrat" %}<strong>{% endifequal %}Les données de votre contrat{% ifequal nomonglet "Les données de votre contrat" %}</strong>{% endifequal %}
+                  {% ifequal nomonglet "Les données de votre contrat" %}<strong>{% endifequal %}Les données de votre contrat{% ifequal nomonglet "Les données de votre contrat" %}</strong>{% endifequal %} {% if request.session.contratcomplet %}<span class="glyphicon glyphicon-ok"></span>{% endif %}
                 </a>
+
               </li>
 
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'informationmission' %}">
-                  {% ifequal nomonglet "Votre mission" %}<strong>{% endifequal %}Votre mission{% ifequal nomonglet "Votre mission" %}</strong>{% endifequal %}
+                  {% ifequal nomonglet "Votre mission" %}<strong>{% endifequal %}Votre mission{% ifequal nomonglet "Votre mission" %}</strong>{% endifequal %} {% if request.session.missioncomplet %}<span class="glyphicon glyphicon-ok"></span>{% endif %}
                 </a>
               </li>
 
+                {% if request.session.alternantcomplet and request.session.entreprisecomplet and request.session.contratcomplet and request.session.formationcomplet and request.session.missioncomplet %}
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'cerfa' %}">
                   {% ifequal nomonglet "Votre CERFA" %}<strong>{% endifequal %}Votre CERFA{% ifequal nomonglet "Votre CERFA" %}</strong>{% endifequal %}
                 </a>
               </li>
-
+                {% endif %}
               {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">

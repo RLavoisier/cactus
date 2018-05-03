@@ -19,10 +19,11 @@ from django.views.generic import ListView, DetailView
 
 from django.conf import settings
 from saisiecontrat.forms import CreationContratForm, CreationEntrepriseForm, CreationAlternantForm, InformationContratForm, InformationMissionForm, ValidationMissionForm
-from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel, Formation, CFA
+from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionCollective, Personnel, Formation, CFA, SMIC
 from django.core.exceptions import ObjectDoesNotExist
 
-from saisiecontrat.utils.helper import creerfichemission, creerrecapinscriptions, creerexportypareo
+from saisiecontrat.utils.helper import creerfichemission, creerrecapinscriptions, creerexportypareo, \
+    informe_saisie_complete, entreprise_complet, alternant_complet, contrat_complet, mission_complet, formation_complet
 from saisiecontrat.utils.pdf_generator import PDFGenerator
 
 
@@ -50,8 +51,6 @@ def creationcontrat(request):
             except ObjectDoesNotExist:
                 contrat = None
 
-
-
             # Si aucun contrat n'existe on crée un nouveau contrat
             if contrat is None:
 
@@ -64,10 +63,12 @@ def creationcontrat(request):
                 contrat.save()
 
                 contrat_a_afficher = contrat
+                informe_saisie_complete(request)
 
-                context["message"] = "Le contrat a bien été créé vous pouvez maintenant le compléter dans les onglets suivants."
+                messages.add_message(request, messages.SUCCESS, "Le contrat a bien été créé vous pouvez maintenant le compléter dans les onglets suivants.")
+
             else:
-                # copy ll'objet (si on écrit nouveaucontrat=contrat on crée juste un pointeur sur contrat)
+                # copy l'objet (si on écrit nouveaucontrat=contrat on crée juste un pointeur sur contrat)
                 # Cette syntaxe python fonctionne sur tout type d'objet et  dictionnaire
                 nouveaucontrat = deepcopy(contrat)
 
@@ -85,6 +86,8 @@ def creationcontrat(request):
 
                 contrat_a_afficher = nouveaucontrat
 
+                informe_saisie_complete(request)
+
                 messages.add_message(request, messages.SUCCESS,
                                      "Un contrat a bien été créé. Les données du contrat précédent on été reprises vous pouver modifier les données dans les onglets suivants.")
 
@@ -97,9 +100,9 @@ def creationcontrat(request):
 
             context["form"] = form
             context["contrat"] = contrat
-            return render(request, 'creationcontrat.html', context)
+            informe_saisie_complete(request)
 
-            # return redirect("creationalternant")
+            return render(request, 'creationcontrat.html', context)
         else:
             return render(request, 'creationcontrat.html', {'form': form})
     else:
@@ -122,6 +125,8 @@ def creationcontrat(request):
 
         context["form"] = form
         context["contrat"]=contrat
+
+        informe_saisie_complete(request)
 
         return render(request, 'creationcontrat.html', context)
 
@@ -248,12 +253,16 @@ def create_entreprise(request):
 
             messages.add_message(request, messages.SUCCESS, "Les données de l'employeur ont été enregistrées.")
 
+            request.session["entreprisecomplet"]=entreprise_complet(entreprise)
+
             # le redirect affiche la page comme sur un GET celà revient à envoyer l'exécution à la ligne du else:*
             # diu test if len(request.POST) > 0: (comme si on demandait l'affichait l'affichage
             return redirect(reverse("creationentreprise"))
         else:
             context["form"] = form
             context["contrat"] = contrat
+            request.session["entreprisecomplet"]=False
+
             return render(request, "entreprise_form.html", context)
     else:
         alternant = request.user.alternant
@@ -362,6 +371,7 @@ def create_alternant(request):
             context["nationalite"] = alternant.nationalite
 
             messages.add_message(request, messages.SUCCESS, "Vos données ont bien été enregistrées.")
+            request.session["alternantcomplet"]=alternant_complet(alternant)
 
             return render(request, "alternant_form.html", context)
         else:
@@ -371,6 +381,7 @@ def create_alternant(request):
 
             context["form"] = form
             context["contrat"] = contrat
+            request.session["alternantcomplet"]=False
 
             return render(request, "alternant_form.html", context)
 
@@ -459,14 +470,20 @@ def inform_contrat(request):
 
             context["form"] = form
             context["contrat"]=contrat
+            context["SMIC"]= SMIC.objects.get()
 
             messages.add_message(request, messages.SUCCESS, "Les données de votre contrat ont bien été enregistrées.")
+            request.session["contratcomplet"] = contrat_complet(contrat)
+
 
             return render(request, "contrat_form.html", context)
         else:
             context["form"] = form
             contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
             context["contrat"]=contrat
+            context["SMIC"]= SMIC.objects.get()
+
+            request.session["contratcomplet"]=False
 
             return render(request, "contrat_form.html", context)
     else:
@@ -478,6 +495,9 @@ def inform_contrat(request):
 
         context["form"] = form
         context["contrat"]=contrat
+        context["SMIC"] = SMIC.objects.get()
+
+        request.session["contratcomplet"] = contrat_complet(contrat)
 
         return render(request, "contrat_form.html", context)
 
@@ -527,17 +547,18 @@ def inform_mission(request):
                 contrat.date_maj=datetime.now()
                 contrat.save()
                 context["boutonenvoiactif"] = (len(contrat.mission) >= 100)
+                messages.add_message(request, messages.SUCCESS, "La mission a bien été enregistrée.")
+                request.session["missioncomplet"] = mission_complet(contrat)
             else:
                 context["boutonenvoiactf"] = False
+                request.session["missioncomplet"] = False
         else:
             context["boutonenvoiactif"] = (len(contrat.mission) >= 100)
-
-        messages.add_message(request, messages.SUCCESS, "La mission a bien été enregistrée.")
-
     else:
         contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
         form = InformationMissionForm(instance=contrat)
         context["boutonenvoiactif"] = (len(contrat.mission) >= 100)
+        request.session["missioncomplet"] = mission_complet(contrat)
 
     context["form"] = form
     context["contrat"]=contrat
@@ -610,8 +631,16 @@ class detail_formation(LoginRequiredMixin, DetailView):
 
     def get_object(self, queryset=None):
         alternant = self.request.user.alternant
+
         # self.contrat permet de récupérer le contrat ailleurs dans la class
         self.contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+
+        if not self.contrat.formation:
+            if alternant.code_acces:
+                f = Formation.objects.get(code_acces=alternant.code_acces)
+                self.contrat.formation=f
+                self.contrat.save()
+
         formation = self.contrat.formation
 
         # la fonction du return est d'envoyer les infos à la page
@@ -623,6 +652,7 @@ class detail_formation(LoginRequiredMixin, DetailView):
         self.object = self.get_object()
 
         # l'objet de la redéfinition de la fonction get est de rerouter vers la page de choix dans le cas où aucune formation n'est associée au contrat
+
         if not self.object:
             return redirect("liste_formation")
         # pas besoin de else: le return return sort de la fonction
@@ -660,6 +690,7 @@ class detail_formation(LoginRequiredMixin, DetailView):
         context["contrat"] = contrat
         context["nomonglet"] = "Votre formation"
 
+        request.session["formationcomplet"] = formation_complet(contrat)
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -671,6 +702,7 @@ class detail_formation(LoginRequiredMixin, DetailView):
 
         messages.add_message(request, messages.SUCCESS, "Vos données ont bien été enregistrées.")
 
+        request.session["formationcomplet"] = formation_complet(contrat)
         return redirect("detail_formation")
 
 
@@ -689,6 +721,7 @@ class appliquer_formation(LoginRequiredMixin, DetailView):
             contrat.formation = self.object
             contrat.save()
 
+        request.session["formationcomplet"] = formation_complet(contrat)
         return redirect("detail_formation")
 
 

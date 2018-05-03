@@ -27,6 +27,7 @@ class ValiderDateDebutContrat(View):
             return JsonResponse(response._asdict())
 
         date_saisie_str = request.POST["date_saisie"]
+        type_derogation = request.POST["type_derogation"]
 
         # conversion de la date saisie en datetime
         try:
@@ -45,9 +46,7 @@ class ValiderDateDebutContrat(View):
         formation = contrat.formation
 
         try:
-            debut_contrat_valide = PeriodesFormationManager.controle_debut_contrat(date_saisie,
-                                                                                  formation.an_1_du)
-
+            debut_contrat_valide = PeriodesFormationManager.controle_debut_contrat(date_saisie,formation.an_1_du, type_derogation)
             response = ApiResponse(
                 success=debut_contrat_valide,
                 response="",

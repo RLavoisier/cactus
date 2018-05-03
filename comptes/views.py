@@ -32,6 +32,7 @@ class UserSignupView(CreateView):
         alternant = Alternant()
         alternant.user = user
 
+        # Stockage du code d'accès dans l'alternant
         if form.cleaned_data["code_formation"]:
             alternant.code_access = form.cleaned_data["code_formation"]
 
@@ -61,7 +62,6 @@ class UserSignupView(CreateView):
             self.form_class = CactusUserCreationForm
 
         return super().post(request, *args, **kwargs)
-
 
 class UserSignupOrLoginView(LoginView):
     template_name = "registration/signup_login.html"

@@ -10,6 +10,7 @@ from django.urls import reverse
 from saisiecontrat.models import Contrat, Entreprise, NAF, Alternant, Personnel, ConventionCollective
 
 
+# Cette redéfinition de la classe modèle form permet de changer le format des nombre (virgule) et d'afficher en info bulle les help_text.
 class LocalizedModelForm(forms.ModelForm):
     """
     Class modifiée pour Model form pour le formattage spécifique des champs
@@ -21,10 +22,11 @@ class LocalizedModelForm(forms.ModelForm):
             if type(field) in (forms.FloatField, forms.DecimalField):
                 field.localize = True
                 field.widget.is_localized = True
+
         # Ajout des popover
         for field in self.fields:
             help_text = self.fields[field].help_text
-            print(help_text)
+            #print(help_text)
             if help_text:
                 cls = self.fields[field].widget.attrs.get("class", "")
                 cls = "%s %s" % (cls, "has-popover")
@@ -188,14 +190,19 @@ class CreationEntrepriseForm(LocalizedModelForm):
         else:
             S=0
             if len(siret) == 14:
-                for i in range(1, 14):
-                    if divmod(i, 2)[1] == 1:
+                for i in range(0, 14):
+                    if divmod(i, 2)[1] == 0:
                         if int(siret[i]) < 5:
                             S += int(siret[i]) * 2
+                            #print(int(siret[i]) * 2)
                         else:
                             S += int(siret[i]) * 2 - 9
+                            #print(int(siret[i]) * 2 - 9)
                     else:
                         S += int(siret[i])
+                        #print(int(siret[i]))
+
+                #print(S)
 
                 # Le code SIREN 356000000 est celui de la poste dont le modulo de S est fait par 5 et non 10
                 if (siret[0:9]=="356000000" and divmod(S,5)[1] == 0) or (siret[0:9]!="356000000" and divmod(S,10)[1] == 0):
@@ -624,6 +631,15 @@ class InformationContratForm(LocalizedModelForm):
             raise forms.ValidationError("Le nombre d'heures de travail hebdomadaire doit être renseignée.")
         else:
             return duree_hebdomadaire_travail_heures
+
+    def clean_caisse_retraite_complementaire(self):
+
+        caisse_retraite_complementaire = self.cleaned_data.get("caisse_retraite_complementaire")
+
+        if caisse_retraite_complementaire is None:
+            raise forms.ValidationError("La caisse de retraite complémentaire à laquelle souscrit l'entreprise pour ses salariés doit être saisie.")
+        else:
+            return caisse_retraite_complementaire
 
 
 class InformationMissionForm(LocalizedModelForm):
