@@ -191,8 +191,8 @@ class Alternant(models.Model):
     )
 
     # Le related name permet de renvoyer l'alternant depuis le user avec la syntaxe user.alternant
-    user = models.OneToOneField(User,on_delete=models.CASCADE, primary_key=True, related_name="alternant")
-    hash = models.CharField(default=generer_uuid4, max_length=50, null=True, blank=True)
+    user = models.OneToOneField(User,on_delete=models.CASCADE, related_name="alternant")
+    hash = models.CharField(max_length=50, blank=True, null=True)
     nom = models.CharField(max_length=70, blank=True, null=True)
     prenom = models.CharField(verbose_name="Prénom", max_length=35, blank=True, null=True)
     sexe = models.CharField(max_length=1, choices=SEXE, default='M')
@@ -224,12 +224,20 @@ class Alternant(models.Model):
     adresse_voie_representant = models.CharField(verbose_name="Voie", max_length=100, blank=True, null=True)
     code_postal_representant = models.CharField(verbose_name="Code postal", max_length=5, blank=True, null=True)
     ville_representant = models.CharField(max_length=60, blank=True, null=True)
-    date_maj = models.DateTimeField(default=datetime.datetime.now())
+    date_maj = models.DateTimeField(default=datetime.datetime.now)
     code_acces = models.CharField(max_length=15, blank=True, null=True)
 
     @property
     def contrat_courant(self):
         return self.get_contrat_courant()
+
+    def save(self, *args, **kwargs):
+        print("PK", self.id)
+        if not self.id:
+            self.hash = generer_uuid4()
+
+        super().save(*args, **kwargs)
+
 
     def get_contrat_courant(self):
         """
@@ -298,8 +306,8 @@ class Entreprise(models.Model):
                                                      help_text="Le lbellé de C.C. est obligatoire, toutefois si le code de convention est renseigné et existe dans notre base il sera renseigné automatiquement.")
     adhesion_regime_assurance_chomage = models.BooleanField(default=False,
                                                             help_text="Cochez cette case si l'employeur appartient au secteur public et si l'apprenti(e) adhère au régime spécifique d'assurance chômage.")
-    date_maj = models.DateTimeField(default=datetime.datetime.now())
-    date_maj_contacts = models.DateTimeField(default=datetime.datetime.now())
+    date_maj = models.DateTimeField(default=datetime.datetime.now)
+    date_maj_contacts = models.DateTimeField(default=datetime.datetime.now)
 
     def __str__(self):
         return "%s" % (self.raison_sociale)
@@ -327,14 +335,14 @@ class Personnel(models.Model):
     prenom = models.CharField(max_length=35)
     courriel = models.CharField(max_length=40, blank=True, null=True)
     date_naissance = models.DateField(blank=True, null=True)
-    date_maj = models.DateTimeField(default=datetime.datetime.now())
+    date_maj = models.DateTimeField(default=datetime.datetime.now)
 
     def __str__(self):
         return "%s %s" % (self.nom, self.prenom)
 
 
 class CFA(models.Model):
-    numeroUAI = models.CharField(max_length=8,primary_key=True)
+    numeroUAI = models.CharField(max_length=8)
     hash = models.CharField(default=generer_uuid4, max_length=50, null=True, blank=True)
     nom = models.CharField(max_length=70)
     adresse_numero = models.CharField(max_length=10, blank=True)
@@ -342,6 +350,13 @@ class CFA(models.Model):
     adresse_complement = models.CharField(max_length=100, blank=True)
     code_postal = models.CharField(max_length=5)
     ville = models.CharField(max_length=60)
+
+    def save(self, *args, **kwargs):
+        print("PK", self.id)
+        if not self.id:
+            self.hash = generer_uuid4()
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.nom
@@ -380,8 +395,8 @@ class Formation(models.Model):
         (4, "Autre"),
     )
 
-    code_formation = models.CharField(max_length=14, primary_key=True)
-    hash = models.CharField(default=generer_uuid4, max_length=50, null=True, blank=True)
+    code_formation = models.CharField(max_length=14)
+    hash = models.CharField(max_length=50, null=True, blank=True)
     cfa = models.ForeignKey(CFA, on_delete=models.CASCADE)
     intitule_formation = models.CharField(max_length=150,blank=True, null=True)
     ville = models.CharField(max_length=35,blank=True, null=True)
@@ -408,6 +423,13 @@ class Formation(models.Model):
 
     def __str__(self):
         return self.intitule_formation
+
+    def save(self, *args, **kwargs):
+        print("PK", self.id)
+        if not self.id:
+            self.hash = generer_uuid4()
+
+        super().save(*args, **kwargs)
 
 
 class Contrat(models.Model):
@@ -516,7 +538,7 @@ class Contrat(models.Model):
     an_4_per_2_au = models.DateField(blank=True, null=True)
     an_4_per_2_taux = models.PositiveSmallIntegerField(blank=True, null=True)
     an_4_per_2_base = models.PositiveSmallIntegerField(choices=BASE, blank=True, null=True, default=1)
-    date_maj = models.DateTimeField(default=datetime.datetime.now())
+    date_maj = models.DateTimeField(default=datetime.datetime.now)
     date_maj_mission = models.DateTimeField(blank=True, null=True)
     date_saisie_complete = models.DateTimeField(blank=True, null=True)
     date_envoi_raf = models.DateTimeField(blank=True, null=True)
