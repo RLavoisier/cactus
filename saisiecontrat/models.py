@@ -285,7 +285,6 @@ class Entreprise(models.Model):
         (4, "Apprentissage familial : l’employeur est un ascendant de l’apprenti"),
     )
 
-    id = models.AutoField(primary_key=True)
     raison_sociale = models.CharField(verbose_name="Raison sociale ou nom du dirigeant", max_length=70, blank=True, null=True,help_text="Entrez la raison sociale de l'entreprise ou les nom et prénom du dirigeant pour un employeur individuel.")
     numero_SIRET = models.CharField(verbose_name="SIRET", max_length=14, blank=True, null=True, help_text="Entrez le SIRET (14 chiffres sans espace) de l'établissement où vous effectuerez votre apprentissage.")
     adresse_numero = models.CharField(verbose_name="N°", max_length=10, blank=True, null=True, help_text="Entrez le numéro. Si l'addresse est un lieu-dit ou toute autre adresse sans numéro, laissez cette case vide.")
@@ -327,7 +326,6 @@ class Personnel(models.Model):
         (4, "Personne à contacter"),
     )
 
-    id = models.AutoField(primary_key=True)
     entreprise = models.ForeignKey(Entreprise, on_delete=models.CASCADE)
     role = models.PositiveSmallIntegerField(choices=ROLE)
     civilite = models.CharField(max_length=12,choices=CIVILITE)
@@ -479,7 +477,6 @@ class Contrat(models.Model):
         (4, "Le responsable de formation a rejeté cette mission"),
     )
 
-    id = models.AutoField(primary_key=True)
     alternant = models.ForeignKey(Alternant, on_delete=models.CASCADE, blank=True, null=True, related_name="contrats")
     mode_contractuel = models.PositiveSmallIntegerField(choices=MODE_CONTRACTUEL)
     entreprise = models.ForeignKey(Entreprise, on_delete=models.CASCADE, blank=True, null=True)
@@ -555,7 +552,6 @@ class Contrat(models.Model):
 
 
 class SMIC (models.Model):
-    id = models.AutoField(primary_key=True)
     du = models.DateField()
     au = models.DateField()
     montant = models.FloatField()
