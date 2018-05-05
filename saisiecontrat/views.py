@@ -145,8 +145,8 @@ def create_entreprise(request):
         # Comme c'est un formulaire modèle, cela prépare également un objet de base de donnée
         form = CreationEntrepriseForm(request.POST)
 
-        alternant = Alternant(user=request.user)
-        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        alternant = request.user.alternant
+        contrat = alternant.contrat_courant
         entreprise = contrat.entreprise
 
         if form.is_valid():
@@ -335,8 +335,8 @@ def create_alternant(request):
 
         if form.is_valid():
 
-            alternant = Alternant(user=request.user)
-            contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+            alternant = request.user.alternant
+            contrat = alternant.contrat_courant
 
             alternant.nom = form.cleaned_data["nom"]
             alternant.prenom = form.cleaned_data["prenom"]
@@ -376,8 +376,8 @@ def create_alternant(request):
             return render(request, "alternant_form.html", context)
         else:
 
-            alternant = Alternant(user=request.user)
-            contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+            alternant = request.user.alternant
+            contrat = alternant.contrat_courant
 
             context["form"] = form
             context["contrat"] = contrat
@@ -469,7 +469,7 @@ def inform_contrat(request):
             contrat.save()
 
             context["form"] = form
-            context["contrat"]=contrat
+            context["contrat"]= contrat
             context["SMIC"]= SMIC.objects.get()
 
             messages.add_message(request, messages.SUCCESS, "Les données de votre contrat ont bien été enregistrées.")
@@ -539,8 +539,8 @@ def inform_mission(request):
 
         if contrat.mission != request.POST.get("mission"):
             if form.is_valid():
-                alternant = Alternant(user=request.user)
-                contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+                alternant = request.user.alternant
+                contrat = alternant.contrat_courant
                 contrat.mission = request.POST.get("mission")
                 contrat.avis_raf=0
                 contrat.date_maj_mission=datetime.now()
@@ -601,8 +601,8 @@ class liste_formation(LoginRequiredMixin, ListView):
         context["diplomes"] = ((0, "Tous"),) + diplomes
         context["request"] = self.request
 
-        alternant = Alternant(user=self.request.user)
-        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        alternant = self.request.user.alternant
+        contrat = alternant.contrat_courant
         context["contrat"] = contrat
         context["nomonglet"] = "Votre formation"
 
@@ -685,8 +685,8 @@ class detail_formation(LoginRequiredMixin, DetailView):
 
         context["libelle_inspection_pedagogique_competente"] = Formation.INSPECTION_PEDAGOGIQUE[i][1]
 
-        alternant = Alternant(user=request.user)
-        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        alternant = request.user.alternant
+        contrat = alternant.contrat_courant
         context["contrat"] = contrat
         context["nomonglet"] = "Votre formation"
 
@@ -695,8 +695,8 @@ class detail_formation(LoginRequiredMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         nombre_annee = self.request.POST.get("nombre_annees")
-        alternant = Alternant(user=request.user)
-        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        alternant = request.user.alternant
+        contrat = alternant.contrat_courant
         contrat.nombre_annees = nombre_annee
         contrat.save()
 
@@ -1055,13 +1055,17 @@ class creerCERFA(LoginRequiredMixin, DetailView):
             data["formation_annee3_au_mois"] = str(formation.an_3_au.month).zfill(2)
             data["formation_annee3_au_annee"] = formation.an_3_au.year
 
-        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas("CERFA.pdf", data, flatten=False)
+        nom_fichier = "CERFA_%s.pdf" % datetime.now().strftime("%Y%m%d%H%M%S")
+        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(nom_fichier, data, flatten=False)
 
 
         with open(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier), "rb") as file:
             response = HttpResponse(FileWrapper(file), content_type='application/pdf')
             response['Content-Disposition'] = 'attachment; filename=%s' % nomfichier
-            return response
+
+        os.remove(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
+
+        return response
 
 
 def envoyermailvalidationraf(request):

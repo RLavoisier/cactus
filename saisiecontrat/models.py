@@ -232,7 +232,6 @@ class Alternant(models.Model):
         return self.get_contrat_courant()
 
     def save(self, *args, **kwargs):
-        print("PK", self.id)
         if not self.id:
             self.hash = generer_uuid4()
 
@@ -350,7 +349,6 @@ class CFA(models.Model):
     ville = models.CharField(max_length=60)
 
     def save(self, *args, **kwargs):
-        print("PK", self.id)
         if not self.id:
             self.hash = generer_uuid4()
 
@@ -423,7 +421,6 @@ class Formation(models.Model):
         return self.intitule_formation
 
     def save(self, *args, **kwargs):
-        print("PK", self.id)
         if not self.id:
             self.hash = generer_uuid4()
 

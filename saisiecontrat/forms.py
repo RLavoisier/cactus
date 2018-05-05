@@ -599,8 +599,8 @@ class InformationContratForm(LocalizedModelForm):
     def clean_date_effet_avenant(self):
 
         date_effet_avenant = self.cleaned_data.get("date_effet_avenant")
-        alternant = Alternant(user=self.request.user)
-        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        alternant = self.request.user.alternant
+        contrat = alternant.contrat_courant
 
         if contrat.type_contrat_avenant in (31, 32, 33, 34, 35, 36):
             if date_effet_avenant is None:
