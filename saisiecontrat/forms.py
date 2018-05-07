@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
-from crispy_forms.bootstrap import InlineField, TabHolder, Tab
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, Layout, Fieldset, Field, Div
 from django import forms
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.urls import reverse
 
 from saisiecontrat.models import Contrat, Entreprise, NAF, Alternant, Personnel, ConventionCollective
 
@@ -60,7 +55,6 @@ class CreationContratForm(forms.Form):
         # Ajout des popover
         for field in self.fields:
             help_text = self.fields[field].help_text
-            print(help_text)
             if help_text:
                 cls = self.fields[field].widget.attrs.get("class", "")
                 cls = "%s %s" % (cls, "has-popover")
@@ -605,8 +599,8 @@ class InformationContratForm(LocalizedModelForm):
     def clean_date_effet_avenant(self):
 
         date_effet_avenant = self.cleaned_data.get("date_effet_avenant")
-        alternant = Alternant(user=self.request.user)
-        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        alternant = self.request.user.alternant
+        contrat = alternant.contrat_courant
 
         if contrat.type_contrat_avenant in (31, 32, 33, 34, 35, 36):
             if date_effet_avenant is None:

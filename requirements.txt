@@ -7,3 +7,5 @@ django[argon2]
 fdfgen==0.16.1
 django-bootstrap3==9.1.0
 python-dateutil==2.7.2
+gunicorn==19.8.1
+virtualenvwrapper==4.8.2

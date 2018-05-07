@@ -145,8 +145,8 @@ def create_entreprise(request):
         # Comme c'est un formulaire modèle, cela prépare également un objet de base de donnée
         form = CreationEntrepriseForm(request.POST)
 
-        alternant = Alternant(user=request.user)
-        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        alternant = request.user.alternant
+        contrat = alternant.contrat_courant
         entreprise = contrat.entreprise
 
         if form.is_valid():
@@ -335,8 +335,8 @@ def create_alternant(request):
 
         if form.is_valid():
 
-            alternant = Alternant(user=request.user)
-            contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+            alternant = request.user.alternant
+            contrat = alternant.contrat_courant
 
             alternant.nom = form.cleaned_data["nom"]
             alternant.prenom = form.cleaned_data["prenom"]
@@ -376,8 +376,8 @@ def create_alternant(request):
             return render(request, "alternant_form.html", context)
         else:
 
-            alternant = Alternant(user=request.user)
-            contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+            alternant = request.user.alternant
+            contrat = alternant.contrat_courant
 
             context["form"] = form
             context["contrat"] = contrat
@@ -391,7 +391,7 @@ def create_alternant(request):
 
         context["form"] = form
         contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
-        context["contrat"]=contrat
+        context["contrat"] = contrat
 
         return render(request, "alternant_form.html", context)
 
@@ -469,8 +469,7 @@ def inform_contrat(request):
             contrat.save()
 
             context["form"] = form
-            context["contrat"]=contrat
-            context["SMIC"]= SMIC.objects.get()
+            context["contrat"] = contrat
 
             messages.add_message(request, messages.SUCCESS, "Les données de votre contrat ont bien été enregistrées.")
             request.session["contratcomplet"] = contrat_complet(contrat)
@@ -480,8 +479,7 @@ def inform_contrat(request):
         else:
             context["form"] = form
             contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
-            context["contrat"]=contrat
-            context["SMIC"]= SMIC.objects.get()
+            context["contrat"] = contrat
 
             request.session["contratcomplet"]=False
 
@@ -494,8 +492,7 @@ def inform_contrat(request):
         form = InformationContratForm(instance=contrat, request=request)
 
         context["form"] = form
-        context["contrat"]=contrat
-        context["SMIC"] = SMIC.objects.get()
+        context["contrat"] = contrat
 
         request.session["contratcomplet"] = contrat_complet(contrat)
 
@@ -539,8 +536,8 @@ def inform_mission(request):
 
         if contrat.mission != request.POST.get("mission"):
             if form.is_valid():
-                alternant = Alternant(user=request.user)
-                contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+                alternant = request.user.alternant
+                contrat = alternant.contrat_courant
                 contrat.mission = request.POST.get("mission")
                 contrat.avis_raf=0
                 contrat.date_maj_mission=datetime.now()
@@ -561,7 +558,7 @@ def inform_mission(request):
         request.session["missioncomplet"] = mission_complet(contrat)
 
     context["form"] = form
-    context["contrat"]=contrat
+    context["contrat"] = contrat
 
     i=0
     while contrat.avis_raf != Contrat.AVIS_RAF[i][0]:
@@ -601,8 +598,8 @@ class liste_formation(LoginRequiredMixin, ListView):
         context["diplomes"] = ((0, "Tous"),) + diplomes
         context["request"] = self.request
 
-        alternant = Alternant(user=self.request.user)
-        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        alternant = self.request.user.alternant
+        contrat = alternant.contrat_courant
         context["contrat"] = contrat
         context["nomonglet"] = "Votre formation"
 
@@ -685,8 +682,8 @@ class detail_formation(LoginRequiredMixin, DetailView):
 
         context["libelle_inspection_pedagogique_competente"] = Formation.INSPECTION_PEDAGOGIQUE[i][1]
 
-        alternant = Alternant(user=request.user)
-        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        alternant = request.user.alternant
+        contrat = alternant.contrat_courant
         context["contrat"] = contrat
         context["nomonglet"] = "Votre formation"
 
@@ -695,8 +692,8 @@ class detail_formation(LoginRequiredMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         nombre_annee = self.request.POST.get("nombre_annees")
-        alternant = Alternant(user=request.user)
-        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+        alternant = request.user.alternant
+        contrat = alternant.contrat_courant
         contrat.nombre_annees = nombre_annee
         contrat.save()
 
@@ -1070,22 +1067,21 @@ class creerCERFA(LoginRequiredMixin, DetailView):
             data["formation_annee3_au_mois"] = str(formation.an_3_au.month).zfill(2)
             data["formation_annee3_au_annee"] = formation.an_3_au.year
 
-        filename = "CERFA %s %s.pdf" % (alternant.nom, alternant.prenom)
+
+        filename = "CERFA_%s_%s.pdf" % (alternant.nom, alternant.prenom)
         filename = filename.replace(' ', '_')
         filename = filename.replace("'", "_")
 
-        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(os.path.join(settings.PDF_OUTPUT_DIR, filename), data, flatten=True)
+        nom_fichier = "CERFA_%s.pdf" % datetime.now().strftime("%Y%m%d%H%M%S")
+        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(nom_fichier, data, flatten=False)
 
         with open(nomfichier, "rb") as file:
             response = HttpResponse(FileWrapper(file), content_type='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename=%s' % filename
-            return response
+            response['Content-Disposition'] = 'attachment; filename=%s' % nomfichier
 
-        print(os.path.join(settings.PDF_OUTPUT_DIR, filename))
-        try:
-            os.remove(os.path.join(settings.PDF_OUTPUT_DIR, filename))
-        except:
-            pass
+        os.remove(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
+
+        return response
 
 def envoyermailvalidationraf(request):
 

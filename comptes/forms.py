@@ -48,7 +48,6 @@ class CactusUserCreationForm(UserCreationForm):
         # Ajout des popover
         for field in self.fields:
             help_text = self.fields[field].help_text
-            print(help_text)
             if help_text:
                 cls = self.fields[field].widget.attrs.get("class", "")
                 cls = "%s %s" % (cls, "has-popover")

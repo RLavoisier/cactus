@@ -165,9 +165,10 @@ class RecupererAnneesFormations(View):
         response = ApiResponse(
             success=True,
             response="",
-            data=pm.annees
+            data={
+                "annees": pm.annees,
+                "salaire": pm.salaire
+            }
         )
-
-        print(pm.annees)
 
         return JsonResponse(response._asdict())
