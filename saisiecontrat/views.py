@@ -391,7 +391,7 @@ def create_alternant(request):
 
         context["form"] = form
         contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
-        context["contrat"]=contrat
+        context["contrat"] = contrat
 
         return render(request, "alternant_form.html", context)
 
@@ -469,8 +469,7 @@ def inform_contrat(request):
             contrat.save()
 
             context["form"] = form
-            context["contrat"]= contrat
-            context["SMIC"]= SMIC.objects.get()
+            context["contrat"] = contrat
 
             messages.add_message(request, messages.SUCCESS, "Les données de votre contrat ont bien été enregistrées.")
             request.session["contratcomplet"] = contrat_complet(contrat)
@@ -480,8 +479,7 @@ def inform_contrat(request):
         else:
             context["form"] = form
             contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
-            context["contrat"]=contrat
-            context["SMIC"]= SMIC.objects.get()
+            context["contrat"] = contrat
 
             request.session["contratcomplet"]=False
 
@@ -494,8 +492,7 @@ def inform_contrat(request):
         form = InformationContratForm(instance=contrat, request=request)
 
         context["form"] = form
-        context["contrat"]=contrat
-        context["SMIC"] = SMIC.objects.get()
+        context["contrat"] = contrat
 
         request.session["contratcomplet"] = contrat_complet(contrat)
 
@@ -561,7 +558,7 @@ def inform_mission(request):
         request.session["missioncomplet"] = mission_complet(contrat)
 
     context["form"] = form
-    context["contrat"]=contrat
+    context["contrat"] = contrat
 
     i=0
     while contrat.avis_raf != Contrat.AVIS_RAF[i][0]:
