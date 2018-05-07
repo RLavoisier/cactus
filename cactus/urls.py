@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from saisiecontrat.views import create_alternant, inform_contrat, inform_mission, liste_formation, detail_formation, \
-    appliquer_formation, exportypareo
+    appliquer_formation, exportypareo, choisirautreformation
 from django.urls import path, include
 
 from cactus.views import accueil
@@ -40,6 +40,7 @@ urlpatterns = [
     path('envoyerficheraf/<str:alternant_hash>/', envoyerficheraf, name='envoyerficheraf'),
     path('validationmission/<str:alternant_hash>/', validationmission, name='validationmission'),
     path('envoyermailvalidationraf/', envoyermailvalidationraf, name='envoyermailvalidationraf'),
+    path('choisirautreformation/', choisirautreformation, name='choisirautreformation'),
     path('recapinscriptions/<str:formation_hash>/', recapinscriptions, name='recapinscriptions'),
-    path('exportypareo/<str:cfa_hash>/<str:email_livraison>/', exportypareo, name='exportypareo'),
+    path('exportypareo/<str:cfa_hash>/<str:email_livraison>/<str:aaaammjj_du>/<str:aaaammjj_au>/<int:extraction>/<int:etat>', exportypareo, name='exportypareo'),
 ]
