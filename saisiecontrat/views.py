@@ -1068,18 +1068,21 @@ class creerCERFA(LoginRequiredMixin, DetailView):
             data["formation_annee3_au_annee"] = formation.an_3_au.year
 
 
-        filename = "CERFA_%s_%s.pdf" % (alternant.nom, alternant.prenom)
+        filename = "CERFA_%s_%s_%s.pdf" % (alternant.nom,
+                                           alternant.prenom,
+                                           datetime.now().strftime("%Y%m%d%H%M%S"))
         filename = filename.replace(' ', '_')
         filename = filename.replace("'", "_")
 
-        nom_fichier = "CERFA_%s.pdf" % datetime.now().strftime("%Y%m%d%H%M%S")
-        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(nom_fichier, data, flatten=False)
+        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(filename, data, flatten=False)
 
-        with open(nomfichier, "rb") as file:
+        filepath = os.path.join(settings.PDF_OUTPUT_DIR, nomfichier)
+
+        with open(filepath, "rb") as file:
             response = HttpResponse(FileWrapper(file), content_type='application/pdf')
             response['Content-Disposition'] = 'attachment; filename=%s' % nomfichier
 
-        os.remove(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
+        os.remove(filepath)
 
         return response
 

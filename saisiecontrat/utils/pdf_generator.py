@@ -9,7 +9,6 @@ class PDFGenerator:
     """
     Class gérant la génération des PDF
     """
-    OUTPUT_DIR = os.path.join(settings.BASE_DIR, "pdf_outputs")
 
     @classmethod
     def generate_cerfa_pdf_with_datas(cls, filename, input_datas, flatten=True):
@@ -60,7 +59,7 @@ class PDFGenerator:
         #filename = "%s.pdf" % str(uuid.uuid4())
 
         # génération du chemin complet vers le fichier
-        output_file_path = os.path.join(cls.OUTPUT_DIR, filename)
+        output_file_path = os.path.join(settings.PDF_OUTPUT_DIR, filename)
 
         # Remplissage du pdf
         pypdftk.fill_form(pdf_path=template, flatten=flatten,
