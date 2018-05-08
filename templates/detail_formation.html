@@ -198,7 +198,6 @@
 
     </fieldset>
 
-    {% if formation.nombre_annees != 1 %}
     <form action="." method="POST">
         {% csrf_token %}
 
@@ -207,6 +206,7 @@
         {% endif %}
 
         <fieldset>
+            {% if formation.nombre_annees != 1 %}
             <div class="row">
                 <div class="col-md-11 col-externe" >
                     <div class="col-md-12">
@@ -218,14 +218,27 @@
                         <input type="text" name="nombre_annees" class="form-control" value="{{ nombre_annees }}">
                     </div>
                 </div>
-
             </div>
+            <div class="row">
+                <div class="col-md-11 col-externe" >
+                    <div class="col-md-12">
+                        <input type="submit" class="btn btn-success" value="Valider" />
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-12 col-externe">
+                    <div class="col-md-12">
+                        <h5><a class="btn btn-warning" href="{% url 'choisirautreformation' %}">Choisir une autre formation</a></h5>
+                    </div>
+                </div>
+            </div>
+
         </fieldset>
-        <input type="submit" class="btn btn-success" value="Valider" />
+
     </form>
-
-    {% endif %}
-
 
 {% endblock %}
 

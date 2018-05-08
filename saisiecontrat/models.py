@@ -391,7 +391,7 @@ class Formation(models.Model):
         (4, "Autre"),
     )
 
-    code_formation = models.CharField(max_length=14)
+    code_formation = models.CharField(max_length=16)
     hash = models.CharField(max_length=50, null=True, blank=True)
     cfa = models.ForeignKey(CFA, on_delete=models.CASCADE)
     intitule_formation = models.CharField(max_length=150,blank=True, null=True)
@@ -489,7 +489,7 @@ class Contrat(models.Model):
     date_fin_contrat = models.DateField(blank=True, null=True)
     duree_hebdomadaire_travail_heures = models.PositiveSmallIntegerField(blank=True, null=True, help_text="Entrez le nombre d'heures de travail hebdomadaire.")
     duree_hebdomadaire_travail_minutes = models.PositiveSmallIntegerField(default=0, blank=True, null=True, help_text="Entrez les minutes du temps de travail hebodmadaire")
-    risques_particuliers = models.BooleanField(help_text="Cochez cette case si les tâches accomplies en entreprise présentent des risques particuliers, par exemple, utilisation de machines dangereuses.",default=False)
+    risques_particuliers = models.BooleanField(help_text="Cochez cette case si les tâches accomplies en entreprise présentent des risques particuliers, par exemple, l'utilisation de machines dangereuses.",default=False)
     salaire_minimum_conventionnel = models.FloatField(blank=True, null=True)
     salaire_brut_mensuel = models.FloatField(blank=True, null=True)
     caisse_retraite_complementaire = models.CharField(max_length=35, blank=True, null=True)

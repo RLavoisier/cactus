@@ -759,7 +759,8 @@ class creerCERFA(LoginRequiredMixin, DetailView):
 
         data["mode_Contrat"] = contrat.mode_contractuel
         data["emp_siret"] = entreprise.numero_SIRET
-        data["emp_adr_num"] = entreprise.adresse_numero
+        if entreprise.adresse_numero:
+            data["emp_adr_num"] = entreprise.adresse_numero
         data["emp_adr_voie"] = entreprise.adresse_voie.upper()
         if entreprise.adresse_complement is not None:
             data["emp_adr_compl"] = entreprise.adresse_complement.upper()
@@ -787,12 +788,24 @@ class creerCERFA(LoginRequiredMixin, DetailView):
         data["alt_adr_ville"] = alternant.ville
         data["alt_adr_cp"] = alternant.code_postal
         data["alt_adr_num"] = alternant.adresse_numero
-        data["alt_adr_voie"] = alternant.adresse_voie.upper()
-        data["alt_repr_adr_ville"] = alternant.ville_representant
-        data["alt_repr_adr_cp"] = alternant.code_postal_representant
-        data["alt_repr_adr_voie"] = alternant.adresse_voie_representant
-        data["alt_repr_adr_num"] = alternant.adresse_numero_representant
-        nom_prenom_representant = "%s %s" % (alternant.nom_representant, alternant.prenom_representant)
+        if alternant.adresse_voie:
+            data["alt_adr_voie"] = alternant.adresse_voie.upper()
+        if alternant.ville_representant:
+            data["alt_repr_adr_ville"] = alternant.ville_representant
+        if alternant.code_postal_representant:
+            data["alt_repr_adr_cp"] = alternant.code_postal_representant
+        if alternant.adresse_voie_representant:
+            data["alt_repr_adr_voie"] = alternant.adresse_voie_representant
+        if alternant.adresse_numero_representant:
+            data["alt_repr_adr_num"] = alternant.adresse_numero_representant
+        if alternant.nom_representant:
+            if alternant.prenom_representant:
+                nom_prenom_representant = "%s %s" % (alternant.nom_representant, alternant.prenom_representant)
+            else:
+                nom_prenom_representant = "%s" % (alternant.nom_representant)
+        else:
+            nom_prenom_representant = "%s" % (alternant.prenom_representant)
+
         data["alt_repr_nom"] = nom_prenom_representant
 
         data["alt_ddn_jour"] = str(alternant.date_naissance.day).zfill(2)
@@ -1006,7 +1019,9 @@ class creerCERFA(LoginRequiredMixin, DetailView):
             data["signature_date_mois"] = str(contrat.fait_le.month).zfill(2)
             data["signature_date_jour"] = str(contrat.fait_le.day).zfill(2)
 
-        data["signature_lieu"] = contrat.fait_a
+        if contrat.fait_a:
+            data["signature_lieu"] = contrat.fait_a
+
         if contrat.attestation_pieces:
             data["signature_emp_attestation"] = 1
 
@@ -1052,18 +1067,21 @@ class creerCERFA(LoginRequiredMixin, DetailView):
             data["formation_annee3_au_mois"] = str(formation.an_3_au.month).zfill(2)
             data["formation_annee3_au_annee"] = formation.an_3_au.year
 
+
+        filename = "CERFA_%s_%s.pdf" % (alternant.nom, alternant.prenom)
+        filename = filename.replace(' ', '_')
+        filename = filename.replace("'", "_")
+
         nom_fichier = "CERFA_%s.pdf" % datetime.now().strftime("%Y%m%d%H%M%S")
         nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(nom_fichier, data, flatten=False)
 
-
-        with open(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier), "rb") as file:
+        with open(nomfichier, "rb") as file:
             response = HttpResponse(FileWrapper(file), content_type='application/pdf')
             response['Content-Disposition'] = 'attachment; filename=%s' % nomfichier
 
         os.remove(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
 
         return response
-
 
 def envoyermailvalidationraf(request):
 
@@ -1086,6 +1104,20 @@ def envoyermailvalidationraf(request):
         messages.add_message(request, messages.INFO, "La mission doit être renseignée et comporter au moins 100 caractères.")
 
     return redirect("informationmission")
+
+
+def choisirautreformation(request):
+
+# Cette vue est appelée depuis l'écran mission
+
+    alternant = request.user.alternant
+    contrat = alternant.get_contrat_courant()
+    contrat.formation = None
+    contrat.save()
+
+    request.session["formationcomplet"] = formation_complet(contrat)
+
+    return redirect("detail_formation")
 
 
 def envoyerficheraf(request, alternant_hash):
@@ -1156,6 +1188,7 @@ def validationmission(request, alternant_hash):
     context["contrat"] = contrat
     context["nom_alternant"]=contrat.alternant.nom
     context["prenom_alternant"]=contrat.alternant.prenom
+    context["mission"]=contrat.mission
 
     return render(request, "validation_mission_form.html", context)
 
@@ -1168,7 +1201,7 @@ def recapinscriptions(request, formation_hash):
 
     return render(request, "message.html")
 
-def exportypareo(request, cfa_hash,email_livraison):
+def exportypareo(request, cfa_hash,email_livraison, aaaammjj_du, aaaammjj_au, extraction, etat):
 
     try:
         CFA.objects.get(hash=cfa_hash)
@@ -1176,7 +1209,7 @@ def exportypareo(request, cfa_hash,email_livraison):
         messages.add_message(request, messages.ERROR,"L'URL est erronée.")
         return render(request, "message.html")
 
-    creerexportypareo(request,email_livraison)
+    creerexportypareo(request, email_livraison, aaaammjj_du, aaaammjj_au, extraction, etat)
 
     messages.add_message(request, messages.SUCCESS, "Un mail a été généré avec le fichier csv joint. S'il n'apparaît pas dans votre boîte de réception, vérifiez le dossier des éléments indésirables.")
 

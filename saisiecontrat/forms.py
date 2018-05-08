@@ -635,6 +635,15 @@ class InformationContratForm(LocalizedModelForm):
         else:
             return caisse_retraite_complementaire
 
+    def clean_salaire_brut_mensuel(self):
+
+        salaire_brut_mensuel = self.cleaned_data.get("salaire_brut_mensuel")
+
+        if salaire_brut_mensuel is None:
+            raise forms.ValidationError("Le salaire brut mensuel doit être renseigné.")
+        else:
+            return salaire_brut_mensuel
+
 
 class InformationMissionForm(LocalizedModelForm):
 

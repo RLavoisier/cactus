@@ -65,6 +65,7 @@ def creerfichemission(request,alternant_hash):
 
     filename = "Fiche mission %s %s.pdf" % (alternant.nom, alternant.prenom)
     filename = filename.replace(' ', '_')
+    filename = filename.replace("'", "_")
 
     nomfichier = PDFGenerator.generate_mission_pdf_with_datas(filename, data, flatten=True)
 
@@ -131,13 +132,56 @@ def creerrecapinscriptions(request,formation_hash):
     email.send(fail_silently=True)
 
 
-def creerexportypareo(request,email_livraison):
+def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction,etat):
 
-    nomfichier = os.path.join(settings.PDF_OUTPUT_DIR, "export.csv")
+    if etat==9:
+        liste_etat = [0,1,2,3,4]
+    else:
+        liste_etat = [etat]
 
-    with open("mon_fichier", "w") as monfichier:
+    date_du = datetime(int(aaaammjj_du[0:4]),int(aaaammjj_du[4] + aaaammjj_du[5]),int(aaaammjj_du[6] + aaaammjj_du[7]))
+    date_au = datetime(int(aaaammjj_au[0:4]),int(aaaammjj_au[4] + aaaammjj_au[5]),int(aaaammjj_au[6] + aaaammjj_au[7]))
 
-        c = csv.writer(monfichier, delimiter="|")
+    # get comme pour le filtre
+    # Attention si plusieurs objets retournés => exception : multipleobjectreturn
+    # si aucun exception DoesNotExist
+    # On utilise un Try
+
+    # Pour récupérer plusieurs objets spécifier un filter
+    # contrats = Contrat.objects.filter()
+
+    # RPour récupérer tout : all()
+
+    # Avant
+    # contrats = Contrat.objects.filter(avis_raf in [1], date_exportation_CFA is None)
+    # Après
+
+    if etat in [0,1,9]:
+        if extraction == 9:
+            contrats = Contrat.objects.filter(avis_raf__in=liste_etat)
+        elif extraction == 0:
+            contrats = Contrat.objects.filter(avis_raf__in=liste_etat, date_exportation_CFA=None)
+        elif extraction == 1:
+            contrats = Contrat.objects.filter(avis_raf__in=liste_etat).exclude(date_exportation_CFA=None)
+    else:
+        if extraction == 9:
+            contrats = Contrat.objects.filter(avis_raf__in=liste_etat, date_validation_raf__gte=date_du, date_validation_raf__lte=date_au)
+        elif extraction == 0:
+            contrats = Contrat.objects.filter(avis_raf__in=liste_etat, date_validation_raf__gte=date_du, date_validation_raf__lte=date_au,date_exportation_CFA=None)
+        elif extraction == 1:
+            contrats = Contrat.objects.filter(avis_raf__in=liste_etat, date_validation_raf__gte=date_du, date_validation_raf__lte=date_au).exclude(date_exportation_CFA=None)
+
+    # contrat = Contrat() crée l'objet sans save (si save on crée un nouvel objet donnée  si id=null)
+
+    # Create créé l'objet + save en base
+    # contrat = Contrat.objects.create(contrat_courant=True)
+
+    nomfichier = "export_%s_%s_%i_%i.csv" % (aaaammjj_du, aaaammjj_au, extraction, etat)
+    nomfichier = os.path.join(settings.PDF_OUTPUT_DIR, nomfichier)
+
+    with open(nomfichier, "w") as f:
+
+        c = csv.writer(f, delimiter="|")
 
         c.writerow(["",""])
 
@@ -218,25 +262,7 @@ def creerexportypareo(request,email_livraison):
                     "SITE WEB ENTREPRISE",
                     "DUMMY"])
 
-        # get comme pour le filtre
-        # Attention si plusieurs objets retournés => exception : multipleobjectreturn
-        # si aucun exception DoesNotExist
-        # On utilise un Try
-
-        # Pour récupérer plusieurs objets spécifier un filter
-        # contrats = Contrat.objects.filter()
-
-        # RPour récupérer tout : all()
-
-        # Avant
-        # contrats = Contrat.objects.filter(avis_raf in [1], date_exportation_CFA is None)
-        # Après
-        contrats = Contrat.objects.filter(avis_raf__in=[2], date_exportation_CFA=None)
-
-        # contrat = Contrat() crée l'objet sans save (si save on crée un nouvel objet donnée  si id=null)
-
-        # Create créé l'objet + save en base
-        # contrat = Contrat.objects.create(contrat_courant=True)
+        print(len(contrats))
 
         for contrat in contrats:
 
@@ -305,9 +331,10 @@ def creerexportypareo(request,email_livraison):
             # 19 SITUATION
             enr.append("")
             # 20 DERNIER DIP
-            enr.append(alternant.dernier_diplome_prepare)
-            # 21 METIER
-            enr.append("")
+            enr.append(alternant.diplome_le_plus_eleve)
+            # 21 METIER/CODE FORMATION
+            codeformation= formation.code_formation + "_"
+            enr.append(codeformation[0:codeformation.find("_")])
             # 22 ORIGINE
             if alternant.situation_avant_contrat == 10:
                 enr.append("0117")
@@ -324,48 +351,41 @@ def creerexportypareo(request,email_livraison):
             elif alternant.situation_avant_contrat == 4:
                 enr.append("0999")
             elif alternant.situation_avant_contrat == 3:
-                if alternant.derniere_annee_suivie == 11 or alternant.derniere_annee_suivie == 12:
-                    annee = 1
-                elif alternant.derniere_annee_suivie == 21 or alternant.derniere_annee_suivie == 22:
-                    annee = 2
-                elif alternant.derniere_annee_suivie == 31 or alternant.derniere_annee_suivie == 32:
-                    annee = 3
-                elif alternant.derniere_annee_suivie == 1:
-                    if alternant.dernier_diplome_prepare == 39:
-                        annee = 2
-                    elif alternant.dernier_diplome_prepare == 32:
-                        annee = 2
-                    elif alternant.dernier_diplome_prepare == 31:
-                        annee = 2
-                    elif alternant.dernier_diplome_prepare == 29:
-                        annee = 3
-                    elif alternant.dernier_diplome_prepare == 24:
-                        annee = 3
-                    elif alternant.dernier_diplome_prepare == 23:
-                        annee = 1
-                    elif alternant.dernier_diplome_prepare == 22:
-                        annee = 2
-                    elif alternant.dernier_diplome_prepare == 21:
-                        annee = 2
-                    elif alternant.dernier_diplome_prepare == 19:
-                        annee = 2
-                    elif alternant.dernier_diplome_prepare == 12:
-                        annee = 2
-                    elif alternant.dernier_diplome_prepare == 11:
-                        annee = 2
-                enr.append("%s%s" % (alternant.dernier_diplome_prepare, annee))
+                enr.append("0069")
+                #if alternant.derniere_annee_suivie == 11 or alternant.derniere_annee_suivie == 12:
+                #   annee = 1
+                #elif alternant.derniere_annee_suivie == 21 or alternant.derniere_annee_suivie == 22:
+                #    annee = 2
+                #elif alternant.derniere_annee_suivie == 31 or alternant.derniere_annee_suivie == 32:
+                #    annee = 3
+                #elif alternant.derniere_annee_suivie == 1:
+                #    if alternant.dernier_diplome_prepare == 39:
+                #        annee = 2
+                #    elif alternant.dernier_diplome_prepare == 32:
+                #        annee = 2
+                #    elif alternant.dernier_diplome_prepare == 31:
+                #        annee = 2
+                #    elif alternant.dernier_diplome_prepare == 29:
+                #        annee = 3
+                #    elif alternant.dernier_diplome_prepare == 24:
+                #        annee = 3
+                #    elif alternant.dernier_diplome_prepare == 23:
+                #        annee = 1
+                #    elif alternant.dernier_diplome_prepare == 22:
+                #        annee = 2
+                #    elif alternant.dernier_diplome_prepare == 21:
+                #        annee = 2
+                #    elif alternant.dernier_diplome_prepare == 19:
+                #        annee = 2
+                #    elif alternant.dernier_diplome_prepare == 12:
+                #        annee = 2
+                #    elif alternant.dernier_diplome_prepare == 11:
+                #        annee = 2
+                #enr.append("%s%s" % (alternant.dernier_diplome_prepare, annee))
             elif alternant.situation_avant_contrat == 2:
                 enr.append("0999")
             elif alternant.situation_avant_contrat == 1:
-                if alternant.derniere_annee_suivie == 11 or alternant.derniere_annee_suivie == 12:
-                    annee = 1
-                elif alternant.derniere_annee_suivie == 21 or alternant.derniere_annee_suivie == 22:
-                    annee = 2
-                elif alternant.derniere_annee_suivie == 31 or alternant.derniere_annee_suivie == 32:
-                    annee = 3
-                elif alternant.derniere_annee_suivie == 1:
-                    annee = 3
-                enr.append("%s%s" % (alternant.dernier_diplome_prepare, annee))
+                enr.append("%s%s" % (alternant.dernier_diplome_prepare, "1"))
             # 23 QUAL
             enr.append("DP")
             # 24 NUMERO CON --------------------------------------------------------------------------------A VOIR
@@ -506,6 +526,17 @@ def creerexportypareo(request,email_livraison):
     email.attach_file(nomfichier)
 
     email.send(fail_silently=True)
+
+    if etat in [2] and extraction in [0]:
+        for contrat in contrats:
+            contrat.date_exportation_CFA =datetime.now()
+            contrat.save()
+
+    print(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
+    try:
+        os.remove(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
+    except:
+        pass
 
 def alternant_complet(alternant):
 
