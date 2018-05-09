@@ -9,7 +9,7 @@ Le responsable de la formation {{formation.intitule_formation }} a examiné votr
 
 Nous vous rappelons les points suivants :
 
-    - La validation de la mission permet la transmission de votre dossier à nos services.
+    - La validation de la mission permet l'édition votre CERFA ainsi que la transmission de votre dossier aux services du CFA Epure.
     - Une réserve implique que vous revoyiez avec votre employeur le contenu de la mission.
     - Le rejet est définitif.
 

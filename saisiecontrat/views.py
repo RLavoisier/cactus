@@ -371,6 +371,10 @@ def create_alternant(request):
             context["nationalite"] = alternant.nationalite
 
             messages.add_message(request, messages.SUCCESS, "Vos données ont bien été enregistrées.")
+
+            if alternant.handicape:
+                messages.add_message(request, messages.INFO, "Vous avez coché la case travailleur handicapé, n'hésitez pas à contacter Céline Grimaud (celine.grimaud@cfa-epure.com), la référente handicap du CFA Epure.")
+
             request.session["alternantcomplet"]=alternant_complet(alternant)
 
             return render(request, "alternant_form.html", context)
@@ -487,6 +491,13 @@ def inform_contrat(request):
     else:
 
         contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
+
+        if not contrat.date_debut_contrat:
+            messages.add_message(request, messages.INFO,
+                                "Commencez par informer le type de dérogation (si nécessaire) ainsi que les dates de début "
+                                "et de fin de contrat. Cette saisie permettra le pré-remplissage du tableau de rémunération. "
+                                "Nous vous rappelons que les pourcentages ainsi que la rémunération mensuelle sont des minima ; modifiez-les au besoin. "
+                                "Suivant la convention collective, la base de calcul de la rémunération peut être le SMIC (valeur par défaut) ou le Salaire Minimum Conventionnel (SMC). Attention ! la base peut changer en cours de contrat.")
 
         # dans le formulaire on utilise l'objet user de la request qui n'existe pas dans le formulaire
         form = InformationContratForm(instance=contrat, request=request)
