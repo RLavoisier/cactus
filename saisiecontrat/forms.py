@@ -314,11 +314,12 @@ class CreationEntrepriseForm(LocalizedModelForm):
 
     def clean_adhesion_regime_assurance_chomage(self):
 
-        # Verrue pour corroger une diférence de notation du booléen
+        # Verrue pour corriger une différence de notation du booléen
         if self.cleaned_data["adhesion_regime_assurance_chomage"] == "on":
             return True
         else:
             return False
+
 
 class CreationAlternantForm(LocalizedModelForm):
 
@@ -363,7 +364,8 @@ class CreationAlternantForm(LocalizedModelForm):
         }
 
     def clean_handicape(self):
-        if self.cleaned_data["handicape"] == "on":
+
+        if self.cleaned_data["handicape"]:
             return True
         else:
             return False

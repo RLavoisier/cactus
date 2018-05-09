@@ -204,7 +204,7 @@ class Alternant(models.Model):
     code_postal = models.CharField(verbose_name="Code postal", max_length=5, blank=True, null=True)
     ville = models.CharField(max_length=60, blank=True, null=True)
     telephone = models.CharField(verbose_name="Téléphone", max_length=15, blank=True, null=True)
-    handicape = models.BooleanField(verbose_name="Travailleur handicapé", default=False)
+    handicape = models.BooleanField(help_text="Cochez cette case si l'on vous a reconnu la qualité de travailleur handicapé (RQTH).", verbose_name="Travailleur handicapé", default=False)
     courriel = models.CharField(max_length=40, blank=True, null=True)
     nationalite = models.PositiveSmallIntegerField(verbose_name="Nationalité", choices=NATIONALITE, default=1, blank=True, null=True)
     regime_social = models.PositiveSmallIntegerField(help_text="Entreprise au régime général, sélectionnez URSSAF. Entreprise au régime agricole, sélectionnez MSA", verbose_name="Régime social", choices=REGIME_SOCIAL, blank=True, null=True)
@@ -416,6 +416,7 @@ class Formation(models.Model):
     raf = models.CharField(max_length=60, blank=True, null=True)
     courriel_raf = models.CharField(max_length=40, blank=True, null=True)
     code_acces = models.CharField(max_length=15, blank=True, null=True)
+    #conseiller_apprentissage = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return self.intitule_formation
