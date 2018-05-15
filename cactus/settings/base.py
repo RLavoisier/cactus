@@ -26,8 +26,7 @@ PDF_OUTPUT_DIR = os.path.join(BASE_DIR, 'pdf_outputs')
 SECRET_KEY = '7+^j%f0bx2ai(12weyzvwekgdgn8c-1cdylm&vg(f#pb+9-dw2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
+DEBUG = False
 ALLOWED_HOSTS = []
 
 

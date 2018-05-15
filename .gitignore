@@ -15,7 +15,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -54,7 +53,9 @@ coverage.xml
 *.log
 local_settings.py
 local.py
-migrations/*
+saisiecontrat/migrations/*
+comptes/migrations/*
+0001_initial.py
 
 # Flask stuff:
 instance/
