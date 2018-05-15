@@ -1,3 +1,7 @@
+"""
+Liste des urls de l'api
+"""
+
 from django.urls import path
 
 from cactus_api.views import ValiderDateDebutContrat, RecupererAnneesFormations, ValiderDateFinContrat
