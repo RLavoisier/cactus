@@ -17,6 +17,7 @@ class ValiderDateDebutContrat(View):
     """
     Cette vue renvoi vrai si la date de début de
     contrat passée dans le post est valide
+
     """
     def post(self, request):
         if not request.POST.get("date_saisie"):
