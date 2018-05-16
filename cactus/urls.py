@@ -24,7 +24,7 @@ from saisiecontrat.views import creationcontrat, create_entreprise, creerCERFA, 
 urlpatterns = [
     path('comptes/', include("comptes.urls"), name="comptes"),
     path('api/', include("cactus_api.urls"), name="api"),
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls, name="admin"),
     path('', accueil, name="accueil"),
     path('accueil/', accueil, name="accueil"),
     path('creationcontrat/',creationcontrat, name="creationcontrat"),

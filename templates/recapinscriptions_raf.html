@@ -29,7 +29,7 @@
           {% endifequal %}
           {% ifequal a.avis_raf 1 %}
             <li>
-                <a href="{{ request.scheme }}://{{ request.get_host }}/validationmission/{{ a.hash }}">{{ a.prenom }} {{ a.nom }}</a> <a href="{{ request.scheme }}://{{ request.get_host }}/envoyerficheraf/{{ a.hash }}">(Fiche de mission)</a>
+                <a href="{{ request.cactus_domain }}/validationmission/{{ a.hash }}">{{ a.prenom }} {{ a.nom }}</a> <a href="{{ request.cactus_domain }}/envoyerficheraf/{{ a.hash }}">(Fiche de mission)</a>
             </li>
           {% endifequal %}
           {% ifequal a.avis_raf 2 %}
@@ -46,7 +46,7 @@
       </ul>
 
       <p>
-          <a href="{{ request.scheme }}://{{ request.get_host }}/recapinscriptions/{{ formation.hash }}">Cliquez sur ce lien pour obtenir un mail contenant une liste actualisée des dossiers d'inscription.</a>
+          <a href="{{ request.cactus_domain }}/recapinscriptions/{{ formation.hash }}">Cliquez sur ce lien pour obtenir un mail contenant une liste actualisée des dossiers d'inscription.</a>
       </p>
 
     <p>Le CFA Epure Méditerranée</p>

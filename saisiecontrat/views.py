@@ -25,6 +25,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from saisiecontrat.utils.helper import creerfichemission, creerrecapinscriptions, creerexportypareo, \
     informe_saisie_complete, entreprise_complet, alternant_complet, contrat_complet, mission_complet, formation_complet
 from saisiecontrat.utils.pdf_generator import PDFGenerator
+from raven.contrib.django.raven_compat.models import client as sentry_client
 
 
 def creationcontrat(request):
@@ -645,9 +646,12 @@ class detail_formation(LoginRequiredMixin, DetailView):
 
         if not self.contrat.formation:
             if alternant.code_acces:
-                f = Formation.objects.get(code_acces=alternant.code_acces)
-                self.contrat.formation=f
-                self.contrat.save()
+                try:
+                    f = Formation.objects.get(code_acces=alternant.code_acces)
+                    self.contrat.formation = f
+                    self.contrat.save()
+                except ObjectDoesNotExist:
+                    sentry_client.captureException()
 
         formation = self.contrat.formation
 
@@ -1085,7 +1089,7 @@ class creerCERFA(LoginRequiredMixin, DetailView):
         filename = filename.replace(' ', '_')
         filename = filename.replace("'", "_")
 
-        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(filename, data, flatten=False)
+        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(filename, data, flatten=True)
 
         filepath = os.path.join(settings.PDF_OUTPUT_DIR, nomfichier)
 

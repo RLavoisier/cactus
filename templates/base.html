@@ -11,6 +11,9 @@
     <script type="text/javascript" src="/static/js/lib/jquery-ui/jquery-ui.min.js?no_cache={{ request.uuid }}"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script type="text/javascript" src="/static/js/cactus.js?no_cache={{ request.uuid }}"></script>
+    <script>
+        var DOMAIN = "{{request.cactus_domain}}";
+    </script>
 
   </head>
   <body id="{% block bodyId %}genericPage{% endblock %}">

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import raven
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from django.contrib import messages
@@ -29,6 +30,7 @@ SECRET_KEY = '7+^j%f0bx2ai(12weyzvwekgdgn8c-1cdylm&vg(f#pb+9-dw2'
 DEBUG = False
 ALLOWED_HOSTS = []
 
+EXTRA_DOMAIN_PATH = None
 
 # Application definition
 
@@ -44,6 +46,7 @@ INSTALLED_APPS = [
     'cactus_api',
     'django.contrib.admin',
     'django.contrib.humanize',
+    'raven.contrib.django.raven_compat',
 
 ]
 
@@ -51,11 +54,13 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'saisiecontrat.middleware.UuidMiddleware',
+    'saisiecontrat.middleware.DomainMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'saisiecontrat.middleware.SuperUserRedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'cactus.urls'
@@ -147,6 +152,13 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
+RAVEN_CONFIG = {
+    'dsn': 'https://df54239ac2d7443d856d53d94a5fc513:71f39159a6244ef29caabca5ad051661@sentry.io/1207989',
+    # If you are using git, you can also automatically configure the
+    # release based on the git info.
+    'release': raven.fetch_git_sha(BASE_DIR),
+}
 
 # Importing local infos
 try:

@@ -34,7 +34,7 @@ class UserSignupView(CreateView):
 
         # Stockage du code d'accès dans l'alternant
         if form.cleaned_data["code_formation"]:
-            alternant.code_access = form.cleaned_data["code_formation"]
+            alternant.code_acces = form.cleaned_data["code_formation"]
 
         alternant.save()
 

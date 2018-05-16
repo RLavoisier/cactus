@@ -24,13 +24,13 @@
       <ul>
       {% for a in alternants %}
           <li>
-             <a href="{{ request.scheme }}://{{ request.get_host }}/validationmission/{{ a.hash }}">{{ a.prenom }} {{ a.nom }}</a> <a href="{{ request.scheme }}://{{ request.get_host }}/envoyerficheraf/{{ a.hash }}">(Fiche de mission)</a>
+             <a href="{{ request.cactus_domain }}/validationmission/{{ a.hash }}">{{ a.prenom }} {{ a.nom }}</a> <a href="{{ request.cactus_domain }}/envoyerficheraf/{{ a.hash }}">(Fiche de mission)</a>
           </li>
       {% endfor %}
       </ul>
 
       <p>
-          <a href="{{ request.scheme }}://{{ request.get_host }}/recapinscriptions/{{ formation.hash }}">Cliquez sur ce lien pour obtenir un mail contenant la liste complète des dossiers d'inscription.</a>
+          <a href="{{ request.cactus_domain }}/recapinscriptions/{{ formation.hash }}">Cliquez sur ce lien pour obtenir un mail contenant la liste complète des dossiers d'inscription.</a>
       </p>
 
       Le CFA Epure Méditerranée
