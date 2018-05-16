@@ -1,5 +1,3 @@
-var DOMAIN = "http://www.cfa-epure.com/cactus/";
-
 $(document).ready(function() {
 
     $('#contrat_form').data('serialize',$('#contrat_form').serialize());

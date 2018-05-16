@@ -30,6 +30,7 @@ SECRET_KEY = '7+^j%f0bx2ai(12weyzvwekgdgn8c-1cdylm&vg(f#pb+9-dw2'
 DEBUG = False
 ALLOWED_HOSTS = []
 
+EXTRA_DOMAIN_PATH = None
 
 # Application definition
 
@@ -53,11 +54,13 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'saisiecontrat.middleware.UuidMiddleware',
+    'saisiecontrat.middleware.DomainMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'saisiecontrat.middleware.SuperUserRedirectMiddleware',
 ]
 
 ROOT_URLCONF = 'cactus.urls'

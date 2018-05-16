@@ -12,7 +12,7 @@ Si vous souhaitez obtenir de nouveau la fiche mission d’un candidat, collez l'
     {{ a.prenom }} {{ a.nom }} (En cours de saisie)
 {% endifequal %}
 {% ifequal a.avis_raf 1 %}
-    {{ a.prenom }} {{ a.nom }} {{ request.scheme }}://{{ request.get_host }}/validationmission/{{ a.hash }} ({{ request.scheme }}://{{ request.get_host }}/envoyerficheraf/{{ a.hash }})
+    {{ a.prenom }} {{ a.nom }} {{ request.cactus_domain }}/validationmission/{{ a.hash }} ({{ request.cactus_domain }}/envoyerficheraf/{{ a.hash }})
 {% endifequal %}
 {% ifequal a.avis_raf 2 %}
     {{ a.prenom }} {{ a.nom }} (Déjà validé)
@@ -23,6 +23,6 @@ Si vous souhaitez obtenir de nouveau la fiche mission d’un candidat, collez l'
 {% endfor %}
 
 
-Collez cette URL dans votre navigateur pour obtenir une liste actualisée des dossiers d'inscription : request.scheme }}://{{ request.get_host }}/recapinscriptions/{{ formation.hash }}
+Collez cette URL dans votre navigateur pour obtenir une liste actualisée des dossiers d'inscription : {{ request.cactus_domain }}/recapinscriptions/{{ formation.hash }}
 
 Le CFA Epure Méditerranée
