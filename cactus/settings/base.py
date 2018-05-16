@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import raven
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from django.contrib import messages
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'cactus_api',
     'django.contrib.admin',
     'django.contrib.humanize',
+    'raven.contrib.django.raven_compat',
 
 ]
 
@@ -147,6 +149,13 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
+
+RAVEN_CONFIG = {
+    'dsn': 'https://df54239ac2d7443d856d53d94a5fc513:71f39159a6244ef29caabca5ad051661@sentry.io/1207989',
+    # If you are using git, you can also automatically configure the
+    # release based on the git info.
+    'release': raven.fetch_git_sha(BASE_DIR),
+}
 
 # Importing local infos
 try:
