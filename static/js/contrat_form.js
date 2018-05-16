@@ -1,4 +1,4 @@
-var DOMAIN = "http://www.cfa-epure.com/cactus/comptes/";
+var DOMAIN = "http://www.cfa-epure.com/cactus/";
 
 $(document).ready(function() {
 
