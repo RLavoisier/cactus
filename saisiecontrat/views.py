@@ -1085,7 +1085,7 @@ class creerCERFA(LoginRequiredMixin, DetailView):
         filename = filename.replace(' ', '_')
         filename = filename.replace("'", "_")
 
-        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(filename, data, flatten=False)
+        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(filename, data, flatten=True)
 
         filepath = os.path.join(settings.PDF_OUTPUT_DIR, nomfichier)
 
