@@ -44,10 +44,10 @@ class SuperUserRedirectMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        redirect_url = "/admin/"
+        redirect_url = request.cactus_domain + "admin/"
         print(request.path)
 
-        if request.user.is_authenticated and request.user.is_superuser and request.path[:7] != redirect_url:
+        if request.user.is_authenticated and request.user.is_superuser and "/admin" not in request.path:
             return redirect(redirect_url)
 
         return self.get_response(request)
