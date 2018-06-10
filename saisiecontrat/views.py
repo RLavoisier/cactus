@@ -77,7 +77,7 @@ def creationcontrat(request):
                 nouveaucontrat.type_contrat_avenant = request.POST['type_contrat_avenant']
                 nouveaucontrat.mode_contractuel = request.POST['mode_contractuel']
                 nouveaucontrat.numero_contrat_anterieur = request.POST['numero_contrat_anterieur']
-                if request.POST['date_effet_avenant'] is not None:
+                if request.POST['date_effet_avenant']:
                     nouveaucontrat.date_effet_avenant = request.POST['date_effet_avenant']
 
                 nouveaucontrat.save()
@@ -1050,7 +1050,7 @@ class creerCERFA(LoginRequiredMixin, DetailView):
             data["inscription_jour"] = str(contrat.date_inscription.day).zfill(2)
 
         if formation.heures_an_1 is not None:
-            data["formation_annee2_heure"] = formation.heures_an_1
+            data["formation_annee1_heure"] = formation.heures_an_1
         if formation.an_1_du is not None:
             data["formation_annee1_du_jour"] = str(formation.an_1_du.day).zfill(2)
             data["formation_annee1_du_mois"] = str(formation.an_1_du.month).zfill(2)
@@ -1127,6 +1127,7 @@ def envoyermailvalidationraf(request):
 def choisirautreformation(request):
 
 # Cette vue est appelée depuis l'écran mission
+
 
     alternant = request.user.alternant
     contrat = alternant.get_contrat_courant()

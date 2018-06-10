@@ -416,7 +416,10 @@ class Formation(models.Model):
     raf = models.CharField(max_length=60, blank=True, null=True)
     courriel_raf = models.CharField(max_length=40, blank=True, null=True)
     code_acces = models.CharField(max_length=15, blank=True, null=True)
-    #conseiller_apprentissage = models.CharField(max_length=50, blank=True, null=True)
+    referent_GU = models.CharField(max_length=50, blank=True, null=True)
+    telephone_referent_GU = models.CharField(verbose_name="Téléphone", max_length=18, blank=True, null=True)
+    courriel_referent_GU = models.CharField(max_length=50, blank=True, null=True)
+    situation_entree = models.CharField(max_length=40, blank=True, null=True)
 
     def __str__(self):
         return self.intitule_formation

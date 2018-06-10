@@ -87,7 +87,7 @@ def creerfichemission(request,alternant_hash):
     email = EmailMultiAlternatives(
         "Fiche mission de %s %s.pdf" % (alternant.nom, alternant.prenom),
         msg_plain,
-        'cactus.test.tg@gmail.com',
+        'no_reply@cfa-epure.com',
         [formation.courriel_raf],
     )
 
@@ -122,7 +122,7 @@ def creerrecapinscriptions(request,formation_hash):
     email = EmailMultiAlternatives(
         "Récapitulatif des dossiers d'inscription",
         msg_plain,
-        'cactus.test.tg@gmail.com',
+        'no_reply@cfa-epure.com',
         [formation.courriel_raf],
     )
 
@@ -155,6 +155,12 @@ def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction
     # Avant
     # contrats = Contrat.objects.filter(avis_raf in [1], date_exportation_CFA is None)
     # Après
+
+    #print(etat)
+    #print(liste_etat)
+    #print(extraction)
+    #print(date_du)
+    #print(date_au)
 
     if etat in [0,1,9]:
         if extraction == 9:
@@ -262,8 +268,6 @@ def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction
                     "SITE WEB ENTREPRISE",
                     "DUMMY"])
 
-        print(len(contrats))
-
         for contrat in contrats:
 
             enr=[]
@@ -329,13 +333,15 @@ def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction
             # 18 CALENDRIER
             enr.append("")
             # 19 SITUATION
-            enr.append("")
+            enr.append(formation.situation_entree)
             # 20 DERNIER DIP
             enr.append(alternant.diplome_le_plus_eleve)
-            # 21 METIER/CODE FORMATION
-            codeformation= formation.code_formation + "_"
-            enr.append(codeformation[0:codeformation.find("_")])
+            # 21 METIER/CODE FORMATION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            enr.append(formation.code_formation[0:9])
             # 22 ORIGINE
+            #print(alternant.situation_avant_contrat)
+            #print(alternant.diplome_le_plus_eleve)
+            #print(alternant.dernier_diplome_prepare)
             if alternant.situation_avant_contrat == 10:
                 enr.append("0117")
             elif alternant.situation_avant_contrat == 9:
@@ -351,43 +357,25 @@ def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction
             elif alternant.situation_avant_contrat == 4:
                 enr.append("0999")
             elif alternant.situation_avant_contrat == 3:
-                enr.append("0069")
-                #if alternant.derniere_annee_suivie == 11 or alternant.derniere_annee_suivie == 12:
-                #   annee = 1
-                #elif alternant.derniere_annee_suivie == 21 or alternant.derniere_annee_suivie == 22:
-                #    annee = 2
-                #elif alternant.derniere_annee_suivie == 31 or alternant.derniere_annee_suivie == 32:
-                #    annee = 3
-                #elif alternant.derniere_annee_suivie == 1:
-                #    if alternant.dernier_diplome_prepare == 39:
-                #        annee = 2
-                #    elif alternant.dernier_diplome_prepare == 32:
-                #        annee = 2
-                #    elif alternant.dernier_diplome_prepare == 31:
-                #        annee = 2
-                #    elif alternant.dernier_diplome_prepare == 29:
-                #        annee = 3
-                #    elif alternant.dernier_diplome_prepare == 24:
-                #        annee = 3
-                #    elif alternant.dernier_diplome_prepare == 23:
-                #        annee = 1
-                #    elif alternant.dernier_diplome_prepare == 22:
-                #        annee = 2
-                #    elif alternant.dernier_diplome_prepare == 21:
-                #        annee = 2
-                #    elif alternant.dernier_diplome_prepare == 19:
-                #        annee = 2
-                #    elif alternant.dernier_diplome_prepare == 12:
-                #        annee = 2
-                #    elif alternant.dernier_diplome_prepare == 11:
-                #        annee = 2
-                #enr.append("%s%s" % (alternant.dernier_diplome_prepare, annee))
+                if alternant.diplome_le_plus_eleve == 31 or alternant.dernier_diplome_prepare == 31:
+                    enr.append("0061")
+                elif alternant.diplome_le_plus_eleve == 32 or alternant.dernier_diplome_prepare == 32:
+                    enr.append("0065")
+                else:
+                    enr.append("0069")
             elif alternant.situation_avant_contrat == 2:
                 enr.append("0999")
             elif alternant.situation_avant_contrat == 1:
-                enr.append("%s%s" % (alternant.dernier_diplome_prepare, "1"))
+                if alternant.dernier_diplome_prepare == 42:
+                    enr.append("0051")
+                elif alternant.dernier_diplome_prepare == 43:
+                    enr.append("0053")
+                else:
+                    enr.append("0999")
+            else:
+                enr.append("0999")
             # 23 QUAL
-            enr.append("DP")
+            enr.append("D")
             # 24 NUMERO CON --------------------------------------------------------------------------------A VOIR
             enr.append("")
             # 25 DATE DEB CONTRAT
@@ -519,7 +507,7 @@ def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction
     email = EmailMultiAlternatives(
         "cactus export ypareo",
         "",
-        'cactus.test.tg@gmail.com',
+        'no_reply@cfa-epure.com',
         [email_livraison],
     )
 

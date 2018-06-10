@@ -26,7 +26,7 @@ class Command(BaseCommand):
                 intitule_formation=row[2],
                 ville=row[3],
                 specialite=row[4],
-                diplome=row[5] or random.randint(21, 24),
+                diplome=row[5],
                 intitule_diplome=row[6],
                 code_diplome_apprentissage=row[7],
                 an_1_du=row[8],
@@ -44,7 +44,12 @@ class Command(BaseCommand):
                 inspection_pedagogique_competente=row[20],
                 raf=row[21],
                 courriel_raf=row[22],
-                code_acces=row[23]
+                code_acces=row[23],
+                referent_GU=row[24],
+                telephone_referent_GU=row[25],
+                courriel_referent_GU=row[26],
+                situation_entree=row[27]
+
             )
             print(row[2])
 
