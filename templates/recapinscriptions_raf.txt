@@ -5,7 +5,7 @@ Veuillez trouver ci-joint la liste récapitulative des inscriptions en cours.
 
 Pour les dossiers en attente de validation les nom et prénom sont suivis de l'URL de validation, recopiez-la dans votre navigateur.
 
-Si vous souhaitez obtenir de nouveau la fiche mission d’un candidat, collez l'URL écrite entre parenthèse dans votre navigateur.
+Si vous souhaitez obtenir de nouveau les documents (CERFA et fiche mission) d’un candidat, collez l'URL écrite entre parenthèse dans votre navigateur.
 
 {% for a in alternants %}
 {% ifequal a.avis_raf 0 %}
