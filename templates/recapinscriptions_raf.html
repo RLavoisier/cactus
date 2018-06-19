@@ -18,7 +18,7 @@
       </p>
 
       <p>
-      Si vous souhaitez obtenir de nouveau la fiche mission d’un candidat, cliquez sur le lien fiche de mission situé en vis à vis de son nom.
+      Si vous souhaitez obtenir de nouveau les documents (CERFA et fiche mission) d’un candidat, cliquez sur le lien Documents situé en vis à vis de son nom.
       </p>
       <ul>
       {% for a in alternants %}
@@ -29,7 +29,7 @@
           {% endifequal %}
           {% ifequal a.avis_raf 1 %}
             <li>
-                <a href="{{ request.cactus_domain }}/validationmission/{{ a.hash }}">{{ a.prenom }} {{ a.nom }}</a> <a href="{{ request.cactus_domain }}/envoyerficheraf/{{ a.hash }}">(Fiche de mission)</a>
+                <a href="{{ request.cactus_domain }}/validationmission/{{ a.hash }}">{{ a.prenom }} {{ a.nom }}</a> <a href="{{ request.cactus_domain }}/envoyerficheraf/{{ a.hash }}">(Documents)</a>
             </li>
           {% endifequal %}
           {% ifequal a.avis_raf 2 %}

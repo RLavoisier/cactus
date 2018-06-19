@@ -63,11 +63,11 @@
 
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'informationmission' %}">
-                  {% ifequal nomonglet "Votre mission" %}<strong>{% endifequal %}Votre mission{% ifequal nomonglet "Votre mission" %}</strong>{% endifequal %} {% if request.session.missioncomplet %}<span class="glyphicon glyphicon-ok"></span>{% endif %}
+                  {% ifequal nomonglet "Votre mission/Validation" %}<strong>{% endifequal %}Votre mission/Validation{% ifequal nomonglet "Votre mission/Validation" %}</strong>{% endifequal %} {% if request.session.accordvalide and request.session.missioncomplet %}<span class="glyphicon glyphicon-ok"></span>{% endif %}
                 </a>
               </li>
 
-                {% if request.session.alternantcomplet and request.session.entreprisecomplet and request.session.contratcomplet and request.session.formationcomplet and request.session.missioncomplet %}
+                {% if request.session.accordvalide and request.session.alternantcomplet and request.session.entreprisecomplet and request.session.contratypareocomplet and request.session.formationcomplet and request.session.missioncomplet %}
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'cerfa' %}">
                   {% ifequal nomonglet "Votre CERFA" %}<strong>{% endifequal %}Votre CERFA{% ifequal nomonglet "Votre CERFA" %}</strong>{% endifequal %}

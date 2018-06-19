@@ -7,7 +7,7 @@ Les dossiers ci-dessous sont en attente de validation.
 
 Pour valider une mission, collez l'URL écrite après le nom du candidat dans votre navigateur.
 
-Si vous souhaitez obtenir de nouveau la fiche mission d’un candidat, utilisez l'URL écrite entre parenthèses.
+Si vous souhaitez obtenir de nouveau les documents (CERFA et fiche mission) d’un candidat, utilisez l'URL écrite entre parenthèses.
 {% for a in alternants %}
     - {{ a.prenom }} {{ a.nom }} : {{ request.cactus_domain }}/validationmission/{{ a.hash }} ({{ request.cactus_domain }}/envoyerficheraf/{{ a.hash }})
 

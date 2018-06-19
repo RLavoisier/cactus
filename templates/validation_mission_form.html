@@ -11,11 +11,12 @@
         <div class="row">
             <div class="col-md-12 col-externe">
                 <div class="col-md-12">
-                    Veuillez cocher la case correspondant à votre évaluation de la mission de ce candidat.<br />
+                    Veuillez cocher la case correspondant à votre évaluation de la mission de ce candidat. Si la mission a été validée antérieurement sans
+                    recourir à Cactus, vous devez néamoins valider le dossier pour permettre son traitement administratif par le CFA Epure.<br />
                     <ul>
                         <li>La validation permet au traitement du contrat d'apprentissage de poursuivre son cours.</li>
-                        <li>La réserve oblige le candidat et son employeur à modifier la mission afin de vous la soumettre de nouveau.</li>
-                        <li>Le rejet est définitif. Il interdit toute modification et réenvoi de la mission. A utiliser donc seulement dans les cas extrêmes.</li>
+                        <li>La réserve oblige le candidat à modifier son dossier pour vous le soumettre de nouveau.</li>
+                        <li>Le rejet est définitif. Il bloque le dossier. A utiliser donc seulement dans les cas extrêmes.</li>
                     </ul>
                     Réserves et rejets doivent être motivés.
                 </div>
@@ -25,13 +26,84 @@
         <div class="row">
             <div class="col-md-1 col-externe">
                 <div class="col-md-12">
-                    <h5><b>Candidat</b></h5>
+                    <h5><b>Formation</b></h5>
                 </div>
             </div>
             <div class="col-md-11 col-externe">
                 <div class="col-md-12">
                     <div class="btn-group" data-toggle="buttons" >
+                        <h5>{{  nom_formation }} </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-1 col-externe">
+                <div class="col-md-12">
+                    <h5><b>Candidat</b></h5>
+                </div>
+            </div>
+            <div class="col-md-11 col-externe">
+                <div class="col-md-6">
+                    <div class="btn-group" data-toggle="buttons" >
                         <h5>{{  nom_alternant }} {{  prenom_alternant }}</h5>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="btn-group" data-toggle="buttons" >
+                        <h5><b>Téléphone</b></h5>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="btn-group" data-toggle="buttons" >
+                        <h5>{{  telephone_alternant }} </h5>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="btn-group" data-toggle="buttons" >
+                        <h5><b>Courriel</b></h5>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="btn-group" data-toggle="buttons" >
+                        <h5>{{  courriel_alternant }} </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-1 col-externe">
+                <div class="col-md-12">
+                    <h5><b>Entreprise</b></h5>
+                </div>
+            </div>
+            <div class="col-md-11 col-externe">
+                <div class="col-md-6">
+                    <div class="btn-group" data-toggle="buttons" >
+                        <h5>{{  raison_sociale_entreprise}} ({{  numero_SIRET_entreprise }}) {{  ville_entreprise }}</h5>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="btn-group" data-toggle="buttons" >
+                        <h5><b>Téléphone</b></h5>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="btn-group" data-toggle="buttons" >
+                        <h5>{{  telephone_entreprise }} </h5>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="btn-group" data-toggle="buttons" >
+                        <h5><b>Courriel</b></h5>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="btn-group" data-toggle="buttons" >
+                        <h5>{{  courriel_entreprise }} </h5>
                     </div>
                 </div>
             </div>
@@ -52,8 +124,7 @@
             </div>
         </div>
 
-
-        <div class="row">
+        <div class="row" >
             <div class="col-md-1 col-externe">
                 <div class="col-md-12">
                     <h5><b>Votre avis</b></h5>
@@ -76,19 +147,12 @@
                 </div>
             </div>
             <div class="col-md-7 col-externe">
-                <div class="col-md-12">
+                <div class="col-md-12" >
                     <h5>{{ form.motif }}</h5>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-12 col-externe">
-                <div class="col-md-12">
-                    <h5>Le candidat va être averti par mail de votre décision.</h5>
-                </div>
-            </div>
-        </div>
 
         <div class="row">
             <div class="col-md-12 col-externe">

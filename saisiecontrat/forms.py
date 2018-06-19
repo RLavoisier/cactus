@@ -237,9 +237,13 @@ class CreationEntrepriseForm(LocalizedModelForm):
 
         telephone = self.cleaned_data["telephone"]
 
+
         if telephone is None:
             raise forms.ValidationError("Le numéro de téléphone doit être renseigné.")
         else:
+            telephone = telephone.replace(' ', '')
+            telephone = telephone.replace('.', '')
+
             return telephone
 
     def clean_telecopie(self):
@@ -249,6 +253,8 @@ class CreationEntrepriseForm(LocalizedModelForm):
         if telecopie is None:
             raise forms.ValidationError("Le numéro de télécopie de l'entreprise doit être renseigné.")
         else:
+            telecopie = telecopie.replace(' ', '')
+            telecopie = telecopie.replace('.', '')
             return telecopie
 
     def clean_courriel(self):
@@ -449,6 +455,9 @@ class CreationAlternantForm(LocalizedModelForm):
         if telephone is None:
             raise forms.ValidationError("Le téléphone doit être renseigné.")
         else:
+            telephone = telephone.replace(' ', '')
+            telephone = telephone.replace('.', '')
+
             return telephone
 
     def clean_nationalite(self):
@@ -580,14 +589,14 @@ class InformationContratForm(LocalizedModelForm):
         self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
 
-    def clean_date_embauche(self):
+    #def clean_date_embauche(self):
 
-        date_embauche = self.cleaned_data.get("date_embauche")
+        #date_embauche = self.cleaned_data.get("date_embauche")
 
-        if date_embauche is None:
-            raise forms.ValidationError("La date d'embauche doit être renseignée.")
-        else:
-            return date_embauche
+        #if date_embauche is None:
+        #    raise forms.ValidationError("La date d'embauche doit être renseignée.")
+        #else:
+        #    return date_embauche
 
     def clean_date_debut_contrat(self):
 
@@ -619,32 +628,32 @@ class InformationContratForm(LocalizedModelForm):
         else:
             return date_fin_contrat
 
-    def clean_duree_hebdomadaire_travail_heures(self):
+        #def clean_duree_hebdomadaire_travail_heures(self):
 
-        duree_hebdomadaire_travail_heures = self.cleaned_data.get("duree_hebdomadaire_travail_heures")
+        #duree_hebdomadaire_travail_heures = self.cleaned_data.get("duree_hebdomadaire_travail_heures")
 
-        if duree_hebdomadaire_travail_heures is None:
-            raise forms.ValidationError("Le nombre d'heures de travail hebdomadaire doit être renseignée.")
-        else:
-            return duree_hebdomadaire_travail_heures
+            #if duree_hebdomadaire_travail_heures is None:
+        #    raise forms.ValidationError("Le nombre d'heures de travail hebdomadaire doit être renseignée.")
+            #else:
+        #    return duree_hebdomadaire_travail_heures
 
-    def clean_caisse_retraite_complementaire(self):
+        #def clean_caisse_retraite_complementaire(self):
 
-        caisse_retraite_complementaire = self.cleaned_data.get("caisse_retraite_complementaire")
+        #caisse_retraite_complementaire = self.cleaned_data.get("caisse_retraite_complementaire")
 
-        if caisse_retraite_complementaire is None:
-            raise forms.ValidationError("La caisse de retraite complémentaire à laquelle souscrit l'entreprise pour ses salariés doit être saisie.")
-        else:
-            return caisse_retraite_complementaire
+            #if caisse_retraite_complementaire is None:
+        #raise forms.ValidationError("La caisse de retraite complémentaire à laquelle souscrit l'entreprise pour ses salariés doit être saisie.")
+            #else:
+        #return caisse_retraite_complementaire
 
-    def clean_salaire_brut_mensuel(self):
+        #def clean_salaire_brut_mensuel(self):
 
-        salaire_brut_mensuel = self.cleaned_data.get("salaire_brut_mensuel")
+        #salaire_brut_mensuel = self.cleaned_data.get("salaire_brut_mensuel")
 
-        if salaire_brut_mensuel is None:
-            raise forms.ValidationError("Le salaire brut mensuel doit être renseigné.")
-        else:
-            return salaire_brut_mensuel
+            #if salaire_brut_mensuel is None:
+        #    raise forms.ValidationError("Le salaire brut mensuel doit être renseigné.")
+            #else:
+        #return salaire_brut_mensuel
 
 
 class InformationMissionForm(LocalizedModelForm):
@@ -665,18 +674,20 @@ class InformationMissionForm(LocalizedModelForm):
 
         mission = self.cleaned_data.get("mission")
 
-        if mission is None:
-            raise forms.ValidationError("Vous devez saisir une mission.")
-        else:
-            if len(mission) < 100:
-                raise forms.ValidationError("La mission doit comporter au minimum 100 caractères.")
-            else:
-                return mission
+        #if mission is None:
+        #    raise forms.ValidationError("Vous devez saisir une mission.")
+        #else:
+        #    if len(mission) < 100:
+        #        raise forms.ValidationError("La mission doit comporter au minimum 100 caractères.")
+        #    else:
+        #        return mission
+
+        return mission
 
 class ValidationMissionForm(LocalizedModelForm):
 
     CHOIX = [
-        (2, "Mission validée"),
+        (2, "Validation"),
         (3, "Réserve"),
         (4, "Rejet")
     ]

@@ -19,12 +19,12 @@
       Les dossiers ci-dessous sont en attente de validation. Cliquez sur les noms pour accéder au formulaire de validation.
       </p>
       <p>
-      Si vous souhaitez obtenir de nouveau la fiche mission d’un candidat, cliquez sur le lien fiche de mission en vis à vis de son nom.
+      Si vous souhaitez obtenir de nouveau les documents (CERFA et fiche mission) d’un candidat, cliquez sur le lien Documents en vis à vis de son nom.
       </p>
       <ul>
       {% for a in alternants %}
           <li>
-             <a href="{{ request.cactus_domain }}/validationmission/{{ a.hash }}">{{ a.prenom }} {{ a.nom }}</a> <a href="{{ request.cactus_domain }}/envoyerficheraf/{{ a.hash }}">(Fiche de mission)</a>
+             <a href="{{ request.cactus_domain }}/validationmission/{{ a.hash }}">{{ a.prenom }} {{ a.nom }}</a> <a href="{{ request.cactus_domain }}/envoyerficheraf/{{ a.hash }}">(Documents)</a>
           </li>
       {% endfor %}
       </ul>

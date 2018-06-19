@@ -45,7 +45,10 @@ def generer_data_pour_pdf_mission(alternant, email, entreprise, ma_1, contrat):
     if ma_1 is not None:
         data["maitredapprentissage"] = "%s %s" % (ma_1.nom, ma_1.prenom)
 
-    data["mission"] = contrat.mission
+    if len(contrat.mission) > 0:
+        data["mission"] = contrat.mission
+    else:
+        data["mission"] = ''
 
     return data
 
@@ -69,6 +72,10 @@ def creerfichemission(request,alternant_hash):
 
     nomfichier = PDFGenerator.generate_mission_pdf_with_datas(filename, data, flatten=True)
 
+    # Génération du CERFA non aplati
+
+    nomfichier2 = creerCERFA(request, False)
+
     context={}
 
     context["alternant"] = alternant
@@ -85,10 +92,10 @@ def creerfichemission(request,alternant_hash):
 
     # Création du mail
     email = EmailMultiAlternatives(
-        "Fiche mission de %s %s.pdf" % (alternant.nom, alternant.prenom),
+        "Validation du dossier de %s %s.pdf" % (alternant.nom, alternant.prenom),
         msg_plain,
         'no_reply@cfa-epure.com',
-        [formation.courriel_raf],
+        formation.courriel_raf.split(','),
     )
 
     # Ajout du format html (https://docs.djangoproject.com/fr/2.0/topics/email/#sending-alternative-content-types)
@@ -96,12 +103,20 @@ def creerfichemission(request,alternant_hash):
 
     email.attach_file(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
 
+    email.attach_file(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier2))
+
     email.send(fail_silently=True)
 
     try:
         os.remove(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
     except:
         pass
+
+    try:
+        os.remove(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier2))
+    except:
+        pass
+
 
 def creerrecapinscriptions(request,formation_hash):
 
@@ -123,7 +138,7 @@ def creerrecapinscriptions(request,formation_hash):
         "Récapitulatif des dossiers d'inscription",
         msg_plain,
         'no_reply@cfa-epure.com',
-        [formation.courriel_raf],
+        formation.courriel_raf.split(','),
     )
 
     # Ajout du format html (https://docs.djangoproject.com/fr/2.0/topics/email/#sending-alternative-content-types)
@@ -520,7 +535,7 @@ def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction
             contrat.date_exportation_CFA =datetime.now()
             contrat.save()
 
-    print(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
+    #print(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
     try:
         os.remove(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
     except:
@@ -630,20 +645,21 @@ def formation_complet(contrat):
 
 def mission_complet(contrat):
 
-    if contrat.mission:
-        if len(contrat.mission) >= 100:
-            return True
-        else:
-            return False
-    else:
-        return False
+    return True
+
+    #if contrat.mission:
+    #    if len(contrat.mission) >= 100:
+    #        return True
+    #    else:
+    #        return False
+    #else:
+    #    return False
 
 
 def contrat_complet(contrat):
 
 
     if contrat:
-
 
         i = 0
 
@@ -722,6 +738,26 @@ def contrat_complet(contrat):
     else:
         return False
 
+
+def contrat_ypareo_complet(contrat):
+
+    if contrat:
+
+        i = 0
+
+        if contrat.date_debut_contrat:
+            i += 1
+        if contrat.date_fin_contrat:
+            i += 1
+
+        if i == 2:
+            return True
+        else:
+            return False
+    else:
+        return False
+
+
 def informe_saisie_complete(request):
 
     alternant = request.user.alternant
@@ -734,13 +770,18 @@ def informe_saisie_complete(request):
 
     if not contrat:
         request.session["contratcomplet"] = False
+        request.session["contratypareocomplet"] = False
         request.session["formationcomplet"] = False
         request.session["missioncomplet"] = False
         request.session["entreprisecomplet"] = False
+        request.session["accordvalide"] = False
+
     else:
         request.session["contratcomplet"] = contrat_complet(contrat)
+        request.session["contratypareocomplet"] = contrat_ypareo_complet(contrat)
         request.session["formationcomplet"] = formation_complet(contrat)
         request.session["missioncomplet"] = mission_complet(contrat)
+        request.session["accordvalide"] = (contrat.avis_raf == 2)
 
         if not contrat.entreprise:
             request.session["entreprisecomplet"] = False
@@ -748,3 +789,932 @@ def informe_saisie_complete(request):
             request.session["entreprisecomplet"] = entreprise_complet(contrat.entreprise)
 
     return request
+
+def creerexporttotal(request, email_livraison):
+
+    # Pour récupérer tout : all()
+
+    contrats = Contrat.objects.all()
+
+    nomfichier = "export.csv"
+    nomfichier = os.path.join(settings.PDF_OUTPUT_DIR, nomfichier)
+
+    with open(nomfichier, "w") as f:
+
+        c = csv.writer(f, delimiter=";")
+
+        c.writerow(["MailApp",
+                    "NomApp",
+                    "PrénomApp",
+                    "SexeApp",
+                    "DateNaisApp",
+                    "DéptNaisApp",
+                    "CommNaisApp",
+                    "AdrApp",
+                    "CPApp",
+                    "VilleApp",
+                    "TelApp",
+                    "Handicap",
+                    "Nationalité",
+                    "RégimeSocial",
+                    "SituationAvant",
+                    "DernierDiplômePréparé",
+                    "DernièreAnnéeSUivie",
+                    "InituléDernierDiplômePréparé",
+                    "DiplômePlusElevé",
+                    "SexeRep",
+                    "NomRep",
+                    "PrénomRep",
+                    "AdrRep",
+                    "CPRep",
+                    "VilleRep",
+                    "RaisonSociale",
+                    "SIRET",
+                    "Adr1Ent",
+                    "Adr2Ent",
+                    "CPEnt",
+                    "VilleEnt",
+                    "TypeEmployeur",
+                    "SecteurEmployeur",
+                    "EmployeurSpécifique",
+                    "CodeAPE",
+                    "Effectif",
+                    "TéléphoneEnt",
+                    "TélécopieEnt",
+                    "EmailEnt",
+                    "LibelléCC",
+                    "CodeCC",
+                    "RégimeAssuranceChômage",
+                    "CivilitéMA1",
+                    "NomMA1",
+                    "PrénomMA1",
+                    "EmailMA1",
+                    "DateNaisMA1",
+                    "CivilitéMA2",
+                    "NomMA2",
+                    "PrénomMA2",
+                    "EmailMA2",
+                    "DateNaisMA2",
+                    "CivilitéCE",
+                    "NomCE",
+                    "PrénomCE",
+                    "EmailCE",
+                    "DateNaisCE",
+                    "CodeFormation",
+                    "LibelléFormation",
+                    "Ville",
+                    "Spécialité",
+                    "CodeDiplôme",
+                    "LibelléDiplôme",
+                    "CodeDiplômeApprentissage",
+                    "Niveau",
+                    "NombreAnnées",
+                    "RAF",
+                    "CodeAccès",
+                    "RéférentGU",
+                    "ModeContractuel",
+                    "TypeContratAvenant",
+                    "TypeDérogation",
+                    "ContratAntérieur",
+                    "DateEmbauche",
+                    "DateDébutContrat",
+                    "DateEffetAvenant",
+                    "DateFinContrat",
+                    "DuréeHebdomadaireHeures",
+                    "DuréeHebdomadaireMinutes",
+                    "RisquesParticuliers",
+                    "BrutMensuel",
+                    "CaisseRetraiteComp",
+                    "Nourriture",
+                    "PrimePanier",
+                    "Logement",
+                    "An1Per1Du",
+                    "An1Per1Au",
+                    "An1Per1Taux",
+                    "An1Per1Base",
+                    "An1Per2Du",
+                    "An1Per2Au",
+                    "An1Per2Taux",
+                    "An1Per2Base",
+                    "An2Per1Du",
+                    "An2Per1Au",
+                    "An2Per1Taux",
+                    "An2Per1Base",
+                    "An2Per2Du",
+                    "An2Per2Au",
+                    "An2Per2Taux",
+                    "An2Per2Base",
+                    "An3Per1Du",
+                    "An3Per1Au",
+                    "An3Per1Taux",
+                    "An3Per1Base",
+                    "An3Per2Du",
+                    "An3Per2Au",
+                    "An3Per2Taux",
+                    "An3Per2Base",
+                    "An4Per1Du",
+                    "An4Per1Au",
+                    "An4Per1Taux",
+                    "An4Per1Base",
+                    "An4Per2Du",
+                    "An4Per2Au",
+                    "An4Per2Taux",
+                    "An4Per2Base",
+                    "DateMAJ",
+                    "DateSaisieComplète",
+                    "DateEnvoiRAF",
+                    "DateGénérationCERFA",
+                    "DateExportationCFA",
+                    "AvisRAF"])
+
+        for contrat in contrats:
+
+            enr=[]
+
+            alternant=contrat.alternant
+            entreprise = contrat.entreprise
+            maitreapprentissage1 = Personnel.objects.get(entreprise=entreprise,role=2)
+            formation = contrat.formation
+
+            enr.append(alternant.user.email)
+            enr.append(alternant.nom)
+            enr.append(alternant.prenom)
+            enr.append(alternant.sexe)
+            enr.append(alternant.date_naissance.strftime('%d/%m/%Y'))
+            enr.append(alternant.numero_departement_naissance)
+            enr.append(alternant.commune_naissance)
+            enr.append("%s %s" % (alternant.adresse_numero, alternant.adresse_voie))
+            enr.append(alternant.code_postal)
+            enr.append(alternant.ville)
+            enr.append(alternant.telephone)
+            enr.append(alternant.handicape)
+            enr.append(alternant.nationalite)
+            enr.append(alternant.regime_social)
+            enr.append(alternant.situation_avant_contrat)
+            enr.append(alternant.dernier_diplome_prepare)
+            enr.append(alternant.derniere_annee_suivie)
+            enr.append(alternant.intitule_dernier_diplome_prepare)
+            enr.append(alternant.diplome_le_plus_eleve)
+            if alternant.civilite_representant == 1 or alternant.civilite_representant == 2:
+                enr.append(alternant.civilite_representant)
+            else:
+                enr.append("")
+            if alternant.nom_representant:
+                enr.append(alternant.nom_representant)
+            else:
+                enr.append("")
+            if alternant.prenom_representant:
+                enr.append(alternant.prenom_representant)
+            else:
+                enr.append("")
+
+            if alternant.adresse_numero_representant:
+                if alternant.adresse_voie_representant:
+                    enr.append("%s %s" % (alternant.adresse_numero_representant, alternant.adresse_voie_representant))
+                else:
+                    enr.append("")
+            else:
+                if alternant.adresse_voie_representant:
+                    enr.append(alternant.adresse_voie_representant)
+                else:
+                    enr.append("")
+            if alternant.code_postal_representant:
+                enr.append(alternant.code_postal_representant)
+            else:
+                enr.append("")
+            if alternant.ville_representant:
+                enr.append(alternant.ville_representant)
+            else:
+                enr.append("")
+
+            enr.append(entreprise.raison_sociale)
+            enr.append(entreprise.numero_SIRET)
+            if entreprise.adresse_numero:
+                enr.append("%s %s" % (entreprise.adresse_numero, entreprise.adresse_voie))
+            else:
+                enr.append(entreprise.adresse_voie)
+            if entreprise.adresse_complement:
+                enr.append(entreprise.adresse_complement)
+            else:
+                enr.append("")
+            enr.append(entreprise.code_postal)
+            enr.append(entreprise.ville)
+            enr.append(entreprise.type_employeur)
+            enr.append(entreprise.secteur_employeur)
+            enr.append(entreprise.employeur_specifique)
+            enr.append(entreprise.code_APE)
+            enr.append(entreprise.effectif_entreprise)
+            enr.append(entreprise.telephone)
+            if entreprise.telecopie:
+                enr.append(entreprise.telecopie)
+            else:
+                enr.append("")
+            if entreprise.courriel:
+                enr.append(entreprise.courriel)
+            else:
+                enr.append("")
+            if entreprise.libelle_convention_collective:
+                enr.append(entreprise.libelle_convention_collective)
+            else:
+                enr.append("")
+            if entreprise.code_convention_collective:
+                enr.append(entreprise.code_convention_collective)
+            else:
+                enr.append("")
+            if entreprise.adhesion_regime_assurance_chomage:
+                enr.append(entreprise.adhesion_regime_assurance_chomage)
+            else:
+                enr.append("")
+
+            if maitreapprentissage1.civilite:
+                enr.append(maitreapprentissage1.civilite)
+            else:
+                enr.append("")
+            if maitreapprentissage1.nom:
+                enr.append(maitreapprentissage1.nom)
+            else:
+                enr.append("")
+            if maitreapprentissage1.prenom:
+                enr.append(maitreapprentissage1.prenom)
+            else:
+                enr.append("")
+            if maitreapprentissage1.courriel:
+                enr.append(maitreapprentissage1.courriel)
+            else:
+                enr.append("")
+            if maitreapprentissage1.date_naissance:
+                enr.append(maitreapprentissage1.date_naissance.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+
+            try:
+                maitreapprentissage2 = Personnel.objects.get(entreprise=entreprise, role=3)
+            except ObjectDoesNotExist:
+                maitreapprentissage2 = None
+
+            if maitreapprentissage2:
+                if maitreapprentissage2.civilite:
+                    enr.append(maitreapprentissage2.civilite)
+                else:
+                    enr.append("")
+                if maitreapprentissage2.nom:
+                    enr.append(maitreapprentissage2.nom)
+                else:
+                    enr.append("")
+                if maitreapprentissage2.prenom:
+                    enr.append(maitreapprentissage2.prenom)
+                else:
+                    enr.append("")
+                if maitreapprentissage2.courriel:
+                    enr.append(maitreapprentissage2.courriel)
+                else:
+                    enr.append("")
+                if maitreapprentissage2.date_naissance:
+                    enr.append(maitreapprentissage2.date_naissance.strftime('%d/%m/%Y'))
+                else:
+                    enr.append("")
+            else:
+                enr.append("")
+                enr.append("")
+                enr.append("")
+                enr.append("")
+                enr.append("")
+
+            try:
+                contactentreprise = Personnel.objects.get(entreprise=entreprise, role=3)
+            except ObjectDoesNotExist:
+                contactentreprise = None
+
+            if contactentreprise:
+                if contactentreprise.civilite:
+                    enr.append(contactentreprise.civilite)
+                else:
+                    enr.append("")
+                if contactentreprise.nom:
+                    enr.append(contactentreprise.nom)
+                else:
+                    enr.append("")
+                if contactentreprise.prenom:
+                    enr.append(contactentreprise.prenom)
+                else:
+                    enr.append("")
+                if contactentreprise.courriel:
+                    enr.append(contactentreprise.courriel)
+                else:
+                    enr.append("")
+                if contactentreprise.date_naissance:
+                    enr.append(contactentreprise.date_naissance.strftime('%d/%m/%Y'))
+                else:
+                    enr.append("")
+            else:
+                enr.append("")
+                enr.append("")
+                enr.append("")
+                enr.append("")
+                enr.append("")
+
+            enr.append(formation.code_formation)
+            enr.append(formation.intitule_formation)
+            enr.append(formation.ville)
+            enr.append(formation.specialite)
+            enr.append(formation.diplome)
+            enr.append(formation.intitule_diplome)
+            enr.append(formation.code_diplome_apprentissage)
+            enr.append(formation.niveau)
+            enr.append(formation.nombre_annees)
+            enr.append(formation.raf)
+            enr.append(formation.code_acces)
+            enr.append(formation.referent_GU)
+
+            enr.append(contrat.mode_contractuel)
+            enr.append(contrat.type_contrat_avenant)
+            if contrat.type_derogation:
+                enr.append(contrat.type_derogation)
+            else:
+                enr.append("")
+
+            if contrat.numero_contrat_anterieur:
+                enr.append(contrat.numero_contrat_anterieur)
+            else:
+                enr.append("")
+
+            if contrat.date_embauche:
+                enr.append(contrat.date_embauche.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+
+            enr.append(contrat.date_debut_contrat.strftime('%d/%m/%Y'))
+            if contrat.date_effet_avenant:
+                enr.append(contrat.date_effet_avenant.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+
+            enr.append(contrat.date_fin_contrat.strftime('%d/%m/%Y'))
+
+            if contrat.duree_hebdomadaire_travail_heures:
+                enr.append(contrat.duree_hebdomadaire_travail_heures)
+            else:
+                enr.append("")
+
+            if contrat.duree_hebdomadaire_travail_minutes:
+                enr.append(contrat.duree_hebdomadaire_travail_minutes)
+            else:
+                enr.append("")
+
+            enr.append(contrat.risques_particuliers)
+
+            if contrat.salaire_brut_mensuel:
+                enr.append(contrat.salaire_brut_mensuel)
+            else:
+                enr.append("")
+
+            if contrat.caisse_retraite_complementaire:
+                enr.append(contrat.caisse_retraite_complementaire)
+            else:
+                enr.append("")
+
+            if contrat.nourriture:
+                enr.append(contrat.nourriture)
+            else:
+                enr.append("")
+
+            if contrat.prime_panier:
+                enr.append(contrat.prime_panier)
+            else:
+                enr.append("")
+
+            if contrat.logement:
+                enr.append(contrat.logement)
+            else:
+                enr.append("")
+
+            if contrat.an_1_per_1_du:
+                enr.append(contrat.an_1_per_1_du.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_1_per_1_au:
+                enr.append(contrat.an_1_per_1_au.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_1_per_1_taux:
+                enr.append(contrat.an_1_per_1_taux)
+            else:
+                enr.append("")
+            if contrat.an_1_per_1_base:
+                enr.append(contrat.an_1_per_1_base)
+            else:
+                enr.append("")
+            if contrat.an_1_per_2_du:
+                enr.append(contrat.an_1_per_2_du.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_1_per_2_au:
+                enr.append(contrat.an_1_per_2_au.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_1_per_2_taux:
+                enr.append(contrat.an_1_per_2_taux)
+            else:
+                enr.append("")
+            if contrat.an_1_per_2_base:
+                enr.append(contrat.an_1_per_2_base)
+            else:
+                enr.append("")
+
+            if contrat.an_2_per_1_du:
+                enr.append(contrat.an_2_per_1_du.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_2_per_1_au:
+                enr.append(contrat.an_2_per_1_au.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_2_per_1_taux:
+                enr.append(contrat.an_2_per_1_taux)
+            else:
+                enr.append("")
+            if contrat.an_2_per_1_base:
+                enr.append(contrat.an_2_per_1_base)
+            else:
+                enr.append("")
+            if contrat.an_2_per_2_du:
+                enr.append(contrat.an_2_per_2_du.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_2_per_2_au:
+                enr.append(contrat.an_2_per_2_au.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_2_per_2_taux:
+                enr.append(contrat.an_2_per_2_taux)
+            else:
+                enr.append("")
+            if contrat.an_2_per_2_base:
+                enr.append(contrat.an_2_per_2_base)
+            else:
+                enr.append("")
+
+            if contrat.an_3_per_1_du:
+                enr.append(contrat.an_3_per_1_du.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_3_per_1_au:
+                enr.append(contrat.an_3_per_1_au.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_3_per_1_taux:
+                enr.append(contrat.an_3_per_1_taux)
+            else:
+                enr.append("")
+            if contrat.an_3_per_1_base:
+                enr.append(contrat.an_3_per_1_base)
+            else:
+                enr.append("")
+            if contrat.an_3_per_2_du:
+                enr.append(contrat.an_3_per_2_du.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_3_per_2_au:
+                enr.append(contrat.an_3_per_2_au.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_3_per_2_taux:
+                enr.append(contrat.an_3_per_2_taux)
+            else:
+                enr.append("")
+            if contrat.an_3_per_2_base:
+                enr.append(contrat.an_3_per_2_base)
+            else:
+                enr.append("")
+
+            if contrat.an_4_per_1_du:
+                enr.append(contrat.an_4_per_1_du.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_4_per_1_au:
+                enr.append(contrat.an_4_per_1_au.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_4_per_1_taux:
+                enr.append(contrat.an_4_per_1_taux)
+            else:
+                enr.append("")
+            if contrat.an_4_per_1_base:
+                enr.append(contrat.an_4_per_1_base)
+            else:
+                enr.append("")
+            if contrat.an_4_per_2_du:
+                enr.append(contrat.an_4_per_2_du.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_4_per_2_au:
+                enr.append(contrat.an_4_per_2_au.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.an_4_per_2_taux:
+                enr.append(contrat.an_4_per_2_taux)
+            else:
+                enr.append("")
+            if contrat.an_4_per_2_base:
+                enr.append(contrat.an_4_per_2_base)
+            else:
+                enr.append("")
+
+            enr.append(contrat.date_maj.strftime('%d/%m/%Y'))
+
+            if contrat.date_saisie_complete:
+                enr.append(contrat.date_saisie_complete.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.date_envoi_raf:
+                enr.append(contrat.date_envoi_raf.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.date_generation_CERFA:
+                enr.append(contrat.date_generation_CERFA.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            if contrat.date_exportation_CFA:
+                enr.append(contrat.date_exportation_CFA.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+            enr.append(contrat.avis_raf)
+
+            c.writerow(enr)
+
+    # Création du mail
+    email = EmailMultiAlternatives(
+        "cactus export ypareo",
+        "",
+        'no_reply@cfa-epure.com',
+        [email_livraison],
+    )
+
+    email.attach_file(nomfichier)
+
+    email.send(fail_silently=True)
+
+    #print(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
+    try:
+        os.remove(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
+    except:
+        pass
+
+
+def creerCERFA(request, aplatir):
+
+    # Recuperer les infos qui nous intéressent pour le pdf
+
+    print(request.user.email)
+    alternant = Alternant.objects.get(user=request.user)
+    contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
+    entreprise = contrat.entreprise
+    formation = contrat.formation
+    cfa = formation.cfa
+
+    try:
+        ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
+    except ObjectDoesNotExist:
+        ma_1 = None
+
+    try:
+        ma_2 = Personnel.objects.get(entreprise=entreprise, role=3)
+    except ObjectDoesNotExist:
+        ma_2 = None
+
+    # Construction du dictionnaire des valeur du pdf
+    data = {}
+    if entreprise.secteur_employeur == 1:
+        data["emp_prive"] = 1
+    else:
+        data["emp_public"] = 1
+
+    if contrat.type_contrat_avenant in (31, 32, 33, 34, 35, 36):
+        data["avenant"] = 1
+    else:
+        data["contrat"] = 1
+
+    data["mode_Contrat"] = contrat.mode_contractuel
+    data["emp_siret"] = entreprise.numero_SIRET
+    if entreprise.adresse_numero:
+        data["emp_adr_num"] = entreprise.adresse_numero
+    data["emp_adr_voie"] = entreprise.adresse_voie.upper()
+    if entreprise.adresse_complement is not None:
+        data["emp_adr_compl"] = entreprise.adresse_complement.upper()
+    data["emp_adr_cp"] = entreprise.code_postal
+    data["emp_adr_ville"] = entreprise.ville.upper()
+    data["emp_tel"] = entreprise.telephone
+    data["emp_fax"] = entreprise.telecopie
+
+    data["emp_mail1"] = entreprise.courriel[0:entreprise.courriel.find('@')]
+    data["emp_mail2"] = entreprise.courriel[entreprise.courriel.find('@') + 1:]
+    data["emp_type"] = entreprise.type_employeur
+    data["emp_specifique"] = entreprise.employeur_specifique
+    data["emp_naf"] = entreprise.code_APE
+    data["emp_eff"] = entreprise.effectif_entreprise
+
+    data["emp_conv_coll"] = entreprise.libelle_convention_collective
+
+    data["emp_idcc"] = entreprise.code_convention_collective
+    data["emp_denom"] = entreprise.raison_sociale.upper()
+    data["emp_adh_chomage"] = entreprise.adhesion_regime_assurance_chomage
+
+    data["alt_nom"] = "%s %s" % (alternant.nom.upper(), alternant.prenom.upper())
+    data["alt_mail1"] = request.user.email
+    data["alt_tel"] = alternant.telephone
+    data["alt_adr_ville"] = alternant.ville
+    data["alt_adr_cp"] = alternant.code_postal
+    data["alt_adr_num"] = alternant.adresse_numero
+    if alternant.adresse_voie:
+        data["alt_adr_voie"] = alternant.adresse_voie.upper()
+    if alternant.ville_representant:
+        data["alt_repr_adr_ville"] = alternant.ville_representant
+    if alternant.code_postal_representant:
+        data["alt_repr_adr_cp"] = alternant.code_postal_representant
+    if alternant.adresse_voie_representant:
+        data["alt_repr_adr_voie"] = alternant.adresse_voie_representant
+    if alternant.adresse_numero_representant:
+        data["alt_repr_adr_num"] = alternant.adresse_numero_representant
+    if alternant.nom_representant:
+        if alternant.prenom_representant:
+            nom_prenom_representant = "%s %s" % (alternant.nom_representant, alternant.prenom_representant)
+        else:
+            nom_prenom_representant = "%s" % (alternant.nom_representant)
+    else:
+        nom_prenom_representant = "%s" % (alternant.prenom_representant)
+
+    data["alt_repr_nom"] = nom_prenom_representant
+
+    data["alt_ddn_jour"] = str(alternant.date_naissance.day).zfill(2)
+    data["alt_ddn_mois"] = str(alternant.date_naissance.month).zfill(2)
+    data["alt_ddn_annee"] = alternant.date_naissance.year
+
+    data["alt_departement_naissance"] = alternant.numero_departement_naissance
+    data["alt_regime"] = alternant.regime_social
+    data["alt_nationnalite"] = alternant.nationalite
+    data["alt_derniere_situation"] = alternant.situation_avant_contrat
+    data["alt_dernier_diplome"] = alternant.dernier_diplome_prepare
+    data["alt_derniere_classe"] = alternant.derniere_annee_suivie
+    data["alt_dernier_diplome_intitule"] = alternant.intitule_dernier_diplome_prepare
+    data["alt_diplome"] = alternant.diplome_le_plus_eleve
+
+    if alternant.sexe == 'M':
+        data["alt_sexe_m"] = 1
+    else:
+        data["alt_sexe_f"] = 1
+
+    if alternant.handicape:
+        data["alt_handicape_oui"] = 1
+    else:
+        data["alt_handicape_non"] = 1
+
+    data["commune_naissance"] = alternant.commune_naissance
+
+    data["maitre1_nom"] = "%s %s" % (ma_1.nom, ma_1.prenom)
+    data["maitre1_ddn_jour"] = str(ma_1.date_naissance.day).zfill(2)
+    data["maitre1_ddn_mois"] = str(ma_1.date_naissance.month).zfill(2)
+    data["maitre1_ddn_annee"] = ma_1.date_naissance.year
+
+    if ma_2 is not None:
+        data["maitre2_nom"] = "%s %s" % (ma_2.nom, ma_2.prenom)
+        data["maitre2_ddn_jour"] = str(ma_2.date_naissance.day).zfill(2)
+        data["maitre2_ddn_mois"] = str(ma_2.date_naissance.month).zfill(2)
+        data["maitre2_ddn_annee"] = ma_2.date_naissance.year
+
+    if contrat.attestation_maitre_apprentissage:
+        data["maitre_attestation"] = 1
+    data["contrat_type"] = contrat.type_contrat_avenant
+    data["contrat_derog"] = contrat.type_derogation
+
+    if contrat.numero_contrat_anterieur is not None:
+        data["contrat_num_prec"] = contrat.numero_contrat_anterieur
+
+    data["contrat_debut_jour"] = str(contrat.date_embauche.day).zfill(2)
+    data["contrat_debut_mois"] = str(contrat.date_embauche.month).zfill(2)
+    data["contrat_debut_annee"] = contrat.date_embauche.year
+    data["execution_fin_annee"] = contrat.date_debut_contrat.year
+    data["execution_fin_mois"] = str(contrat.date_debut_contrat.month).zfill(2)
+    data["execution_fin_jour"] = str(contrat.date_debut_contrat.day).zfill(2)
+
+    data["contrat_duree_hebdo_heures"] = str(contrat.duree_hebdomadaire_travail_heures)
+    data["contrat_duree_hebdo_minutes"] = str(contrat.duree_hebdomadaire_travail_minutes)
+
+    if contrat.risques_particuliers:
+        data["contrat_risques_oui"] = 1
+    else:
+        data["contrat_risques_non"] = 1
+
+    if contrat.an_1_per_1_taux is not None:
+        data["contrat_remu_annee1_taux1"] = str(contrat.an_1_per_1_taux)
+    if contrat.an_2_per_1_taux is not None:
+        data["contrat_remu_annee2_taux1"] = str(contrat.an_2_per_1_taux)
+    if contrat.an_3_per_1_taux is not None:
+        data["contrat_remu_annee3_taux1"] = str(contrat.an_3_per_1_taux)
+    if contrat.an_4_per_1_taux is not None:
+        data["contrat_remu_annee4_taux1"] = str(contrat.an_4_per_1_taux)
+
+    if contrat.an_1_per_1_du is not None:
+        data["contrat_remu_annee1_du1_jour"] = str(contrat.an_1_per_1_du.day).zfill(2)
+        data["contrat_remu_annee1_du1_mois"] = str(contrat.an_1_per_1_du.month).zfill(2)
+        data["contrat_remu_annee1_du1_annee"] = contrat.an_1_per_1_du.year
+    if contrat.an_2_per_1_du is not None:
+        data["contrat_remu_annee2_du1_jour"] = str(contrat.an_2_per_1_du.day).zfill(2)
+        data["contrat_remu_annee2_du1_mois"] = str(contrat.an_2_per_1_du.month).zfill(2)
+        data["contrat_remu_annee2_du1_annee"] = contrat.an_2_per_1_du.year
+    if contrat.an_3_per_1_du is not None:
+        data["contrat_remu_annee3_du1_jour"] = str(contrat.an_3_per_1_du.day).zfill(2)
+        data["contrat_remu_annee3_du1_mois"] = str(contrat.an_3_per_1_du.month).zfill(2)
+        data["contrat_remu_annee3_du1_annee"] = contrat.an_3_per_1_du.year
+    if contrat.an_4_per_1_du is not None:
+        data["contrat_remu_annee4_du1_jour"] = str(contrat.an_4_per_1_du.day).zfill(2)
+        data["contrat_remu_annee4_du1_mois"] = str(contrat.an_4_per_1_du.month).zfill(2)
+        data["contrat_remu_annee4_du1_annee"] = contrat.an_4_per_1_du.year
+    if contrat.an_1_per_1_au is not None:
+        data["contrat_remu_annee1_au1_jour"] = str(contrat.an_1_per_1_au.day).zfill(2)
+        data["contrat_remu_annee1_au1_mois"] = str(contrat.an_1_per_1_au.month).zfill(2)
+        data["contrat_remu_annee1_au1_annee"] = contrat.an_1_per_1_au.year
+    if contrat.an_2_per_1_au is not None:
+        data["contrat_remu_annee2_au1_jour"] = str(contrat.an_2_per_1_au.day).zfill(2)
+        data["contrat_remu_annee2_au1_mois"] = str(contrat.an_2_per_1_au.month).zfill(2)
+        data["contrat_remu_annee2_au1_annee"] = contrat.an_2_per_1_au.year
+    if contrat.an_3_per_1_au is not None:
+        data["contrat_remu_annee3_au1_jour"] = str(contrat.an_3_per_1_au.day).zfill(2)
+        data["contrat_remu_annee3_au1_mois"] = str(contrat.an_3_per_1_au.month).zfill(2)
+        data["contrat_remu_annee3_au1_annee"] = contrat.an_3_per_1_au.year
+    if contrat.an_4_per_1_au is not None:
+        data["contrat_remu_annee4_au1_jour"] = str(contrat.an_4_per_1_au.day).zfill(2)
+        data["contrat_remu_annee4_au1_mois"] = str(contrat.an_4_per_1_au.month).zfill(2)
+        data["contrat_remu_annee4_au1_annee"] = contrat.an_4_per_1_au.year
+
+    if contrat.an_1_per_1_base is not None:
+        data["contrat_remu_annee1_ref1"] = Contrat.BASE[contrat.an_1_per_1_base - 1][1]
+    if contrat.an_2_per_1_base is not None:
+        data["contrat_remu_annee2_ref1"] = Contrat.BASE[contrat.an_2_per_1_base - 1][1]
+    if contrat.an_3_per_1_base is not None:
+        data["contrat_remu_annee3_ref1"] = Contrat.BASE[contrat.an_3_per_1_base - 1][1]
+    if contrat.an_4_per_1_base is not None:
+        data["contrat_remu_annee4_ref1"] = Contrat.BASE[contrat.an_4_per_1_base - 1][1]
+
+    if contrat.an_1_per_2_taux is not None:
+        data["contrat_remu_annee1_taux2"] = str(contrat.an_1_per_2_taux)
+    if contrat.an_2_per_2_taux is not None:
+        data["contrat_remu_annee2_taux2"] = str(contrat.an_2_per_2_taux)
+    if contrat.an_3_per_2_taux is not None:
+        data["contrat_remu_annee3_taux2"] = str(contrat.an_3_per_2_taux)
+    if contrat.an_4_per_2_taux is not None:
+        data["contrat_remu_annee4_taux2"] = str(contrat.an_4_per_2_taux)
+
+    if contrat.an_1_per_1_du is not None:
+        data["contrat_remu_annee1_du2_jour"] = str(contrat.an_1_per_2_du.day).zfill(2)
+        data["contrat_remu_annee1_du2_mois"] = str(contrat.an_1_per_2_du.month).zfill(2)
+        data["contrat_remu_annee1_du2_annee"] = contrat.an_1_per_2_du.year
+    if contrat.an_2_per_2_du is not None:
+        data["contrat_remu_annee2_du2_jour"] = str(contrat.an_2_per_2_du.day).zfill(2)
+        data["contrat_remu_annee2_du2_mois"] = str(contrat.an_2_per_2_du.month).zfill(2)
+        data["contrat_remu_annee2_du2_annee"] = contrat.an_2_per_2_du.year
+    if contrat.an_3_per_2_du is not None:
+        data["contrat_remu_annee3_du2_jour"] = str(contrat.an_3_per_2_du.day).zfill(2)
+        data["contrat_remu_annee3_du2_mois"] = str(contrat.an_3_per_2_du.month).zfill(2)
+        data["contrat_remu_annee3_du2_annee"] = contrat.an_3_per_2_du.year
+    if contrat.an_4_per_2_du is not None:
+        data["contrat_remu_annee4_du2_jour"] = str(contrat.an_4_per_2_du.day).zfill(2)
+        data["contrat_remu_annee4_du2_mois"] = str(contrat.an_4_per_2_du.month).zfill(2)
+        data["contrat_remu_annee4_du2_annee"] = contrat.an_4_per_2_du.year
+    if contrat.an_1_per_2_au is not None:
+        data["contrat_remu_annee1_au2_jour"] = str(contrat.an_1_per_2_au.day).zfill(2)
+        data["contrat_remu_annee1_au2_mois"] = str(contrat.an_1_per_2_au.month).zfill(2)
+        data["contrat_remu_annee1_au2_annee"] = contrat.an_1_per_2_au.year
+    if contrat.an_2_per_2_au is not None:
+        data["contrat_remu_annee2_au2_jour"] = str(contrat.an_2_per_2_au.day).zfill(2)
+        data["contrat_remu_annee2_au2_mois"] = str(contrat.an_2_per_2_au.month).zfill(2)
+        data["contrat_remu_annee2_au2_annee"] = contrat.an_2_per_2_au.year
+    if contrat.an_3_per_2_au is not None:
+        data["contrat_remu_annee3_au2_jour"] = str(contrat.an_3_per_2_au.day).zfill(2)
+        data["contrat_remu_annee3_au2_mois"] = str(contrat.an_3_per_2_au.month).zfill(2)
+        data["contrat_remu_annee3_au2_annee"] = contrat.an_3_per_2_au.year
+    if contrat.an_4_per_2_au is not None:
+        data["contrat_remu_annee4_au2_jour"] = str(contrat.an_4_per_2_au.day).zfill(2)
+        data["contrat_remu_annee4_au2_mois"] = str(contrat.an_4_per_2_au.month).zfill(2)
+        data["contrat_remu_annee4_au2_annee"] = contrat.an_4_per_2_au.year
+    if contrat.an_1_per_2_base is not None:
+        data["contrat_remu_annee1_ref2"] = Contrat.BASE[contrat.an_1_per_2_base - 1][1]
+    if contrat.an_2_per_2_base is not None:
+        data["contrat_remu_annee2_ref2"] = Contrat.BASE[contrat.an_2_per_2_base - 1][1]
+    if contrat.an_3_per_2_base is not None:
+        data["contrat_remu_annee3_ref2"] = Contrat.BASE[contrat.an_3_per_2_base - 1][1]
+    if contrat.an_4_per_2_base is not None:
+        data["contrat_remu_annee4_ref2"] = Contrat.BASE[contrat.an_4_per_2_base - 1][1]
+
+
+    if contrat.salaire_brut_mensuel is not None:
+        entier = int(contrat.salaire_brut_mensuel)
+        decimal = contrat.salaire_brut_mensuel - entier
+        data["contrat_salaire1"] = entier
+        data["contrat_salaire2"] = str(int(decimal)).zfill(2)
+
+    if contrat.nourriture is not None:
+        entier = int(contrat.nourriture)
+        decimal = (contrat.nourriture - entier) * 100
+        data["contrat_avantg_nourr1"] = entier
+        data["contrat_avantg_nourr2"] = str(int(decimal)).zfill(2)
+
+    if contrat.logement is not None:
+        entier = int(contrat.logement)
+        decimal = (contrat.logement - entier) * 100
+        data["contrat_avantg_logt1"] = entier
+        data["contrat_avantg_logt2"] = str(int(decimal)).zfill(2)
+
+    if contrat.prime_panier is not None:
+        entier = int(contrat.prime_panier)
+        decimal = (contrat.prime_panier - entier) * 100
+        data["panier_avantg_logt1"] = entier
+        data["panier_avantg_logt2"] = str(int(decimal)).zfill(2)
+
+    if contrat.date_effet_avenant is not None:
+        data["avenant_debut_jour"] = str(contrat.date_effet_avenant.day).zfill(2)
+        data["avenant_debut_mois"] = str(contrat.date_effet_avenant.month).zfill(2)
+        data["avenant_debut_annee"] = contrat.date_effet_avenant.year
+
+    data["contrat_fin_jour"] = str(contrat.date_fin_contrat.day).zfill(2)
+    data["contrat_fin_mois"] = str(contrat.date_fin_contrat.month).zfill(2)
+    data["contrat_fin_annee"] = contrat.date_fin_contrat.year
+
+    if contrat.caisse_retraite_complementaire is not None:
+        data["retraite_caisse_comp"] = contrat.caisse_retraite_complementaire
+
+    data["formation_nom"] = cfa.nom
+    data["formation_uai"] = cfa.numeroUAI
+
+    data["formation_adr_voie"] = cfa.adresse_voie
+    data["formation_adr_num"] = cfa.adresse_numero
+    data["formation_adr_compl"] = cfa.adresse_complement
+    data["formation_adr_cp"] = cfa.code_postal
+    data["formation_adr_ville"] = cfa.ville
+    data["formation_inspect_pedag"] = formation.inspection_pedagogique_competente
+
+    if contrat.fait_le is not None:
+        data["signature_date_annee"] = contrat.fait_le.year
+        data["signature_date_mois"] = str(contrat.fait_le.month).zfill(2)
+        data["signature_date_jour"] = str(contrat.fait_le.day).zfill(2)
+
+    if contrat.fait_a:
+        data["signature_lieu"] = contrat.fait_a
+
+    if contrat.attestation_pieces:
+        data["signature_emp_attestation"] = 1
+
+    data["formation_intitule"] = formation.intitule_diplome
+    data["formation_diplome"] = formation.diplome
+    data["formation_diplome_code"] = formation.code_diplome_apprentissage
+
+    if contrat.date_inscription is not None:
+        data["inscription_annee"] = contrat.date_inscription.year
+        data["inscription_mois"] = str(contrat.date_inscription.month).zfill(2)
+        data["inscription_jour"] = str(contrat.date_inscription.day).zfill(2)
+
+    if formation.heures_an_1 is not None:
+        data["formation_annee1_heure"] = formation.heures_an_1
+    if formation.an_1_du is not None:
+        data["formation_annee1_du_jour"] = str(formation.an_1_du.day).zfill(2)
+        data["formation_annee1_du_mois"] = str(formation.an_1_du.month).zfill(2)
+        data["formation_annee1_du_annee"] = formation.an_1_du.year
+    if formation.an_1_au is not None:
+        data["formation_annee1_au_jour"] = str(formation.an_1_au.day).zfill(2)
+        data["formation_annee1_au_mois"] = str(formation.an_1_au.month).zfill(2)
+        data["formation_annee1_au_annee"] = formation.an_1_au.year
+
+    if formation.heures_an_2 is not None:
+        data["formation_annee2_heure"] = formation.heures_an_2
+    if formation.an_2_du is not None:
+        data["formation_annee2_du_jour"] = str(formation.an_2_du.day).zfill(2)
+        data["formation_annee2_du_mois"] = str(formation.an_2_du.month).zfill(2)
+        data["formation_annee2_du_annee"] = formation.an_2_du.year
+    if formation.an_2_au is not None:
+        data["formation_annee2_au_jour"] = str(formation.an_2_au.day).zfill(2)
+        data["formation_annee2_au_mois"] = str(formation.an_2_au.month).zfill(2)
+        data["formation_annee2_au_annee"] = formation.an_2_au.year
+
+    if formation.heures_an_3 is not None:
+        data["formation_annee3_heure"] = formation.heures_an_3
+    if formation.an_3_du is not None:
+        data["formation_annee3_du_jour"] = str(formation.an_3_du.day).zfill(2)
+        data["formation_annee3_du_mois"] = str(formation.an_3_du.month).zfill(2)
+        data["formation_annee3_du_annee"] = formation.an_3_du.year
+    if formation.an_3_au is not None:
+        data["formation_annee3_au_jour"] = str(formation.an_3_au.day).zfill(2)
+        data["formation_annee3_au_mois"] = str(formation.an_3_au.month).zfill(2)
+        data["formation_annee3_au_annee"] = formation.an_3_au.year
+
+    filename = "CERFA_%s_%s_%s.pdf" % (alternant.nom,
+                                       alternant.prenom,
+                                       datetime.now().strftime("%Y%m%d%H%M%S"))
+    filename = filename.replace(' ', '_')
+    filename = filename.replace("'", "_")
+
+    nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(filename, data, flatten=aplatir)
+
+    return nomfichier
+
+
+
+

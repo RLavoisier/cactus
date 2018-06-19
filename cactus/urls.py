@@ -15,11 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from saisiecontrat.views import create_alternant, inform_contrat, inform_mission, liste_formation, detail_formation, \
-    appliquer_formation, exportypareo, choisirautreformation
+    appliquer_formation, exportypareo, choisirautreformation, exporttotal
 from django.urls import path, include
 
 from cactus.views import accueil
-from saisiecontrat.views import creationcontrat, create_entreprise, creerCERFA, cerfa, envoyermailvalidationraf, recapinscriptions, envoyerficheraf,validationmission
+from saisiecontrat.views import creationcontrat, create_entreprise, telechargerCERFA, cerfa, envoyermailvalidationraf, recapinscriptions, envoyerficheraf,validationmission
 
 urlpatterns = [
     path('comptes/', include("comptes.urls"), name="comptes"),
@@ -36,11 +36,12 @@ urlpatterns = [
     path('appliquer_formation/<str:pk>', appliquer_formation.as_view(), name="appliquer_formation"),
     path('detail_formation/', detail_formation.as_view(), name='detail_formation'),
     path('cerfa/', cerfa, name='cerfa'),
-    path('creerCERFA/', creerCERFA.as_view(), name='creerCERFA'),
+    path('telechargerCERFA/', telechargerCERFA.as_view(), name='telechargerCERFA'),
     path('envoyerficheraf/<str:alternant_hash>/', envoyerficheraf, name='envoyerficheraf'),
     path('validationmission/<str:alternant_hash>/', validationmission, name='validationmission'),
     path('envoyermailvalidationraf/', envoyermailvalidationraf, name='envoyermailvalidationraf'),
     path('choisirautreformation/', choisirautreformation, name='choisirautreformation'),
     path('recapinscriptions/<str:formation_hash>/', recapinscriptions, name='recapinscriptions'),
     path('exportypareo/<str:cfa_hash>/<str:email_livraison>/<str:aaaammjj_du>/<str:aaaammjj_au>/<int:extraction>/<int:etat>', exportypareo, name='exportypareo'),
+    path('exporttotal/<str:cfa_hash>/<str:email_livraison>', exporttotal, name='exporttotal'),
 ]

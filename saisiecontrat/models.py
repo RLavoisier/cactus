@@ -23,61 +23,61 @@ class Alternant(models.Model):
     )
 
     NATIONALITE = (
-        (1, "Française"),
-        (2, "Union Européenne"),
-        (3, "Etranger hors Union Européenne"),
+        (1, "1 - Française"),
+        (2, "2 - Union Européenne"),
+        (3, "3 - Etranger hors Union Européenne"),
     )
 
     REGIME_SOCIAL = (
-        (1, "MSA"),
-        (2, "URSSAF"),
+        (1, "1 - MSA"),
+        (2, "2 - URSSAF"),
     )
 
     SITUATION_AVANT_CONTRAT = (
-        (1, "Scolaire (hors DIMA)"),
-        (2, "Dispositif d’initiation aux métiers en alternance (DIMA) ou autre classe préparatoire à l’apprentissage (CLIPA, CPA...)"),
-        (3, "Etudiant"),
-        (4, "Contrat d’apprentissage"),
-        (5, "Contrat de professionnalisation"),
-        (6, "Contrat aidé"),
-        (7, "Stagiaire de la formation professionnelle"),
-        (8, "Salarié"),
-        (9, "Personne à la recherche d’un emploi (inscrite ou non au Pôle Emploi)"),
-        (10, "Inactif"),
+        (1, "1 - Scolaire (hors DIMA)"),
+        (2, "2 - Dispositif d’initiation aux métiers en alternance (DIMA) ou autre classe préparatoire à l’apprentissage (CLIPA, CPA...)"),
+        (3, "3 - Etudiant"),
+        (4, "4 - Contrat d’apprentissage"),
+        (5, "5 - Contrat de professionnalisation"),
+        (6, "6 - Contrat aidé"),
+        (7, "7 - Stagiaire de la formation professionnelle"),
+        (8, "8 - Salarié"),
+        (9, "9 - Personne à la recherche d’un emploi (inscrite ou non au Pôle Emploi)"),
+        (10, "10 - Inactif"),
     )
 
     DIPLOME = (
-        (10, "Doctorat"),
-        (11, "Master professionnel/DESS/diplôme grande école"),
-        (12, "Master recherche/DEA"),
-        (19, "Autre diplôme ou titre de niveau bac+5 ou plus"),
-        (21, "Master professionnel (M1+M2 ou seul M2)"),
-        (22, "Master général (M1+M2 ou seul M2)"),
-        (23, "Licence professionnelle"),
-        (24, "Licence générale"),
-        (29, "Autre diplôme ou titre de niveau bac +3 ou 4"),
-        (31, "Brevet de Technicien Supérieur"),
-        (32, "Diplôme Universitaire de technologie"),
-        (39, "Autre diplôme ou titre de niveau bac+2"),
-        (41, "Baccalauréat professionnel"),
-        (42, "Baccalauréat général"),
-        (43, "Baccalauréat technologique"),
-        (49, "Autre diplôme ou titre de niveau bac"),
-        (51, "CAP"),
-        (52, "BEP"),
-        (53, "Mention complémentaire"),
-        (59, "Autre diplôme ou titre de niveau CAP/BEP"),
-        (60, "Aucun diplôme ni titre professionnel"),
+        (10, "10 - Doctorat"),
+        (11, "11 - Master professionnel/DESS/diplôme grande école"),
+        (12, "12 - Master recherche/DEA"),
+        (19, "19 - Autre diplôme ou titre de niveau bac+5 ou plus"),
+        (21, "21 - Master professionnel (M1+M2 ou seul M2)"),
+        (22, "22 - Master général (M1+M2 ou seul M2)"),
+        (23, "23 - Licence professionnelle"),
+        (24, "24 - Licence générale"),
+        (29, "29 - Autre diplôme ou titre de niveau bac +3 ou 4"),
+        (31, "31 - Brevet de Technicien Supérieur"),
+        (32, "32 - Diplôme Universitaire de technologie"),
+        (39, "39 - Autre diplôme ou titre de niveau bac+2"),
+        (41, "41 - Baccalauréat professionnel"),
+        (42, "42 - Baccalauréat général"),
+        (43, "43 - Baccalauréat technologique"),
+        (49, "49 - Autre diplôme ou titre de niveau bac"),
+        (51, "51 - CAP"),
+        (52, "52 - BEP"),
+        (53, "53 - Mention complémentaire"),
+        (59, "59 - Autre diplôme ou titre de niveau CAP/BEP"),
+        (60, "60 - Aucun diplôme ni titre professionnel"),
     )
 
     DERNIERE_ANNEE_SUIVIE = (
-        (1, "Vous avez obtenu le diplôme ou titre."),
-        (11, "Vous avez suivi la 1ère année d'un cycle et vous l’avez validée (examens réussis mais année non diplômante)."),
-        (12, "Vous avez suivi la 1ère année d'un cycle mais vous ne l’avez pas validée (échec aux examens, interruption ou abandon de formation)"),
-        (21, "Vous avez suivi la 2è année d'un cycle et vous l’avez validée (examens réussis mais année non diplômante)"),
-        (22, "Vous avez suivi la 2è année d'un cycle mais vous ne l’avez pas validée (échec aux examens, interruption ou abandon de formation)"),
-        (31, "Vous avez suivi la 3è année d'un cycle et vous l’avez validée (examens réussis mais année non diplômante, cycle adapté)"),
-        (32, "Vous avez suivi la 3è année d'un cycle mais vous ne l’avez pas validée (échec aux examens, interruption ou abandon de formation)"),
+        (1, "1 - Vous avez obtenu le diplôme ou titre."),
+        (11, "11 - Vous avez suivi la 1ère année d'un cycle et vous l’avez validée (examens réussis mais année non diplômante)."),
+        (12, "12 - Vous avez suivi la 1ère année d'un cycle mais vous ne l’avez pas validée (échec aux examens, interruption ou abandon de formation)"),
+        (21, "21 - Vous avez suivi la 2è année d'un cycle et vous l’avez validée (examens réussis mais année non diplômante)"),
+        (22, "22 - Vous avez suivi la 2è année d'un cycle mais vous ne l’avez pas validée (échec aux examens, interruption ou abandon de formation)"),
+        (31, "31 - Vous avez suivi la 3è année d'un cycle et vous l’avez validée (examens réussis mais année non diplômante, cycle adapté)"),
+        (32, "32 - Vous avez suivi la 3è année d'un cycle mais vous ne l’avez pas validée (échec aux examens, interruption ou abandon de formation)"),
     )
 
     DEPARTEMENT_NAISSANCE = (
@@ -203,7 +203,7 @@ class Alternant(models.Model):
     adresse_voie = models.CharField(verbose_name="Voie", max_length=100, blank=True, null=True, help_text="Entrez le type et le nom de la voie.")
     code_postal = models.CharField(verbose_name="Code postal", max_length=5, blank=True, null=True)
     ville = models.CharField(max_length=60, blank=True, null=True)
-    telephone = models.CharField(verbose_name="Téléphone", max_length=15, blank=True, null=True)
+    telephone = models.CharField(verbose_name="Téléphone", max_length=15, blank=True, null=True, help_text="Entrez le numéro de téléphone sans espace ni point")
     handicape = models.BooleanField(help_text="Cochez cette case si l'on vous a reconnu la qualité de travailleur handicapé (RQTH).", verbose_name="Travailleur handicapé", default=False)
     courriel = models.CharField(max_length=40, blank=True, null=True)
     nationalite = models.PositiveSmallIntegerField(verbose_name="Nationalité", choices=NATIONALITE, default=1, blank=True, null=True)
@@ -254,34 +254,34 @@ class Alternant(models.Model):
 class Entreprise(models.Model):
 
     TYPE_EMPLOYEUR = (
-        (12, "Entreprise inscrite uniquement au registre du commerce et des sociétés"),
-        (13, "Entreprises dont les salariés relèvent de la mutualité sociale agricole"),
-        (14, "Profession libérale"),
-        (15, "Association"),
-        (11, "Entreprise inscrite au répertoire des métiers ou au registre des entreprises pour l’Alsace-Moselle"),
-        (16, "Autre employeur privé"),
-        (21, "Service de l’Etat (administrations centrales et leurs services déconcentrés de la fonction publique d’Etat)"),
-        (22, "Commune"),
-        (23, "Département"),
-        (24, "Région"),
-        (25, "Etablissement public hospitalier"),
-        (26, "Etablissement public local d’enseignement"),
-        (27, "Etablissement public administratif de l’Etat"),
-        (28, "Etablissement public administratif local (y compris établissement public de coopération intercommunale EPCI)"),
-        (29, "Autre employeur public"),
+        (12, "12 - Entreprise inscrite uniquement au registre du commerce et des sociétés"),
+        (13, "13 - Entreprises dont les salariés relèvent de la mutualité sociale agricole"),
+        (14, "14 - Profession libérale"),
+        (15, "15 - Association"),
+        (16, "16 - Autre employeur privé"),
+        (11, "11 - Entreprise inscrite au répertoire des métiers ou au registre des entreprises pour l’Alsace-Moselle"),
+        (21, "21 - Service de l’Etat (administrations centrales et leurs services déconcentrés de la fonction publique d’Etat)"),
+        (22, "22 - Commune"),
+        (23, "23 - Département"),
+        (24, "24 - Région"),
+        (25, "25 - Etablissement public hospitalier"),
+        (26, "26 - Etablissement public local d’enseignement"),
+        (27, "27 - Etablissement public administratif de l’Etat"),
+        (28, "28 - Etablissement public administratif local (y compris établissement public de coopération intercommunale EPCI)"),
+        (29, "29 - Autre employeur public"),
     )
 
     SECTEUR_EMPLOYEUR = (
-        (1, "Privé"),
-        (2, "Public"),
+        (1, "1 - Privé"),
+        (2, "2 - Public"),
     )
 
     EMPLOYEUR_SPECIFIQUE = (
-        (0, "Aucun de ces cas"),
-        (1, "Entreprise de travail temporaire"),
-        (2, "Groupement d’employeurs"),
-        (3, "Employeur saisonnier"),
-        (4, "Apprentissage familial : l’employeur est un ascendant de l’apprenti"),
+        (0, "0 - Aucun de ces cas"),
+        (1, "1 - Entreprise de travail temporaire"),
+        (2, "2 - Groupement d’employeurs"),
+        (3, "3 - Employeur saisonnier"),
+        (4, "4 - Apprentissage familial : l’employeur est un ascendant de l’apprenti"),
     )
 
     raison_sociale = models.CharField(verbose_name="Raison sociale ou nom du dirigeant", max_length=70, blank=True, null=True,help_text="Entrez la raison sociale de l'entreprise ou les nom et prénom du dirigeant pour un employeur individuel.")
@@ -296,8 +296,8 @@ class Entreprise(models.Model):
     employeur_specifique = models.PositiveSmallIntegerField(verbose_name="Employeur spécifique", choices=EMPLOYEUR_SPECIFIQUE, default=0)
     code_APE = models.CharField(max_length=5, blank=True, null=True)
     effectif_entreprise = models.PositiveSmallIntegerField(verbose_name="Effectif de l'entreprise", blank=True, null=True)
-    telephone = models.CharField(verbose_name="Téléphone", max_length=18, blank=True, null=True)
-    telecopie = models.CharField(verbose_name="Télécopie", max_length=18, blank=True, null=True)
+    telephone = models.CharField(verbose_name="Téléphone", max_length=18, blank=True, null=True, help_text="Entrez le numéro de téléphone sans espace ni point")
+    telecopie = models.CharField(verbose_name="Télécopie", max_length=18, blank=True, null=True,help_text="Entrez le numéro de télécopie sans espace ni point")
     courriel = models.CharField(max_length=40, blank=True, null=True)
     code_convention_collective = models.CharField(verbose_name="Code de la convention collective", max_length=4, blank=True, null=True, help_text="Saisissez le code de la convention collective (4 chiffres). Si la convention collective n'est pas encore entrée en vigueur saisissez 9998. S'il n'y a aucune convention collective, saisissez 9999.")
     libelle_convention_collective = models.CharField(verbose_name="Libellé de la convention collective", max_length=200, blank=True, null=True,
@@ -361,34 +361,34 @@ class CFA(models.Model):
 class Formation(models.Model):
 
     DIPLOME = (
-        (10,"Doctorat"),
-        (11,"Master professionnel/DESS/diplôme grande école"),
-        (12,"Master recherche/DEA"),
-        (19,"Autre diplôme ou titre de niveau bac+5 ou plus"),
-        (21,"Master professionnel (M1+M2 ou seul M2)"),
-        (22,"Master général (M1+M2 ou seul M2)"),
-        (23,"Licence professionnelle"),
-        (24,"Licence générale"),
-        (29,"Autre diplôme ou titre de niveau bac +3 ou 4"),
-        (31,"Brevet de Technicien Supérieur"),
-        (32,"Diplôme Universitaire de technologie"),
-        (39,"Autre diplôme ou titre de niveau bac+2"),
-        (41,"Baccalauréat professionnel"),
-        (42,"Baccalauréat général"),
-        (43,"Baccalauréat technologique"),
-        (49,"Autre diplôme ou titre de niveau bac"),
-        (51,"CAP"),
-        (52,"BEP"),
-        (53,"Mention complémentaire"),
-        (59,"Autre diplôme ou titre de niveau CAP/BEP"),
-        (60,"Aucun diplôme ni titre professionnel"),
+        (10,"10 - Doctorat"),
+        (11,"11 - Master professionnel/DESS/diplôme grande école"),
+        (12,"12 - Master recherche/DEA"),
+        (19,"19 - Autre diplôme ou titre de niveau bac+5 ou plus"),
+        (21,"21 - Master professionnel (M1+M2 ou seul M2)"),
+        (22,"22 - Master général (M1+M2 ou seul M2)"),
+        (23,"23 - Licence professionnelle"),
+        (24,"24 - Licence générale"),
+        (29,"29 - Autre diplôme ou titre de niveau bac +3 ou 4"),
+        (31,"31 - Brevet de Technicien Supérieur"),
+        (32,"32 - Diplôme Universitaire de technologie"),
+        (39,"33 - Autre diplôme ou titre de niveau bac+2"),
+        (41,"41 - Baccalauréat professionnel"),
+        (42,"42 - Baccalauréat général"),
+        (43,"43 - Baccalauréat technologique"),
+        (49,"49 - Autre diplôme ou titre de niveau bac"),
+        (51,"51 - CAP"),
+        (52,"52 - BEP"),
+        (53,"53 - Mention complémentaire"),
+        (59,"59 - Autre diplôme ou titre de niveau CAP/BEP"),
+        (60,"60 - Aucun diplôme ni titre professionnel"),
     )
 
     INSPECTION_PEDAGOGIQUE = (
-        (1, "Education Nationale"),
-        (2, "Agriculture"),
-        (3, "Jeunesse et sport"),
-        (4, "Autre"),
+        (1, "1 - Education Nationale"),
+        (2, "2 - Agriculture"),
+        (3, "3 - Jeunesse et sport"),
+        (4, "4 - Autre"),
     )
 
     code_formation = models.CharField(max_length=16)
@@ -414,7 +414,7 @@ class Formation(models.Model):
     annee_remuneration_annee_diplome = models.PositiveSmallIntegerField(blank=True, null=True)
     inspection_pedagogique_competente = models.PositiveSmallIntegerField(choices=INSPECTION_PEDAGOGIQUE, blank=True, null=True)
     raf = models.CharField(max_length=60, blank=True, null=True)
-    courriel_raf = models.CharField(max_length=40, blank=True, null=True)
+    courriel_raf = models.CharField(max_length=100, blank=True, null=True)
     code_acces = models.CharField(max_length=15, blank=True, null=True)
     referent_GU = models.CharField(max_length=50, blank=True, null=True)
     telephone_referent_GU = models.CharField(verbose_name="Téléphone", max_length=18, blank=True, null=True)
@@ -434,35 +434,34 @@ class Formation(models.Model):
 class Contrat(models.Model):
 
     MODE_CONTRACTUEL = (
-        (1,"Dans le cadre d'un CDD"),
-        (2,"Dans le cadre d'un CDI"),
-        (3,"Entreprise de travail temporaire"),
-        (4,"Activité saisonn"
-           "ière à deux employeurs"),
+        (1, "1 - Dans le cadre d'un CDD"),
+        (2, "2 - Dans le cadre d'un CDI"),
+        (3, "3 - Entreprise de travail temporaire"),
+        (4, "4 - Activité saisonnière à deux employeurs"),
     )
 
     TYPE_CONTRAT_AVENANT = (
-        (11,"C'est votre tout premier contrat d'apprentissage."),
-        (21,"Vous signez un nouveau contrat avec le même employeur."),
-        (22,"Vous signez un nouveau contrat avec un nouvel employeur."),
-        (23,"Vous signez un nouveau contrat avec un nouvel employeur après une rupture du contrat précédent."),
-        (31,"Vous modifiez un contrat existant : la situation juridique de votre employeur a changé."),
-        (32,"Vous modifiez un contrat existant : vous changez d'employeur dans le cadre d’un contrat saisonnier"),
-        (33,"Vous modifiez un contrat existant : vous prolongez votre contrat suite à un échec à l’examen."),
-        (34,"Vous modifiez un contrat existant : vous venez d'être reconnu comme travailleur handicapé."),
-        (35,"Vous modifiez un contrat existant : vous changez de diplôme préparé en cours de contrat."),
-        (36,"Vous modifiez un contrat existant : d'autres changements sont intervenus (maître d’apprentissage, durée de travail hebdo, etc ..."),
+        (11, "11 - C'est votre tout premier contrat d'apprentissage."),
+        (21, "21 - Vous signez un nouveau contrat avec le même employeur."),
+        (22, "22 - Vous signez un nouveau contrat avec un nouvel employeur."),
+        (23, "23 - Vous signez un nouveau contrat avec un nouvel employeur après une rupture du contrat précédent."),
+        (31, "31 - Vous modifiez un contrat existant : la situation juridique de votre employeur a changé."),
+        (32, "32 - Vous modifiez un contrat existant : vous changez d'employeur dans le cadre d’un contrat saisonnier"),
+        (33, "33 - Vous modifiez un contrat existant : vous prolongez votre contrat suite à un échec à l’examen."),
+        (34, "34 - Vous modifiez un contrat existant : vous venez d'être reconnu comme travailleur handicapé."),
+        (35, "35 - Vous modifiez un contrat existant : vous changez de diplôme préparé en cours de contrat."),
+        (36, "36 - Vous modifiez un contrat existant : d'autres changements sont intervenus (maître d’apprentissage, durée de travail hebdo, etc ..."),
     )
 
     TYPE_DEROGATION = (
-        (11,"Vous avez moins de 16 ans."),
-        (12,"Vous avez plus de 25 ans (cas spécifiques prévus dans le code du travail)."),
-        (21,"Réduction de la durée du contrat ou de la période d’apprentissage"),
-        (22,"Allongement de la durée du contrat ou de la période d’apprentissage"),
-        (31,"Début de l’apprentissage hors période légale (plus de 3 mois avant ou après la date de début du cycle de formation)"),
-        (40,"C'est votre Troisième contrat pour une formation de même niveau"),
-        (50,"Cumul de dérogations"),
-        (60,"Autre dérogation"),
+        (11, "11 - Vous avez moins de 16 ans"),
+        (12, "12 - Vous avez plus de 25 ans (cas spécifiques prévus dans le code du travail)."),
+        (21, "21 - Réduction de la durée du contrat ou de la période d’apprentissage"),
+        (22, "22 - Allongement de la durée du contrat ou de la période d’apprentissage"),
+        (31, "31 - Début de l’apprentissage hors période légale (plus de 3 mois avant ou après la date de début du cycle de formation)"),
+        (40, "40 - C'est votre Troisième contrat pour une formation de même niveau"),
+        (50, "50 - Cumul de dérogations"),
+        (60, "60 - Autre dérogation"),
     )
 
     BASE = (
@@ -471,11 +470,11 @@ class Contrat(models.Model):
     )
 
     AVIS_RAF = (
-        (0, "La fiche mission n'a pas été envoyée au responsable de formation"),
-        (1, "La mission est en attente de validation par le responsable de formation"),
-        (2, "La mission a été validée par le responsable de formation"),
-        (3, "Le responsable de formation a émis des réserves sur la mission"),
-        (4, "Le responsable de formation a rejeté cette mission"),
+        (0, "Votre dossier n'a pas été envoyé au responsable de formation"),
+        (1, "Votre dossier est en attente de validation par le responsable de formation"),
+        (2, "Votre dossier a été validé par le responsable de formation"),
+        (3, "Le responsable de formation a émis des réserves sur votre dossier"),
+        (4, "Le responsable de formation a rejeté ce dossier"),
     )
 
     alternant = models.ForeignKey(Alternant, on_delete=models.CASCADE, blank=True, null=True, related_name="contrats")

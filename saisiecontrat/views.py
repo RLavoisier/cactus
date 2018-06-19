@@ -23,7 +23,8 @@ from saisiecontrat.models import Contrat, Alternant, Entreprise, ConventionColle
 from django.core.exceptions import ObjectDoesNotExist
 
 from saisiecontrat.utils.helper import creerfichemission, creerrecapinscriptions, creerexportypareo, \
-    informe_saisie_complete, entreprise_complet, alternant_complet, contrat_complet, mission_complet, formation_complet
+    informe_saisie_complete, entreprise_complet, alternant_complet, contrat_complet, mission_complet, formation_complet, \
+    creerexporttotal, contrat_ypareo_complet, creerCERFA
 from saisiecontrat.utils.pdf_generator import PDFGenerator
 from raven.contrib.django.raven_compat.models import client as sentry_client
 
@@ -255,6 +256,7 @@ def create_entreprise(request):
             messages.add_message(request, messages.SUCCESS, "Les données de l'employeur ont été enregistrées.")
 
             request.session["entreprisecomplet"]=entreprise_complet(entreprise)
+            request.session["accordvalide"] = (contrat.avis_raf == 2)
 
             # le redirect affiche la page comme sur un GET celà revient à envoyer l'exécution à la ligne du else:*
             # diu test if len(request.POST) > 0: (comme si on demandait l'affichait l'affichage
@@ -377,6 +379,7 @@ def create_alternant(request):
                 messages.add_message(request, messages.INFO, "Vous avez coché la case travailleur handicapé, n'hésitez pas à contacter Céline Grimaud (celine.grimaud@cfa-epure.com), la référente handicap du CFA Epure.")
 
             request.session["alternantcomplet"]=alternant_complet(alternant)
+            request.session["accordvalide"] = (contrat.avis_raf == 2)
 
             return render(request, "alternant_form.html", context)
         else:
@@ -478,7 +481,8 @@ def inform_contrat(request):
 
             messages.add_message(request, messages.SUCCESS, "Les données de votre contrat ont bien été enregistrées.")
             request.session["contratcomplet"] = contrat_complet(contrat)
-
+            request.session["contratypareocomplet"] = contrat_ypareo_complet(contrat)
+            request.session["accordvalide"] = (contrat.avis_raf == 2)
 
             return render(request, "contrat_form.html", context)
         else:
@@ -487,6 +491,7 @@ def inform_contrat(request):
             context["contrat"] = contrat
 
             request.session["contratcomplet"]=False
+            request.session["contratypareocomplet"] = False
 
             return render(request, "contrat_form.html", context)
     else:
@@ -495,6 +500,7 @@ def inform_contrat(request):
 
         if not contrat.date_debut_contrat:
             messages.add_message(request, messages.INFO,
+                                "Les seules données obligatoire pour valider cet écran sont les dates de début et de fin de contrat. "
                                 "Commencez par informer le type de dérogation (si nécessaire) ainsi que les dates de début "
                                 "et de fin de contrat. Cette saisie permettra le pré-remplissage du tableau de rémunération. "
                                 "Nous vous rappelons que les pourcentages ainsi que la rémunération mensuelle sont des minima ; modifiez-les au besoin. "
@@ -507,6 +513,7 @@ def inform_contrat(request):
         context["contrat"] = contrat
 
         request.session["contratcomplet"] = contrat_complet(contrat)
+        request.session["accordvalide"] = (contrat.avis_raf == 2)
 
         return render(request, "contrat_form.html", context)
 
@@ -535,7 +542,7 @@ def inform_mission(request):
         return redirect("comptes:login")
 
     context={}
-    context["nomonglet"] = "Votre mission"
+    context["nomonglet"] = "Votre mission/Validation"
 
     contrat = request.user.alternant.get_contrat_courant()
 
@@ -547,27 +554,32 @@ def inform_mission(request):
         form = InformationMissionForm(request.POST)
 
         if contrat.mission != request.POST.get("mission"):
-            if form.is_valid():
-                alternant = request.user.alternant
-                contrat = alternant.contrat_courant
-                contrat.mission = request.POST.get("mission")
-                contrat.avis_raf=0
-                contrat.date_maj_mission=datetime.now()
-                contrat.date_maj=datetime.now()
-                contrat.save()
-                context["boutonenvoiactif"] = (len(contrat.mission) >= 100)
-                messages.add_message(request, messages.SUCCESS, "La mission a bien été enregistrée.")
-                request.session["missioncomplet"] = mission_complet(contrat)
-            else:
-                context["boutonenvoiactf"] = False
-                request.session["missioncomplet"] = False
+            #if form.is_valid():
+            alternant = request.user.alternant
+            contrat = alternant.contrat_courant
+            contrat.mission = request.POST.get("mission")
+            contrat.avis_raf=0
+            contrat.date_maj_mission=datetime.now()
+            contrat.date_maj=datetime.now()
+            contrat.save()
+            #context["boutonenvoiactif"] = (len(contrat.mission) >= 100)
+            context["boutonenvoiactif"] = True
+            messages.add_message(request, messages.SUCCESS, "La mission a bien été enregistrée.")
+            request.session["missioncomplet"] = mission_complet(contrat)
+            request.session["accordvalide"] = (contrat.avis_raf == 2)
+            #else:
+            #    context["boutonenvoiactf"] = False
+            #    request.session["missioncomplet"] = False
         else:
-            context["boutonenvoiactif"] = (len(contrat.mission) >= 100)
+            context["boutonenvoiactif"] = True
+            #context["boutonenvoiactif"] = (len(contrat.mission) >= 100)
     else:
         contrat = Contrat.objects.get(alternant=request.user.alternant, contrat_courant=True)
         form = InformationMissionForm(instance=contrat)
-        context["boutonenvoiactif"] = (len(contrat.mission) >= 100)
+        #context["boutonenvoiactif"] = (len(contrat.mission) >= 100)
+        context["boutonenvoiactif"] = True
         request.session["missioncomplet"] = mission_complet(contrat)
+        request.session["accordvalide"] = (contrat.avis_raf == 2)
 
     context["form"] = form
     context["contrat"] = contrat
@@ -703,6 +715,8 @@ class detail_formation(LoginRequiredMixin, DetailView):
         context["nomonglet"] = "Votre formation"
 
         request.session["formationcomplet"] = formation_complet(contrat)
+        request.session["accordvalide"] = (contrat.avis_raf == 2)
+
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -715,6 +729,8 @@ class detail_formation(LoginRequiredMixin, DetailView):
         messages.add_message(request, messages.SUCCESS, "Vos données ont bien été enregistrées.")
 
         request.session["formationcomplet"] = formation_complet(contrat)
+        request.session["accordvalide"] = (contrat.avis_raf == 2)
+
         return redirect("detail_formation")
 
 
@@ -731,365 +747,73 @@ class appliquer_formation(LoginRequiredMixin, DetailView):
 
         if contrat:
             contrat.formation = self.object
+
+            contrat.date_debut_contrat = None
+            contrat.date_fin_contrat = None
+
+            contrat.duree_hebdomadaire_travail_heures = None
+            contrat.duree_hebdomadaire_travail_minutes = None
+
+            contrat.salaire_minimum_conventionnel = None
+            contrat.salaire_brut_mensuel = None
+            contrat.caisse_retraite_complementaire = None
+            contrat.nourriture = None
+            contrat.logement = None
+            contrat.prime_panier = None
+            contrat.an_1_per_1_du = None
+            contrat.an_1_per_1_au = None
+            contrat.an_1_per_1_taux = None
+            contrat.an_1_per_1_base = 1
+            contrat.an_1_per_2_du = None
+            contrat.an_1_per_2_au = None
+            contrat.an_1_per_2_taux = None
+            contrat.an_1_per_2_base = 1
+            contrat.an_2_per_1_du = None
+            contrat.an_2_per_1_au = None
+            contrat.an_2_per_1_taux = None
+            contrat.an_2_per_1_base = 1
+            contrat.an_2_per_2_du = None
+            contrat.an_2_per_2_au = None
+            contrat.an_2_per_2_taux = None
+            contrat.an_2_per_2_base = 1
+            contrat.an_3_per_1_du = None
+            contrat.an_3_per_1_au = None
+            contrat.an_3_per_1_taux = None
+            contrat.an_3_per_1_base = 1
+            contrat.an_3_per_2_du = None
+            contrat.an_3_per_2_au = None
+            contrat.an_3_per_2_taux = None
+            contrat.an_3_per_2_base = 1
+            contrat.an_4_per_1_du = None
+            contrat.an_4_per_1_au = None
+            contrat.an_4_per_1_taux = None
+            contrat.an_4_per_1_base = 1
+            contrat.an_4_per_2_du = None
+            contrat.an_4_per_2_au = None
+            contrat.an_4_per_2_taux = None
+            contrat.an_4_per_2_base = 1
+            contrat.date_saisie_complete = None
+            contrat.nombre_annees = None
+            contrat.avis_raf = 0
+            contrat.date_validation_raf = None
+
             contrat.save()
 
+        request.session["contratcomplet"] = contrat_complet(contrat)
+        request.session["contratypareocomplet"] = contrat_ypareo_complet(contrat)
         request.session["formationcomplet"] = formation_complet(contrat)
+        request.session["accordvalide"] = (contrat.avis_raf == 2)
+
         return redirect("detail_formation")
 
 
-class creerCERFA(LoginRequiredMixin, DetailView):
+class telechargerCERFA(LoginRequiredMixin, DetailView):
+
     model = Contrat
 
     def get(self, request, *args, **kwargs):
-        # Recuperer les infos qui nous interesse pour le pdf
 
-
-        alternant = Alternant.objects.get(user=request.user)
-        contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
-        entreprise = contrat.entreprise
-        formation = contrat.formation
-        cfa = formation.cfa
-
-        try:
-            ma_1 = Personnel.objects.get(entreprise=entreprise, role=2)
-        except ObjectDoesNotExist:
-            ma_1 = None
-
-        try:
-            ma_2 = Personnel.objects.get(entreprise=entreprise, role=3)
-        except ObjectDoesNotExist:
-            ma_2 = None
-
-        # Construction du dictionnaire des valeur du pdf
-        data = {}
-        if entreprise.secteur_employeur == 1:
-            data["emp_prive"] = 1
-        else:
-            data["emp_public"] = 1
-
-        if contrat.type_contrat_avenant in (31, 32, 33, 34, 35, 36):
-            data["avenant"] = 1
-        else:
-            data["contrat"] = 1
-
-        data["mode_Contrat"] = contrat.mode_contractuel
-        data["emp_siret"] = entreprise.numero_SIRET
-        if entreprise.adresse_numero:
-            data["emp_adr_num"] = entreprise.adresse_numero
-        data["emp_adr_voie"] = entreprise.adresse_voie.upper()
-        if entreprise.adresse_complement is not None:
-            data["emp_adr_compl"] = entreprise.adresse_complement.upper()
-        data["emp_adr_cp"] = entreprise.code_postal
-        data["emp_adr_ville"] = entreprise.ville.upper()
-        data["emp_tel"] = entreprise.telephone
-        data["emp_fax"] = entreprise.telecopie
-
-        data["emp_mail1"] = entreprise.courriel[0:entreprise.courriel.find('@')]
-        data["emp_mail2"] = entreprise.courriel[entreprise.courriel.find('@')+1:]
-        data["emp_type"] = entreprise.type_employeur
-        data["emp_specifique"] = entreprise.employeur_specifique
-        data["emp_naf"] = entreprise.code_APE
-        data["emp_eff"] = entreprise.effectif_entreprise
-
-        data["emp_conv_coll"] = entreprise.libelle_convention_collective
-
-        data["emp_idcc"] = entreprise.code_convention_collective
-        data["emp_denom"] = entreprise.raison_sociale.upper()
-        data["emp_adh_chomage"] = entreprise.adhesion_regime_assurance_chomage
-
-        data["alt_nom"] = "%s %s" % (alternant.nom.upper(), alternant.prenom.upper())
-        data["alt_mail1"] = request.user.email
-        data["alt_tel"] = alternant.telephone
-        data["alt_adr_ville"] = alternant.ville
-        data["alt_adr_cp"] = alternant.code_postal
-        data["alt_adr_num"] = alternant.adresse_numero
-        if alternant.adresse_voie:
-            data["alt_adr_voie"] = alternant.adresse_voie.upper()
-        if alternant.ville_representant:
-            data["alt_repr_adr_ville"] = alternant.ville_representant
-        if alternant.code_postal_representant:
-            data["alt_repr_adr_cp"] = alternant.code_postal_representant
-        if alternant.adresse_voie_representant:
-            data["alt_repr_adr_voie"] = alternant.adresse_voie_representant
-        if alternant.adresse_numero_representant:
-            data["alt_repr_adr_num"] = alternant.adresse_numero_representant
-        if alternant.nom_representant:
-            if alternant.prenom_representant:
-                nom_prenom_representant = "%s %s" % (alternant.nom_representant, alternant.prenom_representant)
-            else:
-                nom_prenom_representant = "%s" % (alternant.nom_representant)
-        else:
-            nom_prenom_representant = "%s" % (alternant.prenom_representant)
-
-        data["alt_repr_nom"] = nom_prenom_representant
-
-        data["alt_ddn_jour"] = str(alternant.date_naissance.day).zfill(2)
-        data["alt_ddn_mois"] = str(alternant.date_naissance.month).zfill(2)
-        data["alt_ddn_annee"] = alternant.date_naissance.year
-
-        data["alt_departement_naissance"] = alternant.numero_departement_naissance
-        data["alt_regime"] = alternant.regime_social
-        data["alt_nationnalite"] = alternant.nationalite
-        data["alt_derniere_situation"] = alternant.situation_avant_contrat
-        data["alt_dernier_diplome"] = alternant.dernier_diplome_prepare
-        data["alt_derniere_classe"] = alternant.derniere_annee_suivie
-        data["alt_dernier_diplome_intitule"] = alternant.intitule_dernier_diplome_prepare
-        data["alt_diplome"] = alternant.diplome_le_plus_eleve
-
-        if alternant.sexe == 'M':
-            data["alt_sexe_m"] = 1
-        else:
-            data["alt_sexe_f"] = 1
-
-        if alternant.handicape:
-            data["alt_handicape_oui"] = 1
-        else:
-            data["alt_handicape_non"] = 1
-
-        data["commune_naissance"] = alternant.commune_naissance
-
-        data["maitre1_nom"] = "%s %s" % (ma_1.nom, ma_1.prenom)
-        data["maitre1_ddn_jour"] = str(ma_1.date_naissance.day).zfill(2)
-        data["maitre1_ddn_mois"] = str(ma_1.date_naissance.month).zfill(2)
-        data["maitre1_ddn_annee"] = ma_1.date_naissance.year
-
-        if ma_2 is not None:
-            data["maitre2_nom"] = "%s %s" % (ma_2.nom, ma_2.prenom)
-            data["maitre2_ddn_jour"] = str(ma_2.date_naissance.day).zfill(2)
-            data["maitre2_ddn_mois"] = str(ma_2.date_naissance.month).zfill(2)
-            data["maitre2_ddn_annee"] = ma_2.date_naissance.year
-
-        if contrat.attestation_maitre_apprentissage:
-            data["maitre_attestation"] = 1
-        data["contrat_type"] = contrat.type_contrat_avenant
-        data["contrat_derog"] = contrat.type_derogation
-
-        if contrat.numero_contrat_anterieur is not None:
-            data["contrat_num_prec"] = contrat.numero_contrat_anterieur
-
-        data["contrat_debut_jour"] = str(contrat.date_embauche.day).zfill(2)
-        data["contrat_debut_mois"] = str(contrat.date_embauche.month).zfill(2)
-        data["contrat_debut_annee"] = contrat.date_embauche.year
-        data["execution_fin_annee"] = contrat.date_debut_contrat.year
-        data["execution_fin_mois"] = str(contrat.date_debut_contrat.month).zfill(2)
-        data["execution_fin_jour"] = str(contrat.date_debut_contrat.day).zfill(2)
-
-        data["contrat_duree_hebdo_heures"] = str(contrat.duree_hebdomadaire_travail_heures)
-        data["contrat_duree_hebdo_minutes"] = str(contrat.duree_hebdomadaire_travail_minutes)
-
-        if contrat.risques_particuliers:
-            data["contrat_risques_oui"] = 1
-        else:
-            data["contrat_risques_non"] = 1
-
-        if contrat.an_1_per_1_taux is not None:
-            data["contrat_remu_annee1_taux1"] = str(contrat.an_1_per_1_taux)
-        if contrat.an_2_per_1_taux is not None:
-            data["contrat_remu_annee2_taux1"] = str(contrat.an_2_per_1_taux)
-        if contrat.an_3_per_1_taux is not None:
-            data["contrat_remu_annee3_taux1"] = str(contrat.an_3_per_1_taux)
-        if contrat.an_4_per_1_taux is not None:
-            data["contrat_remu_annee4_taux1"] = str(contrat.an_4_per_1_taux)
-
-        if contrat.an_1_per_1_du is not None:
-            data["contrat_remu_annee1_du1_jour"] = str(contrat.an_1_per_1_du.day).zfill(2)
-            data["contrat_remu_annee1_du1_mois"] = str(contrat.an_1_per_1_du.month).zfill(2)
-            data["contrat_remu_annee1_du1_annee"] = contrat.an_1_per_1_du.year
-        if contrat.an_2_per_1_du is not None:
-            data["contrat_remu_annee2_du1_jour"] = str(contrat.an_2_per_1_du.day).zfill(2)
-            data["contrat_remu_annee2_du1_mois"] = str(contrat.an_2_per_1_du.month).zfill(2)
-            data["contrat_remu_annee2_du1_annee"] = contrat.an_2_per_1_du.year
-        if contrat.an_3_per_1_du is not None:
-            data["contrat_remu_annee3_du1_jour"] = str(contrat.an_3_per_1_du.day).zfill(2)
-            data["contrat_remu_annee3_du1_mois"] = str(contrat.an_3_per_1_du.month).zfill(2)
-            data["contrat_remu_annee3_du1_annee"] = contrat.an_3_per_1_du.year
-        if contrat.an_4_per_1_du is not None:
-            data["contrat_remu_annee4_du1_jour"] = str(contrat.an_4_per_1_du.day).zfill(2)
-            data["contrat_remu_annee4_du1_mois"] = str(contrat.an_4_per_1_du.month).zfill(2)
-            data["contrat_remu_annee4_du1_annee"] = contrat.an_4_per_1_du.year
-        if contrat.an_1_per_1_au is not None:
-            data["contrat_remu_annee1_au1_jour"] = str(contrat.an_1_per_1_au.day).zfill(2)
-            data["contrat_remu_annee1_au1_mois"] = str(contrat.an_1_per_1_au.month).zfill(2)
-            data["contrat_remu_annee1_au1_annee"] = contrat.an_1_per_1_au.year
-        if contrat.an_2_per_1_au is not None:
-            data["contrat_remu_annee2_au1_jour"] = str(contrat.an_2_per_1_au.day).zfill(2)
-            data["contrat_remu_annee2_au1_mois"] = str(contrat.an_2_per_1_au.month).zfill(2)
-            data["contrat_remu_annee2_au1_annee"] = contrat.an_2_per_1_au.year
-        if contrat.an_3_per_1_au is not None:
-            data["contrat_remu_annee3_au1_jour"] = str(contrat.an_3_per_1_au.day).zfill(2)
-            data["contrat_remu_annee3_au1_mois"] = str(contrat.an_3_per_1_au.month).zfill(2)
-            data["contrat_remu_annee3_au1_annee"] = contrat.an_3_per_1_au.year
-        if contrat.an_4_per_1_au is not None:
-            data["contrat_remu_annee4_au1_jour"] = str(contrat.an_4_per_1_au.day).zfill(2)
-            data["contrat_remu_annee4_au1_mois"] = str(contrat.an_4_per_1_au.month).zfill(2)
-            data["contrat_remu_annee4_au1_annee"] = contrat.an_4_per_1_au.year
-
-        if contrat.an_1_per_1_base is not None:
-            data["contrat_remu_annee1_ref1"] = Contrat.BASE[contrat.an_1_per_1_base - 1][1]
-        if contrat.an_2_per_1_base is not None:
-            data["contrat_remu_annee2_ref1"] = Contrat.BASE[contrat.an_2_per_1_base - 1][1]
-        if contrat.an_3_per_1_base is not None:
-            data["contrat_remu_annee3_ref1"] = Contrat.BASE[contrat.an_3_per_1_base - 1][1]
-        if contrat.an_4_per_1_base is not None:
-            data["contrat_remu_annee4_ref1"] = Contrat.BASE[contrat.an_4_per_1_base - 1][1]
-
-        if contrat.an_1_per_2_taux is not None:
-            data["contrat_remu_annee1_taux2"] = str(contrat.an_1_per_2_taux)
-        if contrat.an_2_per_2_taux is not None:
-            data["contrat_remu_annee2_taux2"] = str(contrat.an_2_per_2_taux)
-        if contrat.an_3_per_2_taux is not None:
-            data["contrat_remu_annee3_taux2"] = str(contrat.an_3_per_2_taux)
-        if contrat.an_4_per_2_taux is not None:
-            data["contrat_remu_annee4_taux2"] = str(contrat.an_4_per_2_taux)
-
-        if contrat.an_1_per_1_du is not None:
-            data["contrat_remu_annee1_du2_jour"] = str(contrat.an_1_per_2_du.day).zfill(2)
-            data["contrat_remu_annee1_du2_mois"] = str(contrat.an_1_per_2_du.month).zfill(2)
-            data["contrat_remu_annee1_du2_annee"] = contrat.an_1_per_2_du.year
-        if contrat.an_2_per_2_du is not None:
-            data["contrat_remu_annee2_du2_jour"] = str(contrat.an_2_per_2_du.day).zfill(2)
-            data["contrat_remu_annee2_du2_mois"] = str(contrat.an_2_per_2_du.month).zfill(2)
-            data["contrat_remu_annee2_du2_annee"] = contrat.an_2_per_2_du.year
-        if contrat.an_3_per_2_du is not None:
-            data["contrat_remu_annee3_du2_jour"] = str(contrat.an_3_per_2_du.day).zfill(2)
-            data["contrat_remu_annee3_du2_mois"] = str(contrat.an_3_per_2_du.month).zfill(2)
-            data["contrat_remu_annee3_du2_annee"] = contrat.an_3_per_2_du.year
-        if contrat.an_4_per_2_du is not None:
-            data["contrat_remu_annee4_du2_jour"] = str(contrat.an_4_per_2_du.day).zfill(2)
-            data["contrat_remu_annee4_du2_mois"] = str(contrat.an_4_per_2_du.month).zfill(2)
-            data["contrat_remu_annee4_du2_annee"] = contrat.an_4_per_2_du.year
-        if contrat.an_1_per_2_au is not None:
-            data["contrat_remu_annee1_au2_jour"] = str(contrat.an_1_per_2_au.day).zfill(2)
-            data["contrat_remu_annee1_au2_mois"] = str(contrat.an_1_per_2_au.month).zfill(2)
-            data["contrat_remu_annee1_au2_annee"] = contrat.an_1_per_2_au.year
-        if contrat.an_2_per_2_au is not None:
-            data["contrat_remu_annee2_au2_jour"] = str(contrat.an_2_per_2_au.day).zfill(2)
-            data["contrat_remu_annee2_au2_mois"] = str(contrat.an_2_per_2_au.month).zfill(2)
-            data["contrat_remu_annee2_au2_annee"] = contrat.an_2_per_2_au.year
-        if contrat.an_3_per_2_au is not None:
-            data["contrat_remu_annee3_au2_jour"] = str(contrat.an_3_per_2_au.day).zfill(2)
-            data["contrat_remu_annee3_au2_mois"] = str(contrat.an_3_per_2_au.month).zfill(2)
-            data["contrat_remu_annee3_au2_annee"] = contrat.an_3_per_2_au.year
-        if contrat.an_4_per_2_au is not None:
-            data["contrat_remu_annee4_au2_jour"] = str(contrat.an_4_per_2_au.day).zfill(2)
-            data["contrat_remu_annee4_au2_mois"] = str(contrat.an_4_per_2_au.month).zfill(2)
-            data["contrat_remu_annee4_au2_annee"] = contrat.an_4_per_2_au.year
-        if contrat.an_1_per_2_base is not None:
-            data["contrat_remu_annee1_ref2"] = Contrat.BASE[contrat.an_1_per_2_base - 1][1]
-        if contrat.an_2_per_2_base is not None:
-            data["contrat_remu_annee2_ref2"] = Contrat.BASE[contrat.an_2_per_2_base - 1][1]
-        if contrat.an_3_per_2_base is not None:
-            data["contrat_remu_annee3_ref2"] = Contrat.BASE[contrat.an_3_per_2_base - 1][1]
-        if contrat.an_4_per_2_base is not None:
-            data["contrat_remu_annee4_ref2"] = Contrat.BASE[contrat.an_4_per_2_base - 1][1]
-
-        entier = int(contrat.salaire_brut_mensuel)
-        decimal = contrat.salaire_brut_mensuel - entier
-        data["contrat_salaire1"] = entier
-        data["contrat_salaire2"] = str(int(decimal)).zfill(2)
-
-        if contrat.nourriture is not None:
-            entier = int(contrat.nourriture)
-            decimal = (contrat.nourriture - entier)*100
-            data["contrat_avantg_nourr1"] = entier
-            data["contrat_avantg_nourr2"] = str(int(decimal)).zfill(2)
-
-        if contrat.logement is not None:
-            entier = int(contrat.logement)
-            decimal = (contrat.logement - entier)*100
-            data["contrat_avantg_logt1"] = entier
-            data["contrat_avantg_logt2"] =  str(int(decimal)).zfill(2)
-
-
-        if contrat.prime_panier is not None:
-            entier = int(contrat.prime_panier)
-            decimal = (contrat.prime_panier - entier)*100
-            data["panier_avantg_logt1"] = entier
-            data["panier_avantg_logt2"] =  str(int(decimal)).zfill(2)
-
-
-        if contrat.date_effet_avenant is not None:
-            data["avenant_debut_jour"] = str(contrat.date_effet_avenant.day).zfill(2)
-            data["avenant_debut_mois"] = str(contrat.date_effet_avenant.month).zfill(2)
-            data["avenant_debut_annee"] = contrat.date_effet_avenant.year
-
-        data["contrat_fin_jour"] = str(contrat.date_fin_contrat.day).zfill(2)
-        data["contrat_fin_mois"] = str(contrat.date_fin_contrat.month).zfill(2)
-        data["contrat_fin_annee"] = contrat.date_fin_contrat.year
-        data["retraite_caisse_comp"] = contrat.caisse_retraite_complementaire
-
-        data["formation_nom"] = cfa.nom
-        print(cfa.nom)
-        data["formation_uai"] = cfa.numeroUAI
-
-        data["formation_adr_voie"] = cfa.adresse_voie
-        data["formation_adr_num"] = cfa.adresse_numero
-        data["formation_adr_compl"] = cfa.adresse_complement
-        data["formation_adr_cp"] = cfa.code_postal
-        data["formation_adr_ville"] = cfa.ville
-        data["formation_inspect_pedag"] = formation.inspection_pedagogique_competente
-
-        if contrat.fait_le is not None:
-            data["signature_date_annee"] = contrat.fait_le.year
-            data["signature_date_mois"] = str(contrat.fait_le.month).zfill(2)
-            data["signature_date_jour"] = str(contrat.fait_le.day).zfill(2)
-
-        if contrat.fait_a:
-            data["signature_lieu"] = contrat.fait_a
-
-        if contrat.attestation_pieces:
-            data["signature_emp_attestation"] = 1
-
-        data["formation_intitule"] = formation.intitule_diplome
-        data["formation_diplome"] = formation.diplome
-        data["formation_diplome_code"] = formation.code_diplome_apprentissage
-
-        if contrat.date_inscription is not None:
-            data["inscription_annee"] = contrat.date_inscription.year
-            data["inscription_mois"] = str(contrat.date_inscription.month).zfill(2)
-            data["inscription_jour"] = str(contrat.date_inscription.day).zfill(2)
-
-        if formation.heures_an_1 is not None:
-            data["formation_annee1_heure"] = formation.heures_an_1
-        if formation.an_1_du is not None:
-            data["formation_annee1_du_jour"] = str(formation.an_1_du.day).zfill(2)
-            data["formation_annee1_du_mois"] = str(formation.an_1_du.month).zfill(2)
-            data["formation_annee1_du_annee"] = formation.an_1_du.year
-        if formation.an_1_au is not None:
-            data["formation_annee1_au_jour"] = str(formation.an_1_au.day).zfill(2)
-            data["formation_annee1_au_mois"] = str(formation.an_1_au.month).zfill(2)
-            data["formation_annee1_au_annee"] = formation.an_1_au.year
-
-        if formation.heures_an_2 is not None:
-            data["formation_annee2_heure"] = formation.heures_an_2
-        if formation.an_2_du is not None:
-            data["formation_annee2_du_jour"] = str(formation.an_2_du.day).zfill(2)
-            data["formation_annee2_du_mois"] = str(formation.an_2_du.month).zfill(2)
-            data["formation_annee2_du_annee"] = formation.an_2_du.year
-        if formation.an_2_au is not None:
-            data["formation_annee2_au_jour"] = str(formation.an_2_au.day).zfill(2)
-            data["formation_annee2_au_mois"] = str(formation.an_2_au.month).zfill(2)
-            data["formation_annee2_au_annee"] = formation.an_2_au.year
-
-        if formation.heures_an_3 is not None:
-            data["formation_annee3_heure"] = formation.heures_an_3
-        if formation.an_3_du is not None:
-            data["formation_annee3_du_jour"] = str(formation.an_3_du.day).zfill(2)
-            data["formation_annee3_du_mois"] = str(formation.an_3_du.month).zfill(2)
-            data["formation_annee3_du_annee"] = formation.an_3_du.year
-        if formation.an_3_au is not None:
-            data["formation_annee3_au_jour"] = str(formation.an_3_au.day).zfill(2)
-            data["formation_annee3_au_mois"] = str(formation.an_3_au.month).zfill(2)
-            data["formation_annee3_au_annee"] = formation.an_3_au.year
-
-
-        filename = "CERFA_%s_%s_%s.pdf" % (alternant.nom,
-                                           alternant.prenom,
-                                           datetime.now().strftime("%Y%m%d%H%M%S"))
-        filename = filename.replace(' ', '_')
-        filename = filename.replace("'", "_")
-
-        nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(filename, data, flatten=True)
+        nomfichier = creerCERFA(request, True)
 
         filepath = os.path.join(settings.PDF_OUTPUT_DIR, nomfichier)
 
@@ -1108,18 +832,18 @@ def envoyermailvalidationraf(request):
     alternant = request.user.alternant
     contrat = alternant.get_contrat_courant()
 
-    if len(contrat.mission) > 100:
-        contrat.avis_raf = 1
-        contrat.motif = None
-        contrat.date_envoi_raf = datetime.now()
-        contrat.save()
+    #if len(contrat.mission) > 100:
+    contrat.avis_raf = 1
+    contrat.motif = None
+    contrat.date_envoi_raf = datetime.now()
+    contrat.save()
 
-        creerfichemission(request, alternant.hash)
+    creerfichemission(request, alternant.hash)
 
-        messages.add_message(request, messages.SUCCESS, "Un mail a été envoyé au responsable de formation pour qu'il valide votre mission.")
-    else:
+    messages.add_message(request, messages.SUCCESS, "Un mail a été envoyé au responsable de formation pour qu'il valide votre dossier.")
+    #else:
 
-        messages.add_message(request, messages.INFO, "La mission doit être renseignée et comporter au moins 100 caractères.")
+    #    messages.add_message(request, messages.INFO, "La mission doit être renseignée et comporter au moins 100 caractères.")
 
     return redirect("informationmission")
 
@@ -1131,17 +855,19 @@ def choisirautreformation(request):
 
     alternant = request.user.alternant
     contrat = alternant.get_contrat_courant()
+    # print (contrat.formation.code_formation)
     contrat.formation = None
     contrat.save()
 
     request.session["formationcomplet"] = formation_complet(contrat)
+    request.session["accordvalide"] = (contrat.avis_raf == 2)
 
-    return redirect("detail_formation")
+    return redirect("liste_formation")
 
 
 def envoyerficheraf(request, alternant_hash):
 
-    creerfichemission(creerfichemission,alternant_hash)
+    creerfichemission(request,alternant_hash)
 
     messages.add_message(request, messages.SUCCESS, "Un mail a été généré avec la fiche mission demandée. S'il n'apparaît pas dans votre boîte de réception, vérifiez le dossier des éléments indésirables.")
 
@@ -1207,6 +933,15 @@ def validationmission(request, alternant_hash):
     context["contrat"] = contrat
     context["nom_alternant"]=contrat.alternant.nom
     context["prenom_alternant"]=contrat.alternant.prenom
+    context["telephone_alternant"]=contrat.alternant.telephone
+    context["courriel_alternant"]=contrat.alternant.user.email
+    context["nom_formation"]=contrat.formation.intitule_formation
+    context["raison_sociale_entreprise"]=contrat.entreprise.raison_sociale
+    context["ville_entreprise"]=contrat.entreprise.ville
+    context["numero_SIRET_entreprise"]=contrat.entreprise.numero_SIRET
+    context["telephone_entreprise"]=contrat.entreprise.telephone
+    context["courriel_entreprise"]=contrat.entreprise.courriel
+
     context["mission"]=contrat.mission
 
     return render(request, "validation_mission_form.html", context)
@@ -1229,6 +964,20 @@ def exportypareo(request, cfa_hash,email_livraison, aaaammjj_du, aaaammjj_au, ex
         return render(request, "message.html")
 
     creerexportypareo(request, email_livraison, aaaammjj_du, aaaammjj_au, extraction, etat)
+
+    messages.add_message(request, messages.SUCCESS, "Un mail a été généré avec le fichier csv joint. S'il n'apparaît pas dans votre boîte de réception, vérifiez le dossier des éléments indésirables.")
+
+    return render(request, "message.html")
+
+def exporttotal(request, cfa_hash,email_livraison):
+
+    try:
+        CFA.objects.get(hash=cfa_hash)
+    except ObjectDoesNotExist:
+        messages.add_message(request, messages.ERROR,"L'URL est erronée.")
+        return render(request, "message.html")
+
+    creerexporttotal(request, email_livraison)
 
     messages.add_message(request, messages.SUCCESS, "Un mail a été généré avec le fichier csv joint. S'il n'apparaît pas dans votre boîte de réception, vérifiez le dossier des éléments indésirables.")
 
