@@ -1489,9 +1489,11 @@ def creerCERFA(request, aplatir):
     if contrat.numero_contrat_anterieur is not None:
         data["contrat_num_prec"] = contrat.numero_contrat_anterieur
 
-    data["contrat_debut_jour"] = str(contrat.date_embauche.day).zfill(2)
-    data["contrat_debut_mois"] = str(contrat.date_embauche.month).zfill(2)
-    data["contrat_debut_annee"] = contrat.date_embauche.year
+    if contrat.date_embauche is not None:
+        data["contrat_debut_jour"] = str(contrat.date_embauche.day).zfill(2)
+        data["contrat_debut_mois"] = str(contrat.date_embauche.month).zfill(2)
+        data["contrat_debut_annee"] = contrat.date_embauche.year
+
     data["execution_fin_annee"] = contrat.date_debut_contrat.year
     data["execution_fin_mois"] = str(contrat.date_debut_contrat.month).zfill(2)
     data["execution_fin_jour"] = str(contrat.date_debut_contrat.day).zfill(2)

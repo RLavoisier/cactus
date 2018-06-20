@@ -832,20 +832,44 @@ def envoyermailvalidationraf(request):
     alternant = request.user.alternant
     contrat = alternant.get_contrat_courant()
 
-    #if len(contrat.mission) > 100:
-    contrat.avis_raf = 1
-    contrat.motif = None
-    contrat.date_envoi_raf = datetime.now()
-    contrat.save()
+    if request.session["contratypareocomplet"] and request.session["alternantcomplet"] and request.session["entreprisecomplet"] and request.session["formationcomplet"]:
 
-    creerfichemission(request, alternant.hash)
+        #if len(contrat.mission) > 100:
+        contrat.avis_raf = 1
+        contrat.motif = None
+        contrat.date_envoi_raf = datetime.now()
+        contrat.save()
 
-    messages.add_message(request, messages.SUCCESS, "Un mail a été envoyé au responsable de formation pour qu'il valide votre dossier.")
-    #else:
+        creerfichemission(request, alternant.hash)
 
-    #    messages.add_message(request, messages.INFO, "La mission doit être renseignée et comporter au moins 100 caractères.")
+        messages.add_message(request, messages.SUCCESS, "Un mail a été envoyé au responsable de formation pour qu'il valide votre dossier.")
+        #else:
 
-    return redirect("informationmission")
+        #    messages.add_message(request, messages.INFO, "La mission doit être renseignée et comporter au moins 100 caractères.")
+
+        return redirect("informationmission")
+
+    else:
+        # On pourrait aussi compléter la form pour éviter d'afficher le bouton si les données ne sont pas complètes
+
+        form = InformationMissionForm(instance=contrat)
+        context = {}
+        context["nomonglet"] = "Votre mission/Validation"
+        context["boutonenvoiactif"] = True
+        request.session["missioncomplet"] = mission_complet(contrat)
+        request.session["accordvalide"] = (contrat.avis_raf == 2)
+        context["form"] = form
+        context["contrat"] = contrat
+
+        i = 0
+        while contrat.avis_raf != Contrat.AVIS_RAF[i][0]:
+            i += 1
+
+        context["libelle_avis_raf"] = Contrat.AVIS_RAF[i][1]
+
+        messages.add_message(request, messages.ERROR,"Veuillez compléter les données des onglets avant de faire la demande de validation.")
+
+        return render(request, "mission_form.html", context)
 
 
 def choisirautreformation(request):
