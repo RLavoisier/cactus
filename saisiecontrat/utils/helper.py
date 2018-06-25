@@ -94,7 +94,7 @@ def creerfichemission(request,alternant_hash):
     email = EmailMultiAlternatives(
         "Validation du dossier de %s %s.pdf" % (alternant.nom, alternant.prenom),
         msg_plain,
-        'no_reply@cfa-epure.com',
+        'CFA Epure<no_reply@cfa-epure.com>',
         formation.courriel_raf.split(','),
     )
 
@@ -137,7 +137,7 @@ def creerrecapinscriptions(request,formation_hash):
     email = EmailMultiAlternatives(
         "Récapitulatif des dossiers d'inscription",
         msg_plain,
-        'no_reply@cfa-epure.com',
+        'CFA Epure<no_reply@cfa-epure.com>',
         formation.courriel_raf.split(','),
     )
 
@@ -522,7 +522,7 @@ def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction
     email = EmailMultiAlternatives(
         "cactus export ypareo",
         "",
-        'no_reply@cfa-epure.com',
+        'CFA Epure<no_reply@cfa-epure.com>',
         [email_livraison],
     )
 
@@ -1346,7 +1346,7 @@ def creerexporttotal(request, email_livraison):
     email = EmailMultiAlternatives(
         "cactus export ypareo",
         "",
-        'no_reply@cfa-epure.com',
+        'CFA Epure<no_reply@cfa-epure.com>',
         [email_livraison],
     )
 
