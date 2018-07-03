@@ -485,7 +485,7 @@ class Contrat(models.Model):
     type_contrat_avenant = models.PositiveSmallIntegerField(choices=TYPE_CONTRAT_AVENANT, blank=True, null=True)
     date_inscription = models.DateField(verbose_name="Date d'inscription", blank=True, null=True)
     type_derogation = models.PositiveSmallIntegerField(verbose_name="Type de dérogation", choices=TYPE_DEROGATION, blank=True, null=True)
-    numero_contrat_anterieur = models.CharField(verbose_name="Numéro du contrat précédent", max_length=8, blank=True, null=True)
+    numero_contrat_anterieur = models.CharField(verbose_name="Numéro du contrat précédent", max_length=20, blank=True, null=True)
     date_embauche = models.DateField(verbose_name="Date d'embauche", blank=True, null=True, help_text="C'est la date à laquelle est conclu le contrat de travail par les deux parties. Cette date peut être différente de la date de début de contrat.")
     date_debut_contrat = models.DateField(verbose_name="Date de début du contrat", blank=True, null=True)
     date_effet_avenant = models.DateField(verbose_name="Date d'effet de l'avenant", blank=True, null=True,help_text="S'il s'agit d'un avenant à un contrat existant, vous devez en indiquer la date d'entrée en vigueur.")

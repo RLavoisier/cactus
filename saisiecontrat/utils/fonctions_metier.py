@@ -80,6 +80,8 @@ class PeriodesFormationManager(object):
         """
         Cette méthode calcul l'ensemble des années de formation
         """
+        if not self.date_naissance_alternant:
+            return None
 
         date_debut_annee = self.date_debut_contrat + relativedelta(years=annee_formation)
 

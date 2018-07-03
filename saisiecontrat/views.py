@@ -78,8 +78,8 @@ def creationcontrat(request):
                 nouveaucontrat.type_contrat_avenant = request.POST['type_contrat_avenant']
                 nouveaucontrat.mode_contractuel = request.POST['mode_contractuel']
                 nouveaucontrat.numero_contrat_anterieur = request.POST['numero_contrat_anterieur']
-                if request.POST['date_effet_avenant']:
-                    nouveaucontrat.date_effet_avenant = request.POST['date_effet_avenant']
+                if form.cleaned_data['date_effet_avenant']:
+                    nouveaucontrat.date_effet_avenant = form.cleaned_data['date_effet_avenant']
 
                 nouveaucontrat.save()
 

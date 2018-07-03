@@ -181,30 +181,33 @@ class CreationEntrepriseForm(LocalizedModelForm):
 
         if siret is None:
             raise forms.ValidationError("Le SIRET doit être renseigné.")
-        else:
-            S=0
-            if len(siret) == 14:
-                for i in range(0, 14):
-                    if divmod(i, 2)[1] == 0:
-                        if int(siret[i]) < 5:
-                            S += int(siret[i]) * 2
-                            #print(int(siret[i]) * 2)
-                        else:
-                            S += int(siret[i]) * 2 - 9
-                            #print(int(siret[i]) * 2 - 9)
+
+        if not siret.isdigit():
+            raise forms.ValidationError("Le SIRET doit comporter uniquement des chiffres.")
+
+        S=0
+        if len(siret) == 14:
+            for i in range(0, 14):
+                if divmod(i, 2)[1] == 0:
+                    if int(siret[i]) < 5:
+                        S += int(siret[i]) * 2
+                        #print(int(siret[i]) * 2)
                     else:
-                        S += int(siret[i])
-                        #print(int(siret[i]))
-
-                #print(S)
-
-                # Le code SIREN 356000000 est celui de la poste dont le modulo de S est fait par 5 et non 10
-                if (siret[0:9]=="356000000" and divmod(S,5)[1] == 0) or (siret[0:9]!="356000000" and divmod(S,10)[1] == 0):
-                    return siret
+                        S += int(siret[i]) * 2 - 9
+                        #print(int(siret[i]) * 2 - 9)
                 else:
-                    raise forms.ValidationError("Le SIRET n'est pas valide.")
+                    S += int(siret[i])
+                    #print(int(siret[i]))
+
+            #print(S)
+
+            # Le code SIREN 356000000 est celui de la poste dont le modulo de S est fait par 5 et non 10
+            if (siret[0:9]=="356000000" and divmod(S,5)[1] == 0) or (siret[0:9]!="356000000" and divmod(S,10)[1] == 0):
+                return siret
             else:
-                raise forms.ValidationError("Le SIRET doit comporter 14 caractères numériques.")
+                raise forms.ValidationError("Le SIRET n'est pas valide.")
+        else:
+            raise forms.ValidationError("Le SIRET doit comporter 14 caractères numériques.")
 
     def clean_code_APE(self):
 
