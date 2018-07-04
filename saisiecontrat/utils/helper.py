@@ -937,25 +937,92 @@ def creerexporttotal(request, email_livraison):
                 alternant = None
 
             if alternant:
-                enr.append(alternant.user.email)
-                enr.append(alternant.nom)
-                enr.append(alternant.prenom)
-                enr.append(alternant.sexe)
-                enr.append(alternant.date_naissance.strftime('%d/%m/%Y'))
-                enr.append(alternant.numero_departement_naissance)
-                enr.append(alternant.commune_naissance)
-                enr.append("%s %s" % (alternant.adresse_numero, alternant.adresse_voie))
-                enr.append(alternant.code_postal)
-                enr.append(alternant.ville)
-                enr.append(alternant.telephone)
+                if alternant.user.email:
+                    enr.append(alternant.user.email)
+                else:
+                    enr.append("")
+                if alternant.nom:
+                    enr.append(alternant.nom)
+                else:
+                    enr.append("")
+                if alternant.prenom:
+                    enr.append(alternant.prenom)
+                else:
+                    enr.append("")
+                if alternant.sexe:
+                    enr.append(alternant.sexe)
+                else:
+                    enr.append("")
+                if alternant.date_naissance:
+                    enr.append(alternant.date_naissance.strftime('%d/%m/%Y'))
+                else:
+                    enr.append("")
+                if alternant.numero_departement_naissance:
+                    enr.append(alternant.numero_departement_naissance)
+                else:
+                    enr.append("")
+                if alternant.commune_naissance:
+                    enr.append(alternant.commune_naissance)
+                else:
+                    enr.append("")
+
+                if alternant.adresse_numero:
+                    if alternant.adresse_voie:
+                        enr.append("%s %s" % (alternant.adresse_numero, alternant.adresse_voie))
+                    else:
+                        enr.append("%s" % (alternant.adresse_numero))
+                else:
+                    if alternant.adresse_voie:
+                        enr.append("%s" % (alternant.adresse_voie))
+                    else:
+                        enr.append("")
+
+                if alternant.code_postal:
+                    enr.append(alternant.code_postal)
+                else:
+                    enr.append("")
+
+                if alternant.ville:
+                    enr.append(alternant.ville)
+                else:
+                    enr.append("")
+
+                if alternant.telephone:
+                    enr.append(alternant.telephone)
+                else:
+                    enr.append("")
+
                 enr.append(alternant.handicape)
-                enr.append(alternant.nationalite)
-                enr.append(alternant.regime_social)
-                enr.append(alternant.situation_avant_contrat)
-                enr.append(alternant.dernier_diplome_prepare)
-                enr.append(alternant.derniere_annee_suivie)
-                enr.append(alternant.intitule_dernier_diplome_prepare)
-                enr.append(alternant.diplome_le_plus_eleve)
+
+                if alternant.nationalite:
+                    enr.append(alternant.nationalite)
+                else:
+                    enr.append("")
+                if alternant.regime_social:
+                    enr.append(alternant.regime_social)
+                else:
+                    enr.append("")
+                if alternant.situation_avant_contrat:
+                    enr.append(alternant.situation_avant_contrat)
+                else:
+                    enr.append("")
+                if alternant.dernier_diplome_prepare:
+                    enr.append(alternant.dernier_diplome_prepare)
+                else:
+                    enr.append("")
+                if alternant.derniere_annee_suivie:
+                    enr.append(alternant.derniere_annee_suivie)
+                else:
+                    enr.append("")
+                if alternant.intitule_dernier_diplome_prepare:
+                    enr.append(alternant.intitule_dernier_diplome_prepare)
+                else:
+                    enr.append("")
+                if alternant.diplome_le_plus_eleve:
+                    enr.append(alternant.diplome_le_plus_eleve)
+                else:
+                    enr.append("")
+
                 if alternant.civilite_representant == 1 or alternant.civilite_representant == 2:
                     enr.append(alternant.civilite_representant)
                 else:
@@ -1185,13 +1252,20 @@ def creerexporttotal(request, email_livraison):
             else:
                 enr.append("")
 
-            enr.append(contrat.date_debut_contrat.strftime('%d/%m/%Y'))
+            if contrat.date_debut_contrat:
+                enr.append(contrat.date_debut_contrat.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
+
             if contrat.date_effet_avenant:
                 enr.append(contrat.date_effet_avenant.strftime('%d/%m/%Y'))
             else:
                 enr.append("")
 
-            enr.append(contrat.date_fin_contrat.strftime('%d/%m/%Y'))
+            if contrat.date_fin_contrat:
+                enr.append(contrat.date_fin_contrat.strftime('%d/%m/%Y'))
+            else:
+                enr.append("")
 
             if contrat.duree_hebdomadaire_travail_heures:
                 enr.append(contrat.duree_hebdomadaire_travail_heures)
