@@ -803,7 +803,9 @@ def creerexporttotal(request, email_livraison):
 
         c = csv.writer(f, delimiter=";")
 
-        c.writerow(["MailApp",
+        c.writerow(["Id",
+                    "ContratCourant",
+                    "MailApp",
                     "NomApp",
                     "PrénomApp",
                     "SexeApp",
@@ -935,6 +937,9 @@ def creerexporttotal(request, email_livraison):
                 alternant = contrat.alternant
             except ObjectDoesNotExist:
                 alternant = None
+
+            enr.append(contrat.id)
+            enr.append(contrat.contrat_courant)
 
             if alternant:
                 if alternant.user.email:
@@ -1107,7 +1112,7 @@ def creerexporttotal(request, email_livraison):
                     enr.append("")
             else:
                 i = 1
-                while i < 17:
+                while i < 18:
                     enr.append("")
                     i+=1
 
@@ -1231,7 +1236,7 @@ def creerexporttotal(request, email_livraison):
                 enr.append(formation.referent_GU)
             else:
                 i = 1
-                while i < 12:
+                while i < 13:
                     enr.append("")
                     i+=1
 
