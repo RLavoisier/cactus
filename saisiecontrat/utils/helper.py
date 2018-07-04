@@ -931,120 +931,151 @@ def creerexporttotal(request, email_livraison):
 
             enr=[]
 
-            alternant=contrat.alternant
-            entreprise = contrat.entreprise
-            maitreapprentissage1 = Personnel.objects.get(entreprise=entreprise,role=2)
-            formation = contrat.formation
+            try:
+                alternant = contrat.alternant
+            except ObjectDoesNotExist:
+                alternant = None
 
-            enr.append(alternant.user.email)
-            enr.append(alternant.nom)
-            enr.append(alternant.prenom)
-            enr.append(alternant.sexe)
-            enr.append(alternant.date_naissance.strftime('%d/%m/%Y'))
-            enr.append(alternant.numero_departement_naissance)
-            enr.append(alternant.commune_naissance)
-            enr.append("%s %s" % (alternant.adresse_numero, alternant.adresse_voie))
-            enr.append(alternant.code_postal)
-            enr.append(alternant.ville)
-            enr.append(alternant.telephone)
-            enr.append(alternant.handicape)
-            enr.append(alternant.nationalite)
-            enr.append(alternant.regime_social)
-            enr.append(alternant.situation_avant_contrat)
-            enr.append(alternant.dernier_diplome_prepare)
-            enr.append(alternant.derniere_annee_suivie)
-            enr.append(alternant.intitule_dernier_diplome_prepare)
-            enr.append(alternant.diplome_le_plus_eleve)
-            if alternant.civilite_representant == 1 or alternant.civilite_representant == 2:
-                enr.append(alternant.civilite_representant)
-            else:
-                enr.append("")
-            if alternant.nom_representant:
-                enr.append(alternant.nom_representant)
-            else:
-                enr.append("")
-            if alternant.prenom_representant:
-                enr.append(alternant.prenom_representant)
-            else:
-                enr.append("")
+            if alternant:
+                enr.append(alternant.user.email)
+                enr.append(alternant.nom)
+                enr.append(alternant.prenom)
+                enr.append(alternant.sexe)
+                enr.append(alternant.date_naissance.strftime('%d/%m/%Y'))
+                enr.append(alternant.numero_departement_naissance)
+                enr.append(alternant.commune_naissance)
+                enr.append("%s %s" % (alternant.adresse_numero, alternant.adresse_voie))
+                enr.append(alternant.code_postal)
+                enr.append(alternant.ville)
+                enr.append(alternant.telephone)
+                enr.append(alternant.handicape)
+                enr.append(alternant.nationalite)
+                enr.append(alternant.regime_social)
+                enr.append(alternant.situation_avant_contrat)
+                enr.append(alternant.dernier_diplome_prepare)
+                enr.append(alternant.derniere_annee_suivie)
+                enr.append(alternant.intitule_dernier_diplome_prepare)
+                enr.append(alternant.diplome_le_plus_eleve)
+                if alternant.civilite_representant == 1 or alternant.civilite_representant == 2:
+                    enr.append(alternant.civilite_representant)
+                else:
+                    enr.append("")
+                if alternant.nom_representant:
+                    enr.append(alternant.nom_representant)
+                else:
+                    enr.append("")
+                if alternant.prenom_representant:
+                    enr.append(alternant.prenom_representant)
+                else:
+                    enr.append("")
 
-            if alternant.adresse_numero_representant:
-                if alternant.adresse_voie_representant:
-                    enr.append("%s %s" % (alternant.adresse_numero_representant, alternant.adresse_voie_representant))
+                if alternant.adresse_numero_representant:
+                    if alternant.adresse_voie_representant:
+                        enr.append("%s %s" % (alternant.adresse_numero_representant, alternant.adresse_voie_representant))
+                    else:
+                        enr.append("")
+                else:
+                    if alternant.adresse_voie_representant:
+                        enr.append(alternant.adresse_voie_representant)
+                    else:
+                        enr.append("")
+                if alternant.code_postal_representant:
+                    enr.append(alternant.code_postal_representant)
+                else:
+                    enr.append("")
+                if alternant.ville_representant:
+                    enr.append(alternant.ville_representant)
                 else:
                     enr.append("")
             else:
-                if alternant.adresse_voie_representant:
-                    enr.append(alternant.adresse_voie_representant)
+                i = 1
+                while i < 26:
+                    enr.append("")
+                    i+=1
+
+            try:
+                entreprise = contrat.entreprise
+            except ObjectDoesNotExist:
+                entreprise = None
+
+            if entreprise:
+
+                enr.append(entreprise.raison_sociale)
+                enr.append(entreprise.numero_SIRET)
+                if entreprise.adresse_numero:
+                    enr.append("%s %s" % (entreprise.adresse_numero, entreprise.adresse_voie))
+                else:
+                    enr.append(entreprise.adresse_voie)
+                if entreprise.adresse_complement:
+                    enr.append(entreprise.adresse_complement)
                 else:
                     enr.append("")
-            if alternant.code_postal_representant:
-                enr.append(alternant.code_postal_representant)
+                enr.append(entreprise.code_postal)
+                enr.append(entreprise.ville)
+                enr.append(entreprise.type_employeur)
+                enr.append(entreprise.secteur_employeur)
+                enr.append(entreprise.employeur_specifique)
+                enr.append(entreprise.code_APE)
+                enr.append(entreprise.effectif_entreprise)
+                enr.append(entreprise.telephone)
+                if entreprise.telecopie:
+                    enr.append(entreprise.telecopie)
+                else:
+                    enr.append("")
+                if entreprise.courriel:
+                    enr.append(entreprise.courriel)
+                else:
+                    enr.append("")
+                if entreprise.libelle_convention_collective:
+                    enr.append(entreprise.libelle_convention_collective)
+                else:
+                    enr.append("")
+                if entreprise.code_convention_collective:
+                    enr.append(entreprise.code_convention_collective)
+                else:
+                    enr.append("")
+                if entreprise.adhesion_regime_assurance_chomage:
+                    enr.append(entreprise.adhesion_regime_assurance_chomage)
+                else:
+                    enr.append("")
             else:
-                enr.append("")
-            if alternant.ville_representant:
-                enr.append(alternant.ville_representant)
-            else:
-                enr.append("")
+                i = 1
+                while i < 17:
+                    enr.append("")
+                    i+=1
 
-            enr.append(entreprise.raison_sociale)
-            enr.append(entreprise.numero_SIRET)
-            if entreprise.adresse_numero:
-                enr.append("%s %s" % (entreprise.adresse_numero, entreprise.adresse_voie))
-            else:
-                enr.append(entreprise.adresse_voie)
-            if entreprise.adresse_complement:
-                enr.append(entreprise.adresse_complement)
-            else:
-                enr.append("")
-            enr.append(entreprise.code_postal)
-            enr.append(entreprise.ville)
-            enr.append(entreprise.type_employeur)
-            enr.append(entreprise.secteur_employeur)
-            enr.append(entreprise.employeur_specifique)
-            enr.append(entreprise.code_APE)
-            enr.append(entreprise.effectif_entreprise)
-            enr.append(entreprise.telephone)
-            if entreprise.telecopie:
-                enr.append(entreprise.telecopie)
-            else:
-                enr.append("")
-            if entreprise.courriel:
-                enr.append(entreprise.courriel)
-            else:
-                enr.append("")
-            if entreprise.libelle_convention_collective:
-                enr.append(entreprise.libelle_convention_collective)
-            else:
-                enr.append("")
-            if entreprise.code_convention_collective:
-                enr.append(entreprise.code_convention_collective)
-            else:
-                enr.append("")
-            if entreprise.adhesion_regime_assurance_chomage:
-                enr.append(entreprise.adhesion_regime_assurance_chomage)
-            else:
-                enr.append("")
+            try:
+                maitreapprentissage1 = Personnel.objects.get(entreprise=entreprise,role=2)
+            except ObjectDoesNotExist:
+                maitreapprentissage1 = None
 
-            if maitreapprentissage1.civilite:
-                enr.append(maitreapprentissage1.civilite)
+            if maitreapprentissage1:
+                if maitreapprentissage1.civilite:
+                    enr.append(maitreapprentissage1.civilite)
+                else:
+                    enr.append("")
+
+                if maitreapprentissage1.nom:
+                    enr.append(maitreapprentissage1.nom)
+                else:
+                    enr.append("")
+                if maitreapprentissage1.prenom:
+                    enr.append(maitreapprentissage1.prenom)
+                else:
+                    enr.append("")
+                if maitreapprentissage1.courriel:
+                    enr.append(maitreapprentissage1.courriel)
+                else:
+                    enr.append("")
+                if maitreapprentissage1.date_naissance:
+                    enr.append(maitreapprentissage1.date_naissance.strftime('%d/%m/%Y'))
+                else:
+                    enr.append("")
             else:
                 enr.append("")
-            if maitreapprentissage1.nom:
-                enr.append(maitreapprentissage1.nom)
-            else:
                 enr.append("")
-            if maitreapprentissage1.prenom:
-                enr.append(maitreapprentissage1.prenom)
-            else:
                 enr.append("")
-            if maitreapprentissage1.courriel:
-                enr.append(maitreapprentissage1.courriel)
-            else:
                 enr.append("")
-            if maitreapprentissage1.date_naissance:
-                enr.append(maitreapprentissage1.date_naissance.strftime('%d/%m/%Y'))
-            else:
                 enr.append("")
 
             try:
@@ -1113,18 +1144,29 @@ def creerexporttotal(request, email_livraison):
                 enr.append("")
                 enr.append("")
 
-            enr.append(formation.code_formation)
-            enr.append(formation.intitule_formation)
-            enr.append(formation.ville)
-            enr.append(formation.specialite)
-            enr.append(formation.diplome)
-            enr.append(formation.intitule_diplome)
-            enr.append(formation.code_diplome_apprentissage)
-            enr.append(formation.niveau)
-            enr.append(formation.nombre_annees)
-            enr.append(formation.raf)
-            enr.append(formation.code_acces)
-            enr.append(formation.referent_GU)
+            try:
+                formation = contrat.formation
+            except ObjectDoesNotExist:
+                formation = None
+
+            if formation:
+                enr.append(formation.code_formation)
+                enr.append(formation.intitule_formation)
+                enr.append(formation.ville)
+                enr.append(formation.specialite)
+                enr.append(formation.diplome)
+                enr.append(formation.intitule_diplome)
+                enr.append(formation.code_diplome_apprentissage)
+                enr.append(formation.niveau)
+                enr.append(formation.nombre_annees)
+                enr.append(formation.raf)
+                enr.append(formation.code_acces)
+                enr.append(formation.referent_GU)
+            else:
+                i = 1
+                while i < 12:
+                    enr.append("")
+                    i+=1
 
             enr.append(contrat.mode_contractuel)
             enr.append(contrat.type_contrat_avenant)
@@ -1716,7 +1758,3 @@ def creerCERFA(request, aplatir):
     nomfichier = PDFGenerator.generate_cerfa_pdf_with_datas(filename, data, flatten=aplatir)
 
     return nomfichier
-
-
-
-
