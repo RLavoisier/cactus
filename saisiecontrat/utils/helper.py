@@ -1687,7 +1687,7 @@ def creerCERFA(request, aplatir):
     if contrat.an_4_per_2_taux is not None:
         data["contrat_remu_annee4_taux2"] = str(contrat.an_4_per_2_taux)
 
-    if contrat.an_1_per_1_du is not None:
+    if contrat.an_1_per_2_du is not None:
         data["contrat_remu_annee1_du2_jour"] = str(contrat.an_1_per_2_du.day).zfill(2)
         data["contrat_remu_annee1_du2_mois"] = str(contrat.an_1_per_2_du.month).zfill(2)
         data["contrat_remu_annee1_du2_annee"] = contrat.an_1_per_2_du.year
