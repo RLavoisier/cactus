@@ -153,7 +153,12 @@ class RecupererAnneesFormations(View):
         contrat  = alternant.get_contrat_courant()
         formation = contrat.formation
 
-        nb_annee = contrat.nombre_annees or formation.nombre_annees
+        # Prévue initialement, la gestion d'un nombre d'années personnalisé n'a pas été maintenue (problème de dates)
+        # seul le nombre_annees de la formation est utilisé
+        #if contrat.nombre_annees:
+        #    nb_annee = contrat.nombre_annees
+        #else:
+        nb_annee = formation.nombre_annees
 
         # Calcul des années
         pm = PeriodesFormationManager(alternant.date_naissance,

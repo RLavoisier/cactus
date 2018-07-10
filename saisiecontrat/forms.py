@@ -386,7 +386,7 @@ class CreationAlternantForm(LocalizedModelForm):
         if nom is None:
             raise forms.ValidationError("Le nom doit être renseigné.")
         else:
-            return nom
+            return nom.upper()
 
     def clean_prenom(self):
 
@@ -449,7 +449,7 @@ class CreationAlternantForm(LocalizedModelForm):
         if ville is None:
             raise forms.ValidationError("La ville doit être renseignée.")
         else:
-            return ville
+            return ville.upper()
 
     def clean_telephone(self):
 

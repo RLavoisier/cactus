@@ -81,7 +81,7 @@ def creerfichemission(request,alternant_hash):
     context["alternant"] = alternant
     context["formation"] = formation
 
-    contrats = Contrat.objects.filter(formation=formation, avis_raf=1)
+    contrats = Contrat.objects.filter(formation=formation, avis_raf=1, contrat_courant=True)
     alternants = [c.alternant for c in contrats]
 
     context["alternants"] = alternants
@@ -121,8 +121,9 @@ def creerfichemission(request,alternant_hash):
 def creerrecapinscriptions(request,formation_hash):
 
     formation = Formation.objects.get(hash=formation_hash)
-    contrats = Contrat.objects.filter(formation=formation)
-    alternants = [{"nom": c.alternant.nom, "prenom": c.alternant.prenom, "hash": c.alternant.hash, "avis_raf": c.avis_raf} for c in contrats]
+    contrats = Contrat.objects.filter(formation=formation, contrat_courant=True)
+    #alternants = [{"nom": c.alternant.nom, "prenom": c.alternant.prenom, "hash": c.alternant.hash, "avis_raf": c.avis_raf} for c in contrats]
+    alternants = sorted([{"nom": c.alternant.nom, "prenom": c.alternant.prenom, "hash": c.alternant.hash, "avis_raf": c.avis_raf} for c in contrats], key=lambda a: a["nom"])
 
     context={}
 
