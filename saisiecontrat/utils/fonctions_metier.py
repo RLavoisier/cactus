@@ -109,9 +109,13 @@ class PeriodesFormationManager(object):
                                          year=date_debut_annee.year + 1) - relativedelta(days=1)
         else:
             try:
+                # Vérification d'un saut d'année pour les anniversaire en décembre
+                year_to_add = 0
+                if self.date_naissance_alternant.year < date_debut_mois_suivant_ann.year:
+                    year_to_add = 1
                 date_fin_periode1 = datetime(day=date_debut_mois_suivant_ann.day,
                                              month=date_debut_mois_suivant_ann.month,
-                                             year=date_debut_annee.year) - relativedelta(days=1)
+                                             year=date_debut_annee.year + year_to_add) - relativedelta(days=1)
             except ValueError:
                 # gestion des alternant nés le 29 fevrier...
                 date_fin_periode1 = datetime(day=1,
