@@ -343,6 +343,7 @@ def create_alternant(request):
 
             alternant.nom = form.cleaned_data["nom"]
             alternant.prenom = form.cleaned_data["prenom"]
+            alternant.sexe = form.cleaned_data["sexe"]
             alternant.date_naissance = form.cleaned_data["date_naissance"]
             alternant.commune_naissance = form.cleaned_data["commune_naissance"]
             alternant.numero_departement_naissance = form.cleaned_data["numero_departement_naissance"]
