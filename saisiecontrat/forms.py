@@ -292,7 +292,7 @@ class CreationEntrepriseForm(LocalizedModelForm):
             if conventioncollective is None and libelle_convention_collective is None:
                 raise forms.ValidationError("La convention collective %s est inconnue, veuillez renseigner le libellé." % (code_convention_collective))
             else:
-                return libelle_convention_collective
+                return libelle_convention_collective[:200]
 
     def clean_nom_ma_1(self):
 
