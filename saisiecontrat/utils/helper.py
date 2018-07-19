@@ -123,13 +123,14 @@ def creerrecapinscriptions(request,formation_hash):
     formation = Formation.objects.get(hash=formation_hash)
     contrats = Contrat.objects.filter(formation=formation, contrat_courant=True)
     #alternants = [{"nom": c.alternant.nom, "prenom": c.alternant.prenom, "hash": c.alternant.hash, "avis_raf": c.avis_raf} for c in contrats]
-    alternants = sorted([{"nom": c.alternant.nom, "prenom": c.alternant.prenom, "hash": c.alternant.hash, "avis_raf": c.avis_raf} for c in contrats], key=lambda a: a["nom"])
+    alternants = sorted([{"nom": c.alternant.nom, "prenom": c.alternant.prenom, "hash": c.alternant.hash, "avis_raf": c.avis_raf} for c in contrats], key=lambda a: a["nom"] or '')
 
     context={}
 
     context["formation"] = formation
     context["alternants"] = alternants
     context["request"] = request
+
 
     msg_plain = render_to_string('recapinscriptions_raf.txt', context)
     msg_html = render_to_string('recapinscriptions_raf.html', context)
@@ -180,18 +181,18 @@ def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction
 
     if etat in [0,1,9]:
         if extraction == 9:
-            contrats = Contrat.objects.filter(avis_raf__in=liste_etat)
+            contrats = Contrat.objects.filter(contrat_courant=True, avis_raf__in=liste_etat)
         elif extraction == 0:
-            contrats = Contrat.objects.filter(avis_raf__in=liste_etat, date_exportation_CFA=None)
+            contrats = Contrat.objects.filter(contrat_courant=True, avis_raf__in=liste_etat, date_exportation_CFA=None)
         elif extraction == 1:
-            contrats = Contrat.objects.filter(avis_raf__in=liste_etat).exclude(date_exportation_CFA=None)
+            contrats = Contrat.objects.filter(contrat_courant=True, avis_raf__in=liste_etat).exclude(date_exportation_CFA=None)
     else:
         if extraction == 9:
-            contrats = Contrat.objects.filter(avis_raf__in=liste_etat, date_validation_raf__gte=date_du, date_validation_raf__lte=date_au)
+            contrats = Contrat.objects.filter(contrat_courant=True, avis_raf__in=liste_etat, date_validation_raf__gte=date_du, date_validation_raf__lte=date_au)
         elif extraction == 0:
-            contrats = Contrat.objects.filter(avis_raf__in=liste_etat, date_validation_raf__gte=date_du, date_validation_raf__lte=date_au,date_exportation_CFA=None)
+            contrats = Contrat.objects.filter(contrat_courant=True, avis_raf__in=liste_etat, date_validation_raf__gte=date_du, date_validation_raf__lte=date_au,date_exportation_CFA=None)
         elif extraction == 1:
-            contrats = Contrat.objects.filter(avis_raf__in=liste_etat, date_validation_raf__gte=date_du, date_validation_raf__lte=date_au).exclude(date_exportation_CFA=None)
+            contrats = Contrat.objects.filter(contrat_courant=True, avis_raf__in=liste_etat, date_validation_raf__gte=date_du, date_validation_raf__lte=date_au).exclude(date_exportation_CFA=None)
 
     # contrat = Contrat() crée l'objet sans save (si save on crée un nouvel objet donnée  si id=null)
 
@@ -320,7 +321,10 @@ def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction
             else:
                 enr.append("")
             # 7 AD1 JEUNE
-            enr.append("%s %s" % (alternant.adresse_numero, alternant.adresse_voie))
+            if alternant.adresse_numero:
+                if alternant.adresse_voie:
+                    enr.append("%s %s" % (alternant.adresse_numero, alternant.adresse_voie))
+
             # 8 AD2 JEUNE
             enr.append("")
             # 9 CP JEUNE
@@ -1487,7 +1491,7 @@ def creerCERFA(request, aplatir):
 
     # Recuperer les infos qui nous intéressent pour le pdf
 
-    print(request.user.email)
+    #print(request.user.email)
     alternant = Alternant.objects.get(user=request.user)
     contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
     entreprise = contrat.entreprise
