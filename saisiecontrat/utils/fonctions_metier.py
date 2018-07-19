@@ -80,6 +80,7 @@ class PeriodesFormationManager(object):
         """
         Cette méthode calcul l'ensemble des années de formation
         """
+        derniere_periode = False
         if not self.date_naissance_alternant:
             return None
 
@@ -123,6 +124,8 @@ class PeriodesFormationManager(object):
                                              year=date_debut_annee.year) - timedelta(days=1)
 
 
+
+
         # Calcul de l'âge de l'aternant
         age_alternant = self.__age_alternant_a_date(date_debut_annee)
 
@@ -131,24 +134,29 @@ class PeriodesFormationManager(object):
                                               annee_en_cours)
 
         # Création de la période
+        if date_fin_periode1 > self.date_fin_contrat:
+            date_fin_periode1 = self.date_fin_contrat
+            derniere_periode = True
         periode1 = Periode(date_debut_annee, date_fin_periode1,
                            taux=taux_minimum)
 
         # Calcul de la seconde période
-        taux_minimum = self.__get_minima_taux(age_alternant+1,
-                                              annee_en_cours)
+        if not derniere_periode:
+            taux_minimum = self.__get_minima_taux(age_alternant+1,
+                                                  annee_en_cours)
 
-        fin_periode_2 = date_fin_annee - timedelta(days=1)
+            fin_periode_2 = date_fin_annee - timedelta(days=1)
 
-        # Gestion de la fin de période supérieur à la date de fin de contrat
-        derniere_periode = False
-        if fin_periode_2 > self.date_fin_contrat:
-            fin_periode_2 = self.date_fin_contrat
-            derniere_periode = True
+            # Gestion de la fin de période supérieur à la date de fin de contrat
+            if fin_periode_2 > self.date_fin_contrat:
+                fin_periode_2 = self.date_fin_contrat
+                derniere_periode = True
 
-        periode2 = Periode(date_fin_periode1 + timedelta(days=1),
-                           fin_periode_2,
-                           taux=taux_minimum)
+            periode2 = Periode(date_fin_periode1 + timedelta(days=1),
+                               fin_periode_2,
+                               taux=taux_minimum)
+        else:
+            periode2 = None
 
         # Création de la période
         annee = AnneeFormation(periode1, periode2)
