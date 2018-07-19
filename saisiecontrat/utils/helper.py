@@ -101,7 +101,7 @@ def creerfichemission(request,alternant_hash):
     # Ajout du format html (https://docs.djangoproject.com/fr/2.0/topics/email/#sending-alternative-content-types)
     email.attach_alternative(msg_html, "text/html")
 
-    email.attsortedach_file(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
+    email.attach_file(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
 
     email.attach_file(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier2))
 
@@ -321,7 +321,10 @@ def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction
             else:
                 enr.append("")
             # 7 AD1 JEUNE
-            enr.append("%s %s" % (alternant.adresse_numero, alternant.adresse_voie))
+            if alternant.adresse_numero:
+                if alternant.adresse_voie:
+                    enr.append("%s %s" % (alternant.adresse_numero, alternant.adresse_voie))
+
             # 8 AD2 JEUNE
             enr.append("")
             # 9 CP JEUNE
