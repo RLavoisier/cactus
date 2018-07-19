@@ -101,7 +101,7 @@ def creerfichemission(request,alternant_hash):
     # Ajout du format html (https://docs.djangoproject.com/fr/2.0/topics/email/#sending-alternative-content-types)
     email.attach_alternative(msg_html, "text/html")
 
-    email.attach_file(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
+    email.attsortedach_file(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier))
 
     email.attach_file(os.path.join(settings.PDF_OUTPUT_DIR, nomfichier2))
 
@@ -1488,7 +1488,7 @@ def creerCERFA(request, aplatir):
 
     # Recuperer les infos qui nous intéressent pour le pdf
 
-    print(request.user.email)
+    #print(request.user.email)
     alternant = Alternant.objects.get(user=request.user)
     contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
     entreprise = contrat.entreprise
