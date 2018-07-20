@@ -814,7 +814,8 @@ class telechargerCERFA(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
 
-        nomfichier = creerCERFA(request, True)
+
+        nomfichier = creerCERFA(request.user.alternant, True)
 
         filepath = os.path.join(settings.PDF_OUTPUT_DIR, nomfichier)
 
