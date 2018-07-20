@@ -127,7 +127,7 @@ def creerrecapinscriptions(request,formation_hash):
 
     context={}
 
-    context["formation"] = formationgit
+    context["formation"] = formation
     context["alternants"] = alternants
     context["request"] = request
 
