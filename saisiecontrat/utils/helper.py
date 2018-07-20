@@ -74,7 +74,7 @@ def creerfichemission(request,alternant_hash):
 
     # Génération du CERFA non aplati
 
-    nomfichier2 = creerCERFA(request, False)
+    nomfichier2 = creerCERFA(alternant, False)
 
     context={}
 
@@ -300,7 +300,7 @@ def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction
             else:
                 enr.append("Mr")
             #2 NOM JEUNE
-            enr.append(alternant.nom)
+            enr.append(alternant.nom.upper())
             #3 PRENOM JEUNE
             enr.append(alternant.prenom)
             # 4 CIV REP LEG
@@ -320,17 +320,31 @@ def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction
                 enr.append(alternant.prenom_representant)
             else:
                 enr.append("")
-            # 7 AD1 JEUNE
+
             if alternant.adresse_numero:
                 if alternant.adresse_voie:
-                    enr.append("%s %s" % (alternant.adresse_numero, alternant.adresse_voie))
+                    adresse = "%s %s" % (alternant.adresse_numero, alternant.adresse_voie)
+                else:
+                    adresse = "%s" % (alternant.adresse_numero)
+            else:
+                if alternant.adresse_voie:
+                    adresse = "%s" % (alternant.adresse_voie)
+                else:
+                    adresse = ""
 
+            # 7 AD1 JEUNE
             # 8 AD2 JEUNE
-            enr.append("")
+            if len(adresse) > 38:
+                enr.append(adresse[:38])
+                enr.append(adresse[38:])
+            else:
+                enr.append(adresse)
+                enr.append("")
+
             # 9 CP JEUNE
             enr.append(alternant.code_postal)
             # 10 VILLE JEUNE
-            enr.append(alternant.ville)
+            enr.append(alternant.ville.upper())
             # 11 DISTANCE
             enr.append("0")
             # 12 TEL JEUNE
@@ -419,19 +433,36 @@ def creerexportypareo(request,email_livraison,aaaammjj_du,aaaammjj_au,extraction
             # 32 PRENOM REP
             enr.append("")
             # 33 ADR 1 ENT
+
             if entreprise.adresse_numero:
-                enr.append("%s %s" % (entreprise.adresse_numero, entreprise.adresse_voie))
+                if entreprise.adresse_voie:
+                    adresse = "%s %s" % (entreprise.adresse_numero, entreprise.adresse_voie)
+                else:
+                    adresse = "%s" % (entreprise.adresse_numero)
             else:
-                enr.append(entreprise.adresse_voie)
+                if entreprise.adresse_voie:
+                    adresse = "%s" % (entreprise.adresse_voie)
+                else:
+                    adresse = ""
+
             # 34 ADR2 ENT
             if entreprise.adresse_complement:
-                enr.append(entreprise.adresse_complement)
+                adresse2 = entreprise.adresse_complement
             else:
-                enr.append("")
+                adresse2 = ""
+
+            if len(adresse) > 38:
+                enr.append(adresse[:38])
+                adresse3 = "%s %s" % (adresse[38:], adresse2)
+                enr.append(adresse3[:38])
+            else:
+                enr.append(adresse)
+                enr.append(adresse2[:38])
+
             # 35 CP ENT
             enr.append(entreprise.code_postal)
             # 36 VILLE ENT
-            enr.append(entreprise.ville)
+            enr.append(entreprise.ville.upper())
             # 37 TEL ENT
             enr.append(entreprise.telephone)
             # 38 FAX ENT
@@ -1487,12 +1518,13 @@ def creerexporttotal(request, email_livraison):
         pass
 
 
-def creerCERFA(request, aplatir):
+def creerCERFA(alternant, aplatir):
 
     # Recuperer les infos qui nous intéressent pour le pdf
 
     #print(request.user.email)
-    alternant = Alternant.objects.get(user=request.user)
+    #alternant = Alternant.objects.get(user=request.user)
+
     contrat = Contrat.objects.get(alternant=alternant, contrat_courant=True)
     entreprise = contrat.entreprise
     formation = contrat.formation
@@ -1546,7 +1578,7 @@ def creerCERFA(request, aplatir):
     data["emp_adh_chomage"] = entreprise.adhesion_regime_assurance_chomage
 
     data["alt_nom"] = "%s %s" % (alternant.nom.upper(), alternant.prenom.upper())
-    data["alt_mail1"] = request.user.email
+    data["alt_mail1"] = alternant.user.email
     data["alt_tel"] = alternant.telephone
     data["alt_adr_ville"] = alternant.ville
     data["alt_adr_cp"] = alternant.code_postal
