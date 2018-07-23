@@ -283,16 +283,21 @@ class CreationEntrepriseForm(LocalizedModelForm):
         libelle_convention_collective = self.cleaned_data.get("libelle_convention_collective")
         code_convention_collective = self.cleaned_data.get("code_convention_collective")
 
-        if not code_convention_collective is None:
-            try:
-                conventioncollective = ConventionCollective.objects.get(code=self.cleaned_data.get("code_convention_collective"))
-            except ObjectDoesNotExist:
-                conventioncollective = None
+        if libelle_convention_collective:
+            return libelle_convention_collective[:200]
+        else:
+            if code_convention_collective:
+                try:
+                    conventioncollective = ConventionCollective.objects.get(code=self.cleaned_data.get("code_convention_collective"))
+                except ObjectDoesNotExist:
+                    conventioncollective = None
 
-            if conventioncollective is None and libelle_convention_collective is None:
-                raise forms.ValidationError("La convention collective %s est inconnue, veuillez renseigner le libellé." % (code_convention_collective))
+                if conventioncollective is None:
+                    raise forms.ValidationError("La convention collective %s est inconnue, veuillez renseigner le libellé." % (code_convention_collective))
+                else:
+                    return conventioncollective.libelle[:200]
             else:
-                return libelle_convention_collective[:200]
+                raise forms.ValidationError("En l'absence de code de convention collective le libellé doit être renseigné.")
 
     def clean_nom_ma_1(self):
 
