@@ -322,7 +322,7 @@ class CreationEntrepriseForm(LocalizedModelForm):
         date_naissance_ma_1 = self.cleaned_data["date_naissance_ma_1"]
 
         if date_naissance_ma_1 is None:
-            raise forms.ValidationError("La date de naissance du maître d'apprentissage doit être renseigné.")
+            raise forms.ValidationError("La date de naissance du maître d'apprentissage doit être renseignée.")
         else:
             return date_naissance_ma_1
 
@@ -333,6 +333,30 @@ class CreationEntrepriseForm(LocalizedModelForm):
             return True
         else:
             return False
+
+    def clean_prenom_ma_2(self):
+
+        nom_ma_2 = self.cleaned_data["nom_ma_2"]
+        prenom_ma_2 = self.cleaned_data["prenom_ma_2"]
+
+        print(nom_ma_2)
+        print(prenom_ma_2)
+        if nom_ma_2:
+            if not prenom_ma_2:
+                raise forms.ValidationError("Le prénom du maître d'apprentissage doit être renseigné.")
+            else:
+                return prenom_ma_2
+
+    def clean_date_naissance_ma_2(self):
+
+        nom_ma_2 = self.cleaned_data["nom_ma_2"]
+        date_naissance_ma_2 = self.cleaned_data["date_naissance_ma_2"]
+
+        if nom_ma_2:
+            if not date_naissance_ma_2:
+                raise forms.ValidationError("La date de naissance du maître d'apprentissage doit être renseignée.")
+            else:
+                return date_naissance_ma_2
 
 
 class CreationAlternantForm(LocalizedModelForm):

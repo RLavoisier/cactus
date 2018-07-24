@@ -211,7 +211,7 @@ def create_entreprise(request):
                 personnel.date_naissance = form.cleaned_data["date_naissance_ma_1"]
                 personnel.save()
 
-            if request.POST.get("nom_ma_2") is None:
+            if not request.POST.get("nom_ma_2") is None:
                 try:
                     personnel = Personnel.objects.get(entreprise=entreprise, role=3)
                 except ObjectDoesNotExist:
@@ -232,7 +232,7 @@ def create_entreprise(request):
                     personnel.date_naissance = form.cleaned_data["date_naissance_ma_2"]
                     personnel.save()
 
-            if request.POST.get("nom_contact") is None:
+            if not request.POST.get("nom_contact") is None:
                 try:
                     personnel = Personnel.objects.get(entreprise=entreprise, role=4)
                 except ObjectDoesNotExist:
@@ -250,7 +250,7 @@ def create_entreprise(request):
                     personnel.civilite = request.POST.get("civilite_contact")
                     personnel.nom = request.POST.get("nom_contact")
                     personnel.prenom = request.POST.get("prenom_contact")
-                    personnel.courriel_contact = request.POST.get("courriel_contact")
+                    personnel.courriel = request.POST.get("courriel_contact")
                     personnel.save()
 
             messages.add_message(request, messages.SUCCESS, "Les données de l'employeur ont été enregistrées.")
