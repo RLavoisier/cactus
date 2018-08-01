@@ -339,8 +339,9 @@ class CreationEntrepriseForm(LocalizedModelForm):
         nom_ma_2 = self.cleaned_data["nom_ma_2"]
         prenom_ma_2 = self.cleaned_data["prenom_ma_2"]
 
-        print(nom_ma_2)
-        print(prenom_ma_2)
+        #print(nom_ma_2)
+        #print(prenom_ma_2)
+
         if nom_ma_2:
             if not prenom_ma_2:
                 raise forms.ValidationError("Le prénom du maître d'apprentissage doit être renseigné.")

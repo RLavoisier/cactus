@@ -135,7 +135,7 @@ def creationcontrat(request):
 def create_entreprise(request):
 
     if not request.user.is_authenticated:
-        # Si l'utilisateur est authentifié, on le renvoi sur la page d'accueil
+        # Si l'utilisateur est authentifié, on le renvoie sur la page d'accueil
         return redirect("comptes:login")
 
     context = {}
@@ -211,11 +211,12 @@ def create_entreprise(request):
                 personnel.date_naissance = form.cleaned_data["date_naissance_ma_1"]
                 personnel.save()
 
-            if not request.POST.get("nom_ma_2") is None:
-                try:
-                    personnel = Personnel.objects.get(entreprise=entreprise, role=3)
-                except ObjectDoesNotExist:
-                    personnel = None
+            try:
+                personnel = Personnel.objects.get(entreprise=entreprise, role=3)
+            except ObjectDoesNotExist:
+                personnel = None
+
+            if request.POST.get("nom_ma_2"):
 
                 if personnel is None:
                     personnel = Personnel(entreprise=entreprise,
@@ -231,12 +232,16 @@ def create_entreprise(request):
                     personnel.prenom = request.POST.get("prenom_ma_2")
                     personnel.date_naissance = form.cleaned_data["date_naissance_ma_2"]
                     personnel.save()
+            else:
+                if personnel:
+                    personnel.delete()
+
+            try:
+                personnel = Personnel.objects.get(entreprise=entreprise, role=4)
+            except ObjectDoesNotExist:
+                personnel = None
 
             if not request.POST.get("nom_contact") is None:
-                try:
-                    personnel = Personnel.objects.get(entreprise=entreprise, role=4)
-                except ObjectDoesNotExist:
-                    personnel = None
 
                 if personnel is None:
                     personnel = Personnel(entreprise=entreprise,
@@ -252,14 +257,17 @@ def create_entreprise(request):
                     personnel.prenom = request.POST.get("prenom_contact")
                     personnel.courriel = request.POST.get("courriel_contact")
                     personnel.save()
+            else:
+                if personnel:
+                    personnel.delete()
 
             messages.add_message(request, messages.SUCCESS, "Les données de l'employeur ont été enregistrées.")
 
             request.session["entreprisecomplet"]=entreprise_complet(entreprise)
             request.session["accordvalide"] = (contrat.avis_raf == 2)
 
-            # le redirect affiche la page comme sur un GET celà revient à envoyer l'exécution à la ligne du else:*
-            # diu test if len(request.POST) > 0: (comme si on demandait l'affichait l'affichage
+            # le redirect affiche la page comme sur un GET cela revient à envoyer l'exécution à la ligne du else:*
+            # du test if len(request.POST) > 0: (comme si on demandait l'affichage)
             return redirect(reverse("creationentreprise"))
         else:
             context["form"] = form
