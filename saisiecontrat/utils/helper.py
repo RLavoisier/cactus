@@ -1635,9 +1635,10 @@ def creerCERFA(alternant, aplatir):
 
     if ma_2 is not None:
         data["maitre2_nom"] = "%s %s" % (ma_2.nom, ma_2.prenom)
-        data["maitre2_ddn_jour"] = str(ma_2.date_naissance.day).zfill(2)
-        data["maitre2_ddn_mois"] = str(ma_2.date_naissance.month).zfill(2)
-        data["maitre2_ddn_annee"] = ma_2.date_naissance.year
+        if ma_2.date_naissance:
+            data["maitre2_ddn_jour"] = str(ma_2.date_naissance.day).zfill(2)
+            data["maitre2_ddn_mois"] = str(ma_2.date_naissance.month).zfill(2)
+            data["maitre2_ddn_annee"] = ma_2.date_naissance.year
 
     if contrat.attestation_maitre_apprentissage:
         data["maitre_attestation"] = 1
