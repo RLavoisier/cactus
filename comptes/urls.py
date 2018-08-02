@@ -1,8 +1,8 @@
-from django.contrib.auth.views import LoginView, PasswordResetView, PasswordResetConfirmView
+from django.contrib.auth.views import LoginView, PasswordResetConfirmView
 from django.urls import path, include, reverse_lazy
 from django.contrib.auth import urls as auth_urls
 
-from comptes.views import UserSignupView, UserSignupOrLoginView
+from comptes.views import UserSignupView, UserSignupOrLoginView, PasswordResetView
 
 app_name = "comptes"
 
