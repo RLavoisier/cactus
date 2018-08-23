@@ -1769,9 +1769,9 @@ def creerCERFA(alternant, aplatir):
 
     if contrat.salaire_brut_mensuel is not None:
         entier = int(contrat.salaire_brut_mensuel)
-        decimal = contrat.salaire_brut_mensuel - entier
+        decimal = round((contrat.salaire_brut_mensuel - entier) * 100)
         data["contrat_salaire1"] = entier
-        data["contrat_salaire2"] = str(int(decimal)).zfill(2)
+        data["contrat_salaire2"] = str(decimal).zfill(2)
 
     if contrat.nourriture is not None:
         entier = int(contrat.nourriture)
