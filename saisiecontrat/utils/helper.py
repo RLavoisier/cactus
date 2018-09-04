@@ -1665,14 +1665,62 @@ def creerCERFA(alternant, aplatir):
     else:
         data["contrat_risques_non"] = 1
 
+
     if contrat.an_1_per_1_taux is not None:
-        data["contrat_remu_annee1_taux1"] = str(contrat.an_1_per_1_taux)
+        taux = contrat.an_1_per_1_taux
+        entier = int(taux)
+        decimal = round((taux - entier) * 100)
+        premieredecimale = int(decimal / 10)
+        deuxiemedecimale = decimal - premieredecimale * 10
+        if decimal == 0:
+            data["contrat_remu_annee1_taux1"] = str(entier)
+        else:
+            if deuxiemedecimale == 0:
+                data["contrat_remu_annee1_taux1"] = "%i.%i" % (entier, premieredecimale)
+            else:
+                data["contrat_remu_annee1_taux1"] = "%i.%i" % (entier, decimal)
+
     if contrat.an_2_per_1_taux is not None:
-        data["contrat_remu_annee2_taux1"] = str(contrat.an_2_per_1_taux)
+        taux = contrat.an_2_per_1_taux
+        entier = int(taux)
+        decimal = round((taux - entier) * 100)
+        premieredecimale = int(decimal / 10)
+        deuxiemedecimale = decimal - premieredecimale * 10
+        if decimal == 0:
+            data["contrat_remu_annee2_taux1"] = str(entier)
+        else:
+            if deuxiemedecimale == 0:
+                data["contrat_remu_annee2_taux1"] = "%i.%i" % (entier, premieredecimale)
+            else:
+                data["contrat_remu_annee2_taux1"] = "%i.%i" % (entier, decimal)
+
     if contrat.an_3_per_1_taux is not None:
-        data["contrat_remu_annee3_taux1"] = str(contrat.an_3_per_1_taux)
+        taux = contrat.an_3_per_1_taux
+        entier = int(taux)
+        decimal = round((taux - entier) * 100)
+        premieredecimale = int(decimal / 10)
+        deuxiemedecimale = decimal - premieredecimale * 10
+        if decimal == 0:
+            data["contrat_remu_annee3_taux1"] = str(entier)
+        else:
+            if deuxiemedecimale == 0:
+                data["contrat_remu_annee3_taux1"] = "%i.%i" % (entier, premieredecimale)
+            else:
+                data["contrat_remu_annee3_taux1"] = "%i.%i" % (entier, decimal)
+
     if contrat.an_4_per_1_taux is not None:
-        data["contrat_remu_annee4_taux1"] = str(contrat.an_4_per_1_taux)
+        taux = contrat.an_4_per_1_taux
+        entier = int(taux)
+        decimal = round((taux - entier) * 100)
+        premieredecimale = int(decimal / 10)
+        deuxiemedecimale = decimal - premieredecimale * 10
+        if decimal == 0:
+            data["contrat_remu_annee4_taux1"] = str(entier)
+        else:
+            if deuxiemedecimale == 0:
+                data["contrat_remu_annee4_taux1"] = "%i.%i" % (entier, premieredecimale)
+            else:
+                data["contrat_remu_annee4_taux1"] = "%i.%i" % (entier, decimal)
 
     if contrat.an_1_per_1_du is not None:
         data["contrat_remu_annee1_du1_jour"] = str(contrat.an_1_per_1_du.day).zfill(2)
@@ -1717,13 +1765,61 @@ def creerCERFA(alternant, aplatir):
         data["contrat_remu_annee4_ref1"] = Contrat.BASE[contrat.an_4_per_1_base - 1][1]
 
     if contrat.an_1_per_2_taux is not None:
-        data["contrat_remu_annee1_taux2"] = str(contrat.an_1_per_2_taux)
+        taux = contrat.an_1_per_2_taux
+        entier = int(taux)
+        decimal = round((taux - entier) * 100)
+        premieredecimale = int(decimal / 10)
+        deuxiemedecimale = decimal - premieredecimale * 10
+        if decimal == 0:
+            data["contrat_remu_annee1_taux2"] = str(entier)
+        else:
+            if deuxiemedecimale == 0:
+                data["contrat_remu_annee1_taux2"] = "%i.%i" % (entier, premieredecimale)
+            else:
+                data["contrat_remu_annee1_taux2"] = "%i.%i" % (entier, decimal)
+
     if contrat.an_2_per_2_taux is not None:
-        data["contrat_remu_annee2_taux2"] = str(contrat.an_2_per_2_taux)
+        taux = contrat.an_2_per_2_taux
+        entier = int(taux)
+        decimal = round((taux - entier) * 100)
+        premieredecimale = int(decimal / 10)
+        deuxiemedecimale = decimal - premieredecimale * 10
+        if decimal == 0:
+            data["contrat_remu_annee2_taux2"] = str(entier)
+        else:
+            if deuxiemedecimale == 0:
+                data["contrat_remu_annee2_taux2"] = "%i.%i" % (entier, premieredecimale)
+            else:
+                data["contrat_remu_annee2_taux2"] = "%i.%i" % (entier, decimal)
+
     if contrat.an_3_per_2_taux is not None:
-        data["contrat_remu_annee3_taux2"] = str(contrat.an_3_per_2_taux)
+        taux = contrat.an_3_per_2_taux
+        entier = int(taux)
+        decimal = round((taux - entier) * 100)
+        premieredecimale = int(decimal / 10)
+        deuxiemedecimale = decimal - premieredecimale * 10
+        if decimal == 0:
+            data["contrat_remu_annee3_taux2"] = str(entier)
+        else:
+            if deuxiemedecimale == 0:
+                data["contrat_remu_annee3_taux2"] = "%i.%i" % (entier, premieredecimale)
+            else:
+                data["contrat_remu_annee3_taux2"] = "%i.%i" % (entier, decimal)
+
     if contrat.an_4_per_2_taux is not None:
-        data["contrat_remu_annee4_taux2"] = str(contrat.an_4_per_2_taux)
+        taux = contrat.an_4_per_2_taux
+        entier = int(taux)
+        decimal = round((taux - entier) * 100)
+        premieredecimale = int(decimal / 10)
+        deuxiemedecimale = decimal - premieredecimale * 10
+        if decimal == 0:
+            data["contrat_remu_annee4_taux2"] = str(entier)
+        else:
+            if deuxiemedecimale == 0:
+                data["contrat_remu_annee4_taux2"] = "%i.%i" % (entier, premieredecimale)
+            else:
+                data["contrat_remu_annee4_taux2"] = "%i.%i" % (entier, decimal)
+
 
     if contrat.an_1_per_2_du is not None:
         data["contrat_remu_annee1_du2_jour"] = str(contrat.an_1_per_2_du.day).zfill(2)
