@@ -75,6 +75,7 @@ def creationcontrat(request):
                 nouveaucontrat = deepcopy(contrat)
 
                 nouveaucontrat.id=None
+                nouveaucontrat.avis_raf=0
                 nouveaucontrat.type_contrat_avenant = request.POST['type_contrat_avenant']
                 nouveaucontrat.mode_contractuel = request.POST['mode_contractuel']
                 nouveaucontrat.numero_contrat_anterieur = request.POST['numero_contrat_anterieur']

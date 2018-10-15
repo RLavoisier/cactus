@@ -295,7 +295,7 @@ class Entreprise(models.Model):
     secteur_employeur = models.PositiveSmallIntegerField(choices=SECTEUR_EMPLOYEUR, default=1)
     employeur_specifique = models.PositiveSmallIntegerField(verbose_name="Employeur spécifique", choices=EMPLOYEUR_SPECIFIQUE, default=0)
     code_APE = models.CharField(max_length=5, blank=True, null=True)
-    effectif_entreprise = models.PositiveSmallIntegerField(verbose_name="Effectif de l'entreprise", blank=True, null=True)
+    effectif_entreprise = models.PositiveIntegerField(verbose_name="Effectif de l'entreprise", blank=True, null=True)
     telephone = models.CharField(verbose_name="Téléphone", max_length=18, blank=True, null=True, help_text="Entrez le numéro de téléphone sans espace ni point")
     telecopie = models.CharField(verbose_name="Télécopie", max_length=18, blank=True, null=True,help_text="Entrez le numéro de télécopie sans espace ni point")
     courriel = models.CharField(max_length=40, blank=True, null=True)
